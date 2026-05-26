@@ -89,6 +89,24 @@ def get_installation_token(inst_id: int, app_jwt: str) -> str:
     return data["token"]
 
 
+def gh_api(endpoint: str, token: str) -> any:
+    """Installation token 인증이 필요한 엔드포인트 호출 (gh CLI 사용)."""
+    result = subprocess.run(
+        ["gh", "api", endpoint, "--paginate"],
+        env={**os.environ, "GH_TOKEN": token},
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    text = result.stdout.strip()
+    if text.startswith("["):
+        combined = []
+        for chunk in text.replace("][", "]\n[").split("\n"):
+            combined.extend(json.loads(chunk))
+        return combined
+    return json.loads(text)
+
+
 def get_repo_harness_config(full_name: str, token: str) -> dict | None:
     result = subprocess.run(
         ["gh", "api", f"/repos/{full_name}/contents/.harness/sync.yml"],
