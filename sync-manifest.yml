@@ -8,11 +8,6 @@ items:
     dest: .claude/skills/api-design/
     groups: [claude]
 
-  - id: claude/skills/code-review
-    src: .claude/skills/code-review/
-    dest: .claude/skills/code-review/
-    groups: [claude]
-
   - id: claude/skills/git-commit
     src: .claude/skills/git-commit/
     dest: .claude/skills/git-commit/
