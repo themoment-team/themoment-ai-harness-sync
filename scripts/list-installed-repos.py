@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """
-GitHub App이 설치된 모든 레포를 조회해서 BetaHuhn/repo-file-sync-action용
-sync.yml 내용을 stdout으로 출력합니다.
+GitHub App이 설치된 모든 레포를 installation 단위로 조회해서
+GitHub Actions matrix용 JSON을 stdout으로 출력합니다.
 
-각 레포 루트의 .harness-sync.yml을 읽어 동기화할 항목을 결정합니다.
+출력 형식:
+  [{"id": 12345, "config": "group:\n  - repos: |..."}, ...]
+
+각 레포 루트의 .harness/sync.yml을 읽어 동기화할 항목을 결정합니다.
 파일이 없으면 sync-manifest.yml의 defaults 그룹을 모두 적용합니다.
 
-.harness-sync.yml 형식:
+.harness/sync.yml 형식:
   groups:        # 포함할 그룹 (기본값: defaults 그룹 전체)
     - claude
     - codex
@@ -23,13 +26,14 @@ sync.yml 내용을 stdout으로 출력합니다.
 from __future__ import annotations
 
 import base64
+import io
 import json
 import os
 import subprocess
 import sys
 import time
-import urllib.request
 import urllib.error
+import urllib.request
 from collections import defaultdict
 from pathlib import Path
 
@@ -126,10 +130,6 @@ def resolve_files(
     manifest: dict,
     default_groups: list[str],
 ) -> list[tuple[str, str]]:
-    """
-    config: 대상 레포의 .harness-sync.yml 파싱 결과 (없으면 None)
-    반환: (src, dest) 튜플 리스트 (순서 보존, 중복 제거)
-    """
     all_items: dict[str, tuple[str, str]] = {
         item["id"]: (item["src"], item["dest"])
         for item in manifest["items"]
@@ -150,21 +150,40 @@ def resolve_files(
 
     selected: dict[str, tuple[str, str]] = {}
 
-    # 선택된 그룹에 속하는 항목 추가
     for item_id, groups in item_groups.items():
         if any(g in selected_groups for g in groups):
             selected[item_id] = all_items[item_id]
 
-    # exclude 적용
     for item_id in excludes:
         selected.pop(item_id, None)
 
-    # include 추가 (그룹에 없더라도 강제 포함)
     for item_id in includes:
         if item_id in all_items and item_id not in selected:
             selected[item_id] = all_items[item_id]
 
     return list(selected.values())
+
+
+def build_sync_config(repo_files: dict[str, list[tuple[str, str]]]) -> str:
+    """BetaHuhn/repo-file-sync-action용 YAML 설정 문자열을 생성합니다."""
+    if not repo_files:
+        return "group: []"
+
+    files_to_repos: dict[tuple, list[str]] = defaultdict(list)
+    for repo, files in repo_files.items():
+        files_to_repos[tuple(files)].append(repo)
+
+    buf = io.StringIO()
+    buf.write("group:\n")
+    for files_key, repos in files_to_repos.items():
+        buf.write("  - repos: |\n")
+        for repo in repos:
+            buf.write(f"      {repo}\n")
+        buf.write("    files:\n")
+        for src, dest in files_key:
+            buf.write(f"      - source: {src}\n")
+            buf.write(f"        dest: {dest}\n")
+    return buf.getvalue()
 
 
 def main():
@@ -185,8 +204,8 @@ def main():
     if not isinstance(installations, list):
         installations = [installations]
 
-    # repo full_name → resolved (src, dest) file list
-    repo_files: dict[str, list[tuple[str, str]]] = {}
+    # installation_id → {repo_full_name → file_list}
+    matrix: list[dict] = []
 
     for inst in installations:
         inst_id = inst["id"]
@@ -199,6 +218,7 @@ def main():
         data = gh_api("/installation/repositories", inst_token)
         repos = data if isinstance(data, list) else data.get("repositories", [])
 
+        repo_files: dict[str, list[tuple[str, str]]] = {}
         for repo in repos:
             full_name = repo["full_name"]
             if full_name == source_repo:
@@ -206,38 +226,20 @@ def main():
 
             config = get_repo_harness_config(full_name, inst_token)
             if config:
-                groups = config.get("groups", default_groups)
-                excludes = config.get("exclude", [])
-                includes = config.get("include", [])
                 print(
-                    f"  {full_name}: groups={groups} exclude={excludes} include={includes}",
+                    f"  [{inst_id}] {full_name}: groups={config.get('groups')} "
+                    f"exclude={config.get('exclude', [])} include={config.get('include', [])}",
                     file=sys.stderr,
                 )
             else:
-                print(f"  {full_name}: no config, using defaults={default_groups}", file=sys.stderr)
+                print(f"  [{inst_id}] {full_name}: no config, using defaults={default_groups}", file=sys.stderr)
 
             repo_files[full_name] = resolve_files(config, manifest, default_groups)
 
-    if not repo_files:
-        print("# No target repos found — check GitHub App installations", file=sys.stderr)
-        print("group: []")
-        return
+        if repo_files:
+            matrix.append({"id": inst_id, "config": build_sync_config(repo_files)})
 
-    # 동일한 파일 셋을 원하는 레포끼리 하나의 group 항목으로 묶음
-    files_to_repos: dict[tuple, list[str]] = defaultdict(list)
-    for repo, files in repo_files.items():
-        key = tuple(files)
-        files_to_repos[key].append(repo)
-
-    print("group:")
-    for files_key, repos in files_to_repos.items():
-        print("  - repos: |")
-        for repo in repos:
-            print(f"      {repo}")
-        print("    files:")
-        for src, dest in files_key:
-            print(f"      - source: {src}")
-            print(f"        dest: {dest}")
+    print(json.dumps(matrix))
 
 
 if __name__ == "__main__":
