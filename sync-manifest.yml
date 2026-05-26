@@ -106,11 +106,6 @@ items:
     dest: .agents/skills/api-design/
     groups: [codex]
 
-  - id: codex/skills/code-review
-    src: .agents/skills/code-review/
-    dest: .agents/skills/code-review/
-    groups: [codex]
-
   - id: codex/skills/git-commit
     src: .agents/skills/git-commit/
     dest: .agents/skills/git-commit/
