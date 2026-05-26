@@ -54,3 +54,4 @@ jobs:
           BRANCH_PREFIX: harness-sync
           COMMIT_PREFIX: "chore"
           PR_BODY: "themoment-ai-harness-sync에서 자동 동기화된 파일입니다."
+          DELETE_ORPHANED_FILES: true
