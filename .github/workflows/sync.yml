@@ -34,14 +34,14 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v6
-      - name: Generate token for installation ${{ matrix.installation.id }}
+      - name: Generate token for ${{ matrix.installation.repo }}
         id: app-token
         uses: tibdex/github-app-token@v2
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
           installation_retrieval_mode: id
-          installation_retrieval_payload: ${{ matrix.installation.id }}
+          installation_retrieval_payload: ${{ matrix.installation.inst_id }}
       - name: Write sync config
         run: echo '${{ matrix.installation.config }}' > /tmp/sync.yml
       - name: Show sync config
@@ -51,6 +51,18 @@ jobs:
           GH_INSTALLATION_TOKEN: ${{ steps.app-token.outputs.token }}
           CONFIG_PATH: /tmp/sync.yml
           PR_LABELS: harness-sync
-          BRANCH_PREFIX: harness-sync
+          BRANCH_PREFIX: ${{ matrix.installation.branch_prefix }}
           COMMIT_PREFIX: "chore"
           PR_BODY: "themoment-ai-harness-sync에서 자동 동기화된 파일입니다."
+      - name: Retarget open sync PRs to base branch
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          gh pr list \
+            --repo "${{ matrix.installation.repo }}" \
+            --state open \
+            --json number,headRefName \
+            --jq '.[] | select(.headRefName | startswith("${{ matrix.installation.branch_prefix }}/")) | .number' \
+          | xargs -r -I{} gh pr edit {} \
+              --repo "${{ matrix.installation.repo }}" \
+              --base "${{ matrix.installation.base_branch }}"

@@ -23,3 +23,7 @@ groups:
 # 그룹에 없어도 추가할 항목
 # include:
 #   - copilot/instructions
+
+# 동기화 PR 설정 (선택 — 생략하면 기본값 적용)
+# branch_prefix: harness-sync   # 기본값: harness-sync
+# base_branch: develop          # 기본값: 레포의 기본 브랜치 (main 또는 master)

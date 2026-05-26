@@ -164,25 +164,19 @@ def resolve_files(
     return list(selected.values())
 
 
-def build_sync_config(repo_files: dict[str, list[tuple[str, str]]]) -> str:
-    """BetaHuhn/repo-file-sync-action용 YAML 설정 문자열을 생성합니다."""
-    if not repo_files:
+def build_sync_config(full_name: str, files: list[tuple[str, str]]) -> str:
+    """BetaHuhn/repo-file-sync-action용 YAML 설정 문자열을 생성합니다 (레포 1개)."""
+    if not files:
         return "group: []"
-
-    files_to_repos: dict[tuple, list[str]] = defaultdict(list)
-    for repo, files in repo_files.items():
-        files_to_repos[tuple(files)].append(repo)
 
     buf = io.StringIO()
     buf.write("group:\n")
-    for files_key, repos in files_to_repos.items():
-        buf.write("  - repos: |\n")
-        for repo in repos:
-            buf.write(f"      {repo}\n")
-        buf.write("    files:\n")
-        for src, dest in files_key:
-            buf.write(f"      - source: {src}\n")
-            buf.write(f"        dest: {dest}\n")
+    buf.write("  - repos: |\n")
+    buf.write(f"      {full_name}\n")
+    buf.write("    files:\n")
+    for src, dest in files:
+        buf.write(f"      - source: {src}\n")
+        buf.write(f"        dest: {dest}\n")
     return buf.getvalue()
 
 
@@ -204,7 +198,7 @@ def main():
     if not isinstance(installations, list):
         installations = [installations]
 
-    # installation_id → {repo_full_name → file_list}
+    # 레포 단위 matrix (per-repo per-installation)
     matrix: list[dict] = []
 
     for inst in installations:
@@ -218,26 +212,43 @@ def main():
         data = gh_api("/installation/repositories", inst_token)
         repos = data if isinstance(data, list) else data.get("repositories", [])
 
-        repo_files: dict[str, list[tuple[str, str]]] = {}
         for repo in repos:
             full_name = repo["full_name"]
             if full_name == source_repo:
                 continue
 
+            default_branch = repo.get("default_branch", "main")
             config = get_repo_harness_config(full_name, inst_token)
+
+            branch_prefix = "harness-sync"
+            base_branch = default_branch
             if config:
+                branch_prefix = config.get("branch_prefix", "harness-sync")
+                base_branch = config.get("base_branch", default_branch)
                 print(
                     f"  [{inst_id}] {full_name}: groups={config.get('groups')} "
-                    f"exclude={config.get('exclude', [])} include={config.get('include', [])}",
+                    f"exclude={config.get('exclude', [])} include={config.get('include', [])} "
+                    f"branch_prefix={branch_prefix} base_branch={base_branch}",
                     file=sys.stderr,
                 )
             else:
-                print(f"  [{inst_id}] {full_name}: no config, using defaults={default_groups}", file=sys.stderr)
+                print(
+                    f"  [{inst_id}] {full_name}: no config, using defaults={default_groups} "
+                    f"base_branch={base_branch}",
+                    file=sys.stderr,
+                )
 
-            repo_files[full_name] = resolve_files(config, manifest, default_groups)
+            files = resolve_files(config, manifest, default_groups)
+            if not files:
+                continue
 
-        if repo_files:
-            matrix.append({"id": inst_id, "config": build_sync_config(repo_files)})
+            matrix.append({
+                "inst_id": inst_id,
+                "repo": full_name,
+                "branch_prefix": branch_prefix,
+                "base_branch": base_branch,
+                "config": build_sync_config(full_name, files),
+            })
 
     print(json.dumps(matrix))
 
