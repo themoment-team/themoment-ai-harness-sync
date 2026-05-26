@@ -2,8 +2,7 @@ name: Sync AI Harness files
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 jobs:
