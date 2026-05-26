@@ -28,6 +28,8 @@ import os
 import subprocess
 import sys
 import time
+import urllib.request
+import urllib.error
 from collections import defaultdict
 from pathlib import Path
 
@@ -35,6 +37,7 @@ import yaml
 
 
 MANIFEST_PATH = Path(__file__).parent.parent / "sync-manifest.yml"
+GH_API_BASE = "https://api.github.com"
 
 
 def load_manifest() -> dict:
@@ -50,30 +53,39 @@ def generate_jwt(app_id: str, private_key: str) -> str:
     return jwt.encode(payload, private_key, algorithm="RS256")
 
 
-def gh_api(endpoint: str, token: str, method: str = "GET") -> any:
-    cmd = ["gh", "api", endpoint]
-    if method == "POST":
-        cmd += ["--method", "POST"]
-    else:
-        cmd += ["--paginate"]
-    result = subprocess.run(
-        cmd,
-        env={**os.environ, "GH_TOKEN": token},
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    text = result.stdout.strip()
-    if text.startswith("["):
-        combined = []
-        for chunk in text.replace("][", "]\n[").split("\n"):
-            combined.extend(json.loads(chunk))
-        return combined
-    return json.loads(text)
+def app_api(endpoint: str, app_jwt: str, method: str = "GET") -> any:
+    """App JWT 인증이 필요한 엔드포인트 호출 (Bearer 스킴 사용)."""
+    results = []
+    url = f"{GH_API_BASE}{endpoint}"
+    while url:
+        req = urllib.request.Request(
+            url,
+            data=b"" if method == "POST" else None,
+            method=method,
+            headers={
+                "Authorization": f"Bearer {app_jwt}",
+                "Accept": "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28",
+            },
+        )
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read())
+            link_header = resp.headers.get("Link", "")
+            if isinstance(data, list):
+                results.extend(data)
+            else:
+                return data
+            next_url = None
+            for part in link_header.split(","):
+                if 'rel="next"' in part:
+                    next_url = part.strip().split(";")[0].strip().strip("<>")
+                    break
+            url = next_url
+    return results
 
 
 def get_installation_token(inst_id: int, app_jwt: str) -> str:
-    data = gh_api(f"/app/installations/{inst_id}/access_tokens", app_jwt, method="POST")
+    data = app_api(f"/app/installations/{inst_id}/access_tokens", app_jwt, method="POST")
     return data["token"]
 
 
@@ -151,7 +163,7 @@ def main():
 
     app_jwt = generate_jwt(app_id, private_key)
 
-    installations = gh_api("/app/installations", app_jwt)
+    installations = app_api("/app/installations", app_jwt)
     if not isinstance(installations, list):
         installations = [installations]
 
@@ -162,11 +174,11 @@ def main():
         inst_id = inst["id"]
         try:
             inst_token = get_installation_token(inst_id, app_jwt)
-        except subprocess.CalledProcessError:
-            print(f"Warning: failed to get token for installation {inst_id}", file=sys.stderr)
+        except urllib.error.HTTPError as e:
+            print(f"Warning: failed to get token for installation {inst_id}: {e}", file=sys.stderr)
             continue
 
-        data = gh_api(f"/app/installations/{inst_id}/repositories", app_jwt)
+        data = app_api(f"/app/installations/{inst_id}/repositories", app_jwt)
         repos = data if isinstance(data, list) else data.get("repositories", [])
 
         for repo in repos:
