@@ -1,76 +1,112 @@
-# ai-harness
+# AI Harness
 
-여러 프로젝트에 걸쳐 AI 도구 설정 파일을 공유·배포하는 허브 레포지토리입니다.
+> Distribute AI tool configurations across all your repositories — automatically.
 
-Claude, Codex, Gemini, Copilot 등의 에이전트·스킬·훅·설정을 중앙에서 관리하고, GitHub Actions를 통해 앱이 설치된 모든 프로젝트에 자동으로 동기화합니다.
+A central hub that shares Claude skills/agents/hooks, Codex skills, Gemini config, and Copilot instructions with every project that installs the GitHub App. Add a new project in seconds; no manual config editing required.
 
-## 구조
+---
+
+## How It Works
+
+1. Push updates to this repo → GitHub Actions triggers
+2. The workflow discovers every repository where the App is installed
+3. A PR is opened in each target repo with the updated files
+
+New projects are auto-detected the moment the App is installed — no `sync.yml` edits needed.
+
+## Synced Paths
+
+| Path | Contents |
+|------|----------|
+| `.claude/agents/` | Claude Code sub-agents |
+| `.claude/hooks/` | pre/post tool-use hooks |
+| `.claude/skills/` | Claude Code skills |
+| `.agents/skills/` | Codex-compatible skills |
+| `.codex/` | OpenAI Codex / Agents CLI config |
+| `.gemini/` | Gemini CLI config |
+
+Each target repo manages its own `.claude/rules/`, `CLAUDE.md`, `AGENTS.md`, and `.github/copilot-instructions.md` independently.
+
+## Per-repo Customization
+
+Place `.harness/sync.yml` in any target repository to control what gets synced:
+
+```yaml
+# .harness/sync.yml
+groups:
+  - claude   # Claude Code skills, agents, hooks
+  - codex    # Codex skills + config
+  # - gemini
+  # - copilot
+
+exclude:
+  - claude/skills/kotest-guide       # remove items you don't need
+  - codex/skills/kotlin-spring-arch
+
+include:
+  - copilot/instructions             # add items outside your selected groups
+```
+
+Without this file, the default groups (`claude`, `codex`, `gemini`) are applied.
+See `.harness/sync.yml.example` for the full reference and all available item IDs.
+
+## Repository Structure
 
 ```
 ai-harness/
-├── .agents/skills/        → [Codex 호환 스킬](.agents/skills/README.md)
+├── .agents/skills/        → Codex-compatible skills
 ├── .claude/
-│   ├── agents/            → [서브에이전트](.claude/agents/README.md)
-│   ├── hooks/             # pre/post 훅
-│   ├── rules/             # 이 레포 자체 규칙 (각 프로젝트는 별도 관리)
-│   └── skills/            → [Claude 스킬](.claude/skills/README.md)
-├── .codex/                # Codex 설정
-├── .gemini/               # Gemini 설정
+│   ├── agents/            → Claude Code sub-agents
+│   ├── hooks/             # pre/post hooks
+│   └── skills/            → Claude Code skills
+├── .codex/                # Codex config & hooks
+├── .gemini/               # Gemini config
+├── .harness/
+│   └── sync.yml.example   # target repo config template
+├── sync-manifest.yml      # item registry and group definitions
 ├── scripts/
-│   └── list-installed-repos.py   # 동기화 대상 자동 생성
+│   └── list-installed-repos.py
 └── .github/
     ├── copilot-instructions.md
-    ├── sync.yml           # 폴백용 정적 동기화 설정
     └── workflows/
-        └── sync.yml       # 자동 동기화 워크플로우
+        └── sync.yml
 ```
 
-## 동기화 방식
+## Setup
 
-`main` 브랜치에 push하면 GitHub Actions가 **App이 설치된 모든 레포**를 자동으로 감지하여 PR을 생성합니다.
+### 1. Create a GitHub App
 
-새 프로젝트를 sync 대상에 추가하려면 **GitHub App을 해당 레포에 설치**하기만 하면 됩니다. `sync.yml`을 수동으로 수정할 필요가 없습니다.
+Create a GitHub App in your organization settings with these permissions:
 
-### 동기화되는 파일
+| Permission | Level |
+|-----------|-------|
+| Contents | Read & Write |
+| Pull requests | Read & Write |
+| Metadata | Read |
 
-| 경로                | 설명          |
-|-------------------|-------------|
-| `.claude/agents/` | 서브에이전트      |
-| `.claude/hooks/`  | pre/post 훅  |
-| `.claude/skills/` | 스킬          |
-| `.agents/skills/` | Codex 호환 스킬 |
-| `.codex/`         | Codex 설정    |
-| `.gemini/`        | Gemini 설정   |
+Enable **"Request user authorization (OAuth) during installation"** if needed.
 
-### 각 프로젝트가 직접 관리하는 파일
+### 2. Register Secrets
 
-| 경로                                | 이유               |
-|-----------------------------------|------------------|
-| `.claude/rules/`                  | 프로젝트별 코딩 컨벤션     |
-| `.claude/settings.json`           | 프로젝트별 권한·훅 설정    |
-| `CLAUDE.md`                       | 프로젝트 개요·명령어      |
-| `AGENTS.md`                       | 프로젝트 개요·명령어      |
-| `.github/copilot-instructions.md` | 프로젝트별 Copilot 지시 |
+In this repo → Settings → Secrets and variables → Actions:
 
-## 초기 설정
+| Secret | Value |
+|--------|-------|
+| `APP_ID` | Your GitHub App ID (number) |
+| `APP_PRIVATE_KEY` | Full contents of the generated `.pem` file |
 
-### 1. GitHub App 생성
+### 3. Connect a Project
 
-→ `github.com/organizations/themoment-team/settings/apps` 에서 생성. [상세 절차](https://github.com/themoment-team/themoment-ai-harness-sync/wiki/GitHub-App-Setup) 참고.
+Install the GitHub App on any repository. It will be automatically included in the next sync.
 
-### 2. 시크릿 등록
+---
 
-이 레포 Settings → Secrets and variables → Actions:
+## Directory Docs
 
-| 시크릿 | 값 |
-|--------|-----|
-| `APP_ID` | GitHub App ID (숫자) |
-| `APP_PRIVATE_KEY` | 발급한 `.pem` 파일 전체 내용 |
+- [Claude Skills](.claude/skills/README.md)
+- [Claude Agents](.claude/agents/README.md)
+- [Codex Skills](.agents/skills/README.md)
 
-### 3. 새 프로젝트 연결
+## License
 
-GitHub App을 해당 레포에 Install하면 다음 sync 시 자동으로 포함됩니다.
-
-## 라이선스
-
-MIT License — [themoment-team](https://github.com/themoment-team)
+MIT License
