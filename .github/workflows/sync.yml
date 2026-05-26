@@ -11,7 +11,7 @@ jobs:
     outputs:
       matrix: ${{ steps.list.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install dependencies
         run: pip install PyJWT cryptography pyyaml -q
       - name: List installations and build matrix
@@ -33,7 +33,7 @@ jobs:
         installation: ${{ fromJSON(needs.prepare.outputs.matrix) }}
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Generate token for installation ${{ matrix.installation.id }}
         id: app-token
         uses: tibdex/github-app-token@v2
@@ -54,4 +54,3 @@ jobs:
           BRANCH_PREFIX: harness-sync
           COMMIT_PREFIX: "chore"
           PR_BODY: "themoment-ai-harness-sync에서 자동 동기화된 파일입니다."
-          DELETE_ORPHANED_FILES: true
