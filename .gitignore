@@ -11,3 +11,6 @@ PR_BODY.md
 
 ### macOS ###
 .DS_Store
+
+### Tool internals ###
+.antigravitycli/
