@@ -178,7 +178,7 @@ def main():
             print(f"Warning: failed to get token for installation {inst_id}: {e}", file=sys.stderr)
             continue
 
-        data = app_api(f"/app/installations/{inst_id}/repositories", app_jwt)
+        data = gh_api("/installation/repositories", inst_token)
         repos = data if isinstance(data, list) else data.get("repositories", [])
 
         for repo in repos:
