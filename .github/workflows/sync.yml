@@ -18,6 +18,8 @@ jobs:
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          installation_retrieval_mode: organization
+          installation_retrieval_payload: themoment-team
       - name: Install dependencies
         run: pip install PyJWT cryptography pyyaml -q
 
