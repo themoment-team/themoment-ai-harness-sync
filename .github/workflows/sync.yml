@@ -38,4 +38,4 @@ jobs:
           CONFIG_PATH: /tmp/dynamic-sync.yml
           PR_LABELS: harness-sync
           COMMIT_PREFIX: "chore"
-          PR_TITLE: "chore: sync AI harness files"
+          PR_BODY: "themoment-ai-harness-sync에서 자동 동기화된 파일입니다."
