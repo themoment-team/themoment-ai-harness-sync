@@ -1,5 +1,4 @@
 group:
-  # Kotlin/Spring 백엔드 프로젝트
   - repos: |
       themoment-team/datagsm-server
     files:
