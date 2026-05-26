@@ -1,0 +1,54 @@
+group:
+  # Kotlin/Spring 백엔드 프로젝트
+  - repos: |
+      themoment-team/datagsm-server
+    files:
+      - source: .claude/agents/
+        dest: .claude/agents/
+      - source: .claude/hooks/
+        dest: .claude/hooks/
+      - source: .claude/skills/
+        dest: .claude/skills/
+      - source: .agents/skills/
+        dest: .agents/skills/
+      - source: .codex/
+        dest: .codex/
+      - source: .gemini/
+        dest: .gemini/
+
+  # 프론트엔드 프로젝트
+  - repos: |
+      themoment-team/everygsm-v2
+      themoment-team/readygsm
+      themoment-team/hello-gsm-26
+    files:
+      - source: .claude/agents/
+        dest: .claude/agents/
+      - source: .claude/hooks/
+        dest: .claude/hooks/
+      - source: .claude/skills/
+        dest: .claude/skills/
+      - source: .agents/skills/
+        dest: .agents/skills/
+      - source: .codex/
+        dest: .codex/
+      - source: .gemini/
+        dest: .gemini/
+
+  # 외부 프로젝트 (org 이름 확인 후 추가)
+  # - repos: |
+  #     your-org/cowork-server
+  #     your-org/Washer-Backend-V2
+  #   files:
+  #     - source: .claude/agents/
+  #       dest: .claude/agents/
+  #     - source: .claude/hooks/
+  #       dest: .claude/hooks/
+  #     - source: .claude/skills/
+  #       dest: .claude/skills/
+  #     - source: .agents/skills/
+  #       dest: .agents/skills/
+  #     - source: .codex/
+  #       dest: .codex/
+  #     - source: .gemini/
+  #       dest: .gemini/

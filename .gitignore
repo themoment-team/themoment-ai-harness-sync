@@ -1,0 +1,13 @@
+# AI tool logs & temp files
+.claude/command.log
+.pr-tmp/
+PR_BODY.md
+
+### IntelliJ IDEA ###
+.idea/
+*.iml
+*.iws
+*.ipr
+
+### macOS ###
+.DS_Store

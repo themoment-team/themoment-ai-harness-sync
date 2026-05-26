@@ -1,0 +1,30 @@
+name: Sync AI Harness files
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate GitHub App token
+        id: app-token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - uses: BetaHuhn/repo-file-sync-action@v1
+        with:
+          GH_INSTALLATION_TOKEN: ${{ steps.app-token.outputs.token }}
+          CONFIG_PATH: .github/sync.yml
+          PR_LABELS: harness-sync
+          COMMIT_PREFIX: "chore"
+          PR_TITLE: "chore: sync AI harness files"
