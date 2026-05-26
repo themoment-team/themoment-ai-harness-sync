@@ -79,7 +79,7 @@ def get_installation_token(inst_id: int, app_jwt: str) -> str:
 
 def get_repo_harness_config(full_name: str, token: str) -> dict | None:
     result = subprocess.run(
-        ["gh", "api", f"/repos/{full_name}/contents/.harness-sync.yml"],
+        ["gh", "api", f"/repos/{full_name}/contents/.harness/sync.yml"],
         env={**os.environ, "GH_TOKEN": token},
         capture_output=True,
         text=True,
