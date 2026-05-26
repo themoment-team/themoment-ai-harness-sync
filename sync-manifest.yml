@@ -33,9 +33,9 @@ items:
     dest: .claude/skills/migration-guide/
     groups: [claude]
 
-  - id: claude/skills/plan-deep-dive
-    src: .claude/skills/plan-deep-dive/
-    dest: .claude/skills/plan-deep-dive/
+  - id: claude/skills/planning
+    src: .claude/skills/planning/
+    dest: .claude/skills/planning/
     groups: [claude]
 
   - id: claude/skills/resolve-reviews
@@ -131,9 +131,9 @@ items:
     dest: .agents/skills/migration-guide/
     groups: [codex]
 
-  - id: codex/skills/plan-deep-dive
-    src: .agents/skills/plan-deep-dive/
-    dest: .agents/skills/plan-deep-dive/
+  - id: codex/skills/planning
+    src: .agents/skills/planning/
+    dest: .agents/skills/planning/
     groups: [codex]
 
   - id: codex/skills/resolve-reviews
