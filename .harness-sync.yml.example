@@ -1,0 +1,15 @@
+# themoment-ai-harness-sync 동기화 설정
+# 이 파일을 .harness-sync.yml로 이름을 바꾸고 레포 루트에 배치하세요
+#
+# 사용 가능한 그룹:
+#   claude  — .claude/agents/, .claude/hooks/, .claude/skills/
+#   codex   — .agents/skills/, .codex/
+#   gemini  — .gemini/
+#   copilot — .github/copilot-instructions.md
+#
+# 이 파일이 없으면 기본값(claude, codex, gemini)이 적용됩니다
+groups:
+  - claude
+  - codex
+  - gemini
+  # - copilot

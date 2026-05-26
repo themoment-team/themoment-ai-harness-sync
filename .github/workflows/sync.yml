@@ -18,14 +18,14 @@ jobs:
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
-      - name: Install PyJWT
-        run: pip install PyJWT cryptography -q
+      - name: Install dependencies
+        run: pip install PyJWT cryptography pyyaml -q
 
       - name: Generate sync targets from App installations
         env:
           APP_ID: ${{ secrets.APP_ID }}
           APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
-          SOURCE_REPO: themoment-team/ai-harness
+          SOURCE_REPO: themoment-team/themoment-ai-harness-sync
         run: python3 scripts/list-installed-repos.py > /tmp/dynamic-sync.yml
 
       - name: Show sync targets

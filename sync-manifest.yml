@@ -1,0 +1,27 @@
+# 동기화 가능한 파일 그룹 정의
+# 각 대상 레포는 .harness-sync.yml 파일로 원하는 그룹을 선택할 수 있습니다
+groups:
+  claude:
+    - src: .claude/agents/
+      dest: .claude/agents/
+    - src: .claude/hooks/
+      dest: .claude/hooks/
+    - src: .claude/skills/
+      dest: .claude/skills/
+  codex:
+    - src: .agents/skills/
+      dest: .agents/skills/
+    - src: .codex/
+      dest: .codex/
+  gemini:
+    - src: .gemini/
+      dest: .gemini/
+  copilot:
+    - src: .github/copilot-instructions.md
+      dest: .github/copilot-instructions.md
+
+# .harness-sync.yml이 없는 레포에 적용할 기본 그룹
+defaults:
+  - claude
+  - codex
+  - gemini
