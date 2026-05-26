@@ -3,8 +3,17 @@
 GitHub App이 설치된 모든 레포를 조회해서 BetaHuhn/repo-file-sync-action용
 sync.yml 내용을 stdout으로 출력합니다.
 
-각 레포 루트의 .harness-sync.yml을 읽어 동기화할 그룹을 결정합니다.
-파일이 없으면 sync-manifest.yml의 defaults 그룹을 사용합니다.
+각 레포 루트의 .harness-sync.yml을 읽어 동기화할 항목을 결정합니다.
+파일이 없으면 sync-manifest.yml의 defaults 그룹을 모두 적용합니다.
+
+.harness-sync.yml 형식:
+  groups:        # 포함할 그룹 (기본값: defaults 그룹 전체)
+    - claude
+    - codex
+  exclude:       # groups에서 제외할 항목 ID
+    - claude/skills/kotest-guide
+  include:       # groups 외에 추가할 항목 ID
+    - copilot/instructions
 
 환경변수:
   APP_ID           - GitHub App ID
@@ -82,16 +91,50 @@ def get_repo_harness_config(full_name: str, token: str) -> dict | None:
     return yaml.safe_load(content)
 
 
-def resolve_files(groups: list[str], manifest: dict) -> list[tuple[str, str]]:
-    seen: set[tuple[str, str]] = set()
-    files: list[tuple[str, str]] = []
-    for group in groups:
-        for entry in manifest["groups"].get(group, []):
-            pair = (entry["src"], entry["dest"])
-            if pair not in seen:
-                seen.add(pair)
-                files.append(pair)
-    return files
+def resolve_files(
+    config: dict | None,
+    manifest: dict,
+    default_groups: list[str],
+) -> list[tuple[str, str]]:
+    """
+    config: 대상 레포의 .harness-sync.yml 파싱 결과 (없으면 None)
+    반환: (src, dest) 튜플 리스트 (순서 보존, 중복 제거)
+    """
+    all_items: dict[str, tuple[str, str]] = {
+        item["id"]: (item["src"], item["dest"])
+        for item in manifest["items"]
+    }
+    item_groups: dict[str, list[str]] = {
+        item["id"]: item["groups"]
+        for item in manifest["items"]
+    }
+
+    if config is None:
+        selected_groups = default_groups
+        excludes: list[str] = []
+        includes: list[str] = []
+    else:
+        selected_groups = config.get("groups", default_groups)
+        excludes = config.get("exclude", [])
+        includes = config.get("include", [])
+
+    selected: dict[str, tuple[str, str]] = {}
+
+    # 선택된 그룹에 속하는 항목 추가
+    for item_id, groups in item_groups.items():
+        if any(g in selected_groups for g in groups):
+            selected[item_id] = all_items[item_id]
+
+    # exclude 적용
+    for item_id in excludes:
+        selected.pop(item_id, None)
+
+    # include 추가 (그룹에 없더라도 강제 포함)
+    for item_id in includes:
+        if item_id in all_items and item_id not in selected:
+            selected[item_id] = all_items[item_id]
+
+    return list(selected.values())
 
 
 def main():
@@ -104,7 +147,7 @@ def main():
         sys.exit(1)
 
     manifest = load_manifest()
-    default_groups: list[str] = manifest.get("defaults", list(manifest["groups"].keys()))
+    default_groups: list[str] = manifest.get("defaults", [])
 
     app_jwt = generate_jwt(app_id, private_key)
 
@@ -132,14 +175,18 @@ def main():
                 continue
 
             config = get_repo_harness_config(full_name, inst_token)
-            if config and "groups" in config:
-                groups = config["groups"]
-                print(f"  {full_name}: groups={groups}", file=sys.stderr)
+            if config:
+                groups = config.get("groups", default_groups)
+                excludes = config.get("exclude", [])
+                includes = config.get("include", [])
+                print(
+                    f"  {full_name}: groups={groups} exclude={excludes} include={includes}",
+                    file=sys.stderr,
+                )
             else:
-                groups = default_groups
-                print(f"  {full_name}: no config, using defaults={groups}", file=sys.stderr)
+                print(f"  {full_name}: no config, using defaults={default_groups}", file=sys.stderr)
 
-            repo_files[full_name] = resolve_files(groups, manifest)
+            repo_files[full_name] = resolve_files(config, manifest, default_groups)
 
     if not repo_files:
         print("# No target repos found — check GitHub App installations", file=sys.stderr)
@@ -149,7 +196,7 @@ def main():
     # 동일한 파일 셋을 원하는 레포끼리 하나의 group 항목으로 묶음
     files_to_repos: dict[tuple, list[str]] = defaultdict(list)
     for repo, files in repo_files.items():
-        key = tuple(files)  # 순서 보존 (그룹 선언 순서 반영)
+        key = tuple(files)
         files_to_repos[key].append(repo)
 
     print("group:")

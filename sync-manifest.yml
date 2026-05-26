@@ -1,24 +1,198 @@
-# 동기화 가능한 파일 그룹 정의
-# 각 대상 레포는 .harness-sync.yml 파일로 원하는 그룹을 선택할 수 있습니다
-groups:
-  claude:
-    - src: .claude/agents/
-      dest: .claude/agents/
-    - src: .claude/hooks/
-      dest: .claude/hooks/
-    - src: .claude/skills/
-      dest: .claude/skills/
-  codex:
-    - src: .agents/skills/
-      dest: .agents/skills/
-    - src: .codex/
-      dest: .codex/
-  gemini:
-    - src: .gemini/
-      dest: .gemini/
-  copilot:
-    - src: .github/copilot-instructions.md
-      dest: .github/copilot-instructions.md
+# 동기화 가능한 개별 항목 목록
+# 각 대상 레포는 .harness-sync.yml에서 groups/include/exclude로 원하는 항목을 선택합니다
+# 새 스킬/에이전트 추가 시 이 목록도 업데이트하세요
+items:
+  # ── Claude skills ────────────────────────────────────────────
+  - id: claude/skills/api-design
+    src: .claude/skills/api-design/
+    dest: .claude/skills/api-design/
+    groups: [claude]
+
+  - id: claude/skills/code-review
+    src: .claude/skills/code-review/
+    dest: .claude/skills/code-review/
+    groups: [claude]
+
+  - id: claude/skills/git-commit
+    src: .claude/skills/git-commit/
+    dest: .claude/skills/git-commit/
+    groups: [claude]
+
+  - id: claude/skills/kotest-guide
+    src: .claude/skills/kotest-guide/
+    dest: .claude/skills/kotest-guide/
+    groups: [claude]
+
+  - id: claude/skills/kotlin-spring-arch
+    src: .claude/skills/kotlin-spring-arch/
+    dest: .claude/skills/kotlin-spring-arch/
+    groups: [claude]
+
+  - id: claude/skills/migration-guide
+    src: .claude/skills/migration-guide/
+    dest: .claude/skills/migration-guide/
+    groups: [claude]
+
+  - id: claude/skills/plan-deep-dive
+    src: .claude/skills/plan-deep-dive/
+    dest: .claude/skills/plan-deep-dive/
+    groups: [claude]
+
+  - id: claude/skills/resolve-reviews
+    src: .claude/skills/resolve-reviews/
+    dest: .claude/skills/resolve-reviews/
+    groups: [claude]
+
+  - id: claude/skills/security-checklist
+    src: .claude/skills/security-checklist/
+    dest: .claude/skills/security-checklist/
+    groups: [claude]
+
+  - id: claude/skills/systematic-debugging
+    src: .claude/skills/systematic-debugging/
+    dest: .claude/skills/systematic-debugging/
+    groups: [claude]
+
+  - id: claude/skills/test
+    src: .claude/skills/test/
+    dest: .claude/skills/test/
+    groups: [claude]
+
+  - id: claude/skills/write-pr
+    src: .claude/skills/write-pr/
+    dest: .claude/skills/write-pr/
+    groups: [claude]
+
+  # ── Claude agents ─────────────────────────────────────────────
+  - id: claude/agents/contradiction-finder
+    src: .claude/agents/contradiction-finder.md
+    dest: .claude/agents/contradiction-finder.md
+    groups: [claude]
+
+  - id: claude/agents/convention-validator
+    src: .claude/agents/convention-validator.md
+    dest: .claude/agents/convention-validator.md
+    groups: [claude]
+
+  - id: claude/agents/doc-polisher
+    src: .claude/agents/doc-polisher.md
+    dest: .claude/agents/doc-polisher.md
+    groups: [claude]
+
+  - id: claude/agents/prompt-polisher
+    src: .claude/agents/prompt-polisher.md
+    dest: .claude/agents/prompt-polisher.md
+    groups: [claude]
+
+  - id: claude/agents/test-fixer
+    src: .claude/agents/test-fixer.md
+    dest: .claude/agents/test-fixer.md
+    groups: [claude]
+
+  - id: claude/agents/web-researcher
+    src: .claude/agents/web-researcher.md
+    dest: .claude/agents/web-researcher.md
+    groups: [claude]
+
+  # ── Claude hooks ──────────────────────────────────────────────
+  - id: claude/hooks
+    src: .claude/hooks/
+    dest: .claude/hooks/
+    groups: [claude]
+
+  # ── Codex (OpenAI Codex / Agents CLI) skills ─────────────────
+  - id: codex/skills/api-design
+    src: .agents/skills/api-design/
+    dest: .agents/skills/api-design/
+    groups: [codex]
+
+  - id: codex/skills/code-review
+    src: .agents/skills/code-review/
+    dest: .agents/skills/code-review/
+    groups: [codex]
+
+  - id: codex/skills/git-commit
+    src: .agents/skills/git-commit/
+    dest: .agents/skills/git-commit/
+    groups: [codex]
+
+  - id: codex/skills/kotest-guide
+    src: .agents/skills/kotest-guide/
+    dest: .agents/skills/kotest-guide/
+    groups: [codex]
+
+  - id: codex/skills/kotlin-spring-arch
+    src: .agents/skills/kotlin-spring-arch/
+    dest: .agents/skills/kotlin-spring-arch/
+    groups: [codex]
+
+  - id: codex/skills/migration-guide
+    src: .agents/skills/migration-guide/
+    dest: .agents/skills/migration-guide/
+    groups: [codex]
+
+  - id: codex/skills/plan-deep-dive
+    src: .agents/skills/plan-deep-dive/
+    dest: .agents/skills/plan-deep-dive/
+    groups: [codex]
+
+  - id: codex/skills/resolve-reviews
+    src: .agents/skills/resolve-reviews/
+    dest: .agents/skills/resolve-reviews/
+    groups: [codex]
+
+  - id: codex/skills/security-checklist
+    src: .agents/skills/security-checklist/
+    dest: .agents/skills/security-checklist/
+    groups: [codex]
+
+  - id: codex/skills/systematic-debugging
+    src: .agents/skills/systematic-debugging/
+    dest: .agents/skills/systematic-debugging/
+    groups: [codex]
+
+  - id: codex/skills/test
+    src: .agents/skills/test/
+    dest: .agents/skills/test/
+    groups: [codex]
+
+  - id: codex/skills/write-pr
+    src: .agents/skills/write-pr/
+    dest: .agents/skills/write-pr/
+    groups: [codex]
+
+  # ── Codex config & hooks ──────────────────────────────────────
+  - id: codex/config
+    src: .codex/config.toml
+    dest: .codex/config.toml
+    groups: [codex]
+
+  - id: codex/hooks
+    src: .codex/hooks/
+    dest: .codex/hooks/
+    groups: [codex]
+
+  - id: codex/hooks-json
+    src: .codex/hooks.json
+    dest: .codex/hooks.json
+    groups: [codex]
+
+  # ── Gemini ────────────────────────────────────────────────────
+  - id: gemini/settings
+    src: .gemini/settings.json
+    dest: .gemini/settings.json
+    groups: [gemini]
+
+  - id: gemini/styleguide
+    src: .gemini/styleguide.md
+    dest: .gemini/styleguide.md
+    groups: [gemini]
+
+  # ── Copilot ───────────────────────────────────────────────────
+  - id: copilot/instructions
+    src: .github/copilot-instructions.md
+    dest: .github/copilot-instructions.md
+    groups: [copilot]
 
 # .harness-sync.yml이 없는 레포에 적용할 기본 그룹
 defaults:
