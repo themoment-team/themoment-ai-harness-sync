@@ -15,7 +15,7 @@ description: Database schema design guide — table naming, column conventions, 
 
 ## Standard Columns
 
-모든 엔티티 테이블에 포함:
+Include in every entity table:
 
 ```sql
 id         BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -25,18 +25,18 @@ updated_at DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_
 
 ## Index Strategy
 
-- 조회 조건으로 자주 쓰이는 단일 컬럼: 단순 인덱스
-- WHERE + ORDER BY 조합: 복합 인덱스 (WHERE 컬럼 먼저)
-- 카디널리티 낮은 컬럼(`is_active` 등)은 인덱스 효과 없음
+- Single column used frequently in WHERE: simple index
+- WHERE + ORDER BY combination: composite index (WHERE column first)
+- Low-cardinality columns (`is_active`, `status` enum): indexing rarely helps
 
 ```sql
--- 복합 인덱스 예시
+-- Composite index example
 CREATE INDEX idx_posts_user_created ON posts (user_id, created_at DESC);
 ```
 
 ## Flyway Migration
 
-파일명 형식: `V{version}__{description}.sql`
+File naming: `V{version}__{description}.sql`
 
 ```
 db/migration/
@@ -58,7 +58,7 @@ CREATE TABLE api_keys (
 );
 ```
 
-## JPA Entity 매핑
+## JPA Entity Mapping
 
 ```kotlin
 @Entity
