@@ -23,6 +23,16 @@ groups:
 # 그룹에 없어도 추가할 항목
 # include:
 #   - copilot/instructions
+#
+# ── Hook 모듈 (기본 비포함, 명시적으로 추가 필요) ──────────────────────
+# claude/hooks/dispatcher, claude/hooks/logging, claude/hooks/command-guard 는
+# claude 그룹에 기본 포함됩니다 (settings.json 등록 포함).
+#
+# Kotlin/Spring 프로젝트의 경우 아래 항목을 include에 추가하세요:
+#   - claude/hooks/ktlint    # .kt 파일 저장 시 ktlintFormat 자동 실행
+#   - claude/hooks/kotest    # *ServiceImpl.kt 저장 시 관련 테스트 자동 실행
+#   - codex/hooks/ktlint
+#   - codex/hooks/kotest
 
 # 동기화 PR 설정 (선택 — 생략하면 기본값 적용)
 # branch_prefix: harness-sync/  # 기본값: harness-sync/ (슬래시 포함하여 명시)
