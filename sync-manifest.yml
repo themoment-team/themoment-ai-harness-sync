@@ -120,6 +120,31 @@ items:
     dest: .claude/hooks/modules/kotest/
     groups: []
 
+  - id: claude/hooks/biome
+    src: .claude/hooks/modules/biome/
+    dest: .claude/hooks/modules/biome/
+    groups: []
+
+  - id: claude/hooks/eslint
+    src: .claude/hooks/modules/eslint/
+    dest: .claude/hooks/modules/eslint/
+    groups: []
+
+  - id: claude/hooks/spotless
+    src: .claude/hooks/modules/spotless/
+    dest: .claude/hooks/modules/spotless/
+    groups: []
+
+  - id: claude/hooks/ts-check
+    src: .claude/hooks/modules/ts-check/
+    dest: .claude/hooks/modules/ts-check/
+    groups: []
+
+  - id: claude/hooks/prettier
+    src: .claude/hooks/modules/prettier/
+    dest: .claude/hooks/modules/prettier/
+    groups: []
+
   # ── Codex (OpenAI Codex / Agents CLI) skills ─────────────────
   - id: codex/skills/api-design
     src: .agents/skills/api-design/
@@ -205,6 +230,31 @@ items:
   - id: codex/hooks/kotest
     src: .codex/hooks/modules/kotest/
     dest: .codex/hooks/modules/kotest/
+    groups: []
+
+  - id: codex/hooks/biome
+    src: .codex/hooks/modules/biome/
+    dest: .codex/hooks/modules/biome/
+    groups: []
+
+  - id: codex/hooks/eslint
+    src: .codex/hooks/modules/eslint/
+    dest: .codex/hooks/modules/eslint/
+    groups: []
+
+  - id: codex/hooks/spotless
+    src: .codex/hooks/modules/spotless/
+    dest: .codex/hooks/modules/spotless/
+    groups: []
+
+  - id: codex/hooks/ts-check
+    src: .codex/hooks/modules/ts-check/
+    dest: .codex/hooks/modules/ts-check/
+    groups: []
+
+  - id: codex/hooks/prettier
+    src: .codex/hooks/modules/prettier/
+    dest: .codex/hooks/modules/prettier/
     groups: []
 
   - id: codex/hooks-json
