@@ -220,10 +220,10 @@ def main():
             default_branch = repo.get("default_branch", "main")
             config = get_repo_harness_config(full_name, inst_token)
 
-            branch_prefix = "harness-sync"
+            branch_prefix = "harness-sync/"
             base_branch = default_branch
             if config:
-                branch_prefix = config.get("branch_prefix", "harness-sync")
+                branch_prefix = config.get("branch_prefix", "harness-sync/")
                 base_branch = config.get("base_branch", default_branch)
                 print(
                     f"  [{inst_id}] {full_name}: groups={config.get('groups')} "
