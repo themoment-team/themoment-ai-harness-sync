@@ -95,8 +95,8 @@ items:
     dest: .claude/hooks/
     groups: [claude]
 
-  - id: claude/hooks/settings
-    src: .claude/templates/settings-hooks.json
+  - id: claude/settings
+    src: .claude/settings.json
     dest: .claude/settings.json
     groups: [claude]
 

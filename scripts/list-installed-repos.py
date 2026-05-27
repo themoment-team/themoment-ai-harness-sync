@@ -125,6 +125,10 @@ def get_repo_harness_config(full_name: str, token: str) -> dict | None:
     return yaml.safe_load(content)
 
 
+SETTINGS_WITH_HOOKS = ".claude/settings.json"
+SETTINGS_BASE = ".claude/templates/settings-base.json"
+
+
 def resolve_files(
     config: dict | None,
     manifest: dict,
@@ -160,6 +164,15 @@ def resolve_files(
     for item_id in includes:
         if item_id in all_items and item_id not in selected:
             selected[item_id] = all_items[item_id]
+
+    # hooks 포함 여부에 따라 settings.json 소스 파일 분기
+    if "claude/settings" in selected:
+        has_hooks = any(item_id.startswith("claude/hooks/") for item_id in selected)
+        dest = selected["claude/settings"][1]
+        selected["claude/settings"] = (
+            SETTINGS_WITH_HOOKS if has_hooks else SETTINGS_BASE,
+            dest,
+        )
 
     return list(selected.values())
 
