@@ -145,12 +145,16 @@ def resolve_files(
 
     if config is None:
         selected_groups = default_groups
-        excludes: list[str] = []
-        includes: list[str] = []
+        overrides: dict[str, bool] = {}
     else:
         selected_groups = config.get("groups", default_groups)
-        excludes = config.get("exclude", [])
-        includes = config.get("include", [])
+        overrides = config.get("overrides", {})
+        # 하위 호환: 구형 exclude/include 형식 지원
+        if not overrides and ("exclude" in config or "include" in config):
+            for item_id in config.get("exclude", []):
+                overrides[item_id] = False
+            for item_id in config.get("include", []):
+                overrides[item_id] = True
 
     selected: dict[str, tuple[str, str]] = {}
 
@@ -158,12 +162,12 @@ def resolve_files(
         if any(g in selected_groups for g in groups):
             selected[item_id] = all_items[item_id]
 
-    for item_id in excludes:
-        selected.pop(item_id, None)
-
-    for item_id in includes:
-        if item_id in all_items and item_id not in selected:
-            selected[item_id] = all_items[item_id]
+    for item_id, enabled in overrides.items():
+        if enabled:
+            if item_id in all_items:
+                selected[item_id] = all_items[item_id]
+        else:
+            selected.pop(item_id, None)
 
     # hooks 포함 여부에 따라 settings.json 소스 파일 분기
     if "claude/settings" in selected:
@@ -238,9 +242,12 @@ def main():
             if config:
                 branch_prefix = config.get("branch_prefix", "harness-sync/")
                 base_branch = config.get("base_branch", default_branch)
+                overrides_log = config.get("overrides") or {
+                    k: False for k in config.get("exclude", [])
+                } | {k: True for k in config.get("include", [])}
                 print(
                     f"  [{inst_id}] {full_name}: groups={config.get('groups')} "
-                    f"exclude={config.get('exclude', [])} include={config.get('include', [])} "
+                    f"overrides={overrides_log} "
                     f"branch_prefix={branch_prefix} base_branch={base_branch}",
                     file=sys.stderr,
                 )

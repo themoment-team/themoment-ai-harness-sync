@@ -30,15 +30,33 @@ Hook 모듈은 dispatcher가 자동으로 스캔하는 구조입니다.
 
 ```
 .claude/hooks/
-  dispatcher/          ← claude 그룹 기본 포함 (settings.json 등록 포함)
+  dispatcher/          ← opt-in (overrides: {claude/hooks/dispatcher: true})
     preToolUse.sh      ← modules/*/preToolUse.sh 자동 스캔·실행
     postToolUse.sh
   modules/
-    logging/           ← claude 그룹 기본 포함
-    command-guard/     ← claude 그룹 기본 포함
-    ktlint/            ← opt-in (include: [claude/hooks/ktlint])
-    kotest/            ← opt-in (include: [claude/hooks/kotest])
+    logging/           ← opt-in
+    command-guard/     ← opt-in
+    ktlint/            ← opt-in
+    kotest/            ← opt-in
 ```
+
+## .harness/sync.yml 설정 포맷
+
+타깃 레포의 `.harness/sync.yml`은 `groups` + `overrides` 구조를 사용합니다.
+
+```yaml
+groups:
+  - claude
+  - codex
+
+overrides:
+  claude/skills/git-commit: false   # 그룹 내 항목 비활성화
+  claude/hooks/ktlint: true         # opt-in 항목 활성화
+```
+
+- `false`: groups에 포함된 항목을 제외 (구형 `exclude`)
+- `true`: groups에 없는 opt-in 항목을 추가 (구형 `include`)
+- 구형 `exclude`/`include` 형식도 하위 호환으로 지원
 
 ## Key Files
 

@@ -13,26 +13,38 @@ groups:
   - gemini
   # - copilot
 
-# 위 그룹에서 제외할 항목 (sync-manifest.yml의 id 사용)
-# exclude:
-#   - claude/skills/kotest-guide       # Kotest 쓰지 않는 프로젝트
-#   - claude/skills/kotlin-spring-arch  # Kotlin/Spring 아닌 프로젝트
-#   - codex/skills/kotest-guide
-#   - codex/skills/kotlin-spring-arch
-
-# 그룹에 없어도 추가할 항목
-# include:
-#   - copilot/instructions
+# 개별 항목 활성화/비활성화 (sync-manifest.yml의 id 기준)
+# - false: 그룹에 포함된 항목을 제외
+# - true:  그룹에 없는 opt-in 항목을 추가
+# overrides:
+#   claude/skills/git-commit: false        # 이 스킬은 받지 않음
+#   claude/skills/kotlin-spring-arch: false
+#   codex/skills/git-commit: false
+#   codex/skills/kotlin-spring-arch: false
 #
-# ── Hook 모듈 (기본 비포함, 명시적으로 추가 필요) ──────────────────────
-# claude/hooks/dispatcher, claude/hooks/logging, claude/hooks/command-guard 는
-# claude 그룹에 기본 포함됩니다 (settings.json 등록 포함).
-#
-# Kotlin/Spring 프로젝트의 경우 아래 항목을 include에 추가하세요:
-#   - claude/hooks/ktlint    # .kt 파일 저장 시 ktlintFormat 자동 실행
-#   - claude/hooks/kotest    # *ServiceImpl.kt 저장 시 관련 테스트 자동 실행
-#   - codex/hooks/ktlint
-#   - codex/hooks/kotest
+# ── Hook 모듈 (기본 비포함, true로 활성화 필요) ──────────────────────────
+#   claude/hooks/dispatcher: true   # 훅 사용 시 필수
+#   claude/settings: true           # 훅 사용 시 필수
+#   claude/hooks/logging: true
+#   claude/hooks/command-guard: true
+#   claude/hooks/ktlint: true       # Kotlin 프로젝트
+#   claude/hooks/kotest: true       # Kotlin 프로젝트
+#   claude/hooks/secret-guard: true
+#   claude/hooks/biome: true        # JS/TS 프로젝트
+#   claude/hooks/eslint: true       # JS/TS 프로젝트
+#   claude/hooks/jest: true         # JS/TS 프로젝트
+#   claude/hooks/vitest: true       # JS/TS 프로젝트
+#   claude/hooks/ts-check: true     # TypeScript 프로젝트
+#   claude/hooks/prettier: true     # JS/TS 프로젝트
+#   claude/hooks/spotless: true     # Java/Kotlin 프로젝트
+#   claude/hooks/ruff: true         # Python 프로젝트
+#   codex/hooks/dispatcher: true
+#   codex/hooks-json: true
+#   codex/hooks/logging: true
+#   codex/hooks/command-guard: true
+#   codex/hooks/ktlint: true
+#   codex/hooks/kotest: true
+#   codex/hooks/secret-guard: true
 
 # 동기화 PR 설정 (선택 — 생략하면 기본값 적용)
 # branch_prefix: harness-sync/  # 기본값: harness-sync/ (슬래시 포함하여 명시)
