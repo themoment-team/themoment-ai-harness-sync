@@ -90,10 +90,35 @@ items:
     groups: [claude]
 
   # ── Claude hooks ──────────────────────────────────────────────
-  - id: claude/hooks
-    src: .claude/hooks/
+  - id: claude/hooks/dispatcher
+    src: .claude/hooks/dispatcher/
     dest: .claude/hooks/
     groups: [claude]
+
+  - id: claude/hooks/settings
+    src: .claude/templates/settings-hooks.json
+    dest: .claude/settings.json
+    groups: [claude]
+
+  - id: claude/hooks/logging
+    src: .claude/hooks/modules/logging/
+    dest: .claude/hooks/modules/logging/
+    groups: [claude]
+
+  - id: claude/hooks/command-guard
+    src: .claude/hooks/modules/command-guard/
+    dest: .claude/hooks/modules/command-guard/
+    groups: [claude]
+
+  - id: claude/hooks/ktlint
+    src: .claude/hooks/modules/ktlint/
+    dest: .claude/hooks/modules/ktlint/
+    groups: []
+
+  - id: claude/hooks/kotest
+    src: .claude/hooks/modules/kotest/
+    dest: .claude/hooks/modules/kotest/
+    groups: []
 
   # ── Codex (OpenAI Codex / Agents CLI) skills ─────────────────
   - id: codex/skills/api-design
@@ -157,10 +182,30 @@ items:
     dest: .codex/config.toml
     groups: [codex]
 
-  - id: codex/hooks
-    src: .codex/hooks/
+  - id: codex/hooks/dispatcher
+    src: .codex/hooks/dispatcher/
     dest: .codex/hooks/
     groups: [codex]
+
+  - id: codex/hooks/logging
+    src: .codex/hooks/modules/logging/
+    dest: .codex/hooks/modules/logging/
+    groups: [codex]
+
+  - id: codex/hooks/command-guard
+    src: .codex/hooks/modules/command-guard/
+    dest: .codex/hooks/modules/command-guard/
+    groups: [codex]
+
+  - id: codex/hooks/ktlint
+    src: .codex/hooks/modules/ktlint/
+    dest: .codex/hooks/modules/ktlint/
+    groups: []
+
+  - id: codex/hooks/kotest
+    src: .codex/hooks/modules/kotest/
+    dest: .codex/hooks/modules/kotest/
+    groups: []
 
   - id: codex/hooks-json
     src: .codex/hooks.json
