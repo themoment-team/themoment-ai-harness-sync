@@ -1,11 +1,9 @@
 #!/bin/bash
 INPUT=$(cat)
 TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name')
-
 if [[ "$TOOL_NAME" == "Edit" ]] || [[ "$TOOL_NAME" == "Write" ]]; then
     FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
     CWD=$(echo "$INPUT" | jq -r '.cwd')
-
     case "$FILE_PATH" in
         *.js|*.ts|*.jsx|*.tsx|*.mjs|*.cjs|*.vue)
             if ! compgen -G "$CWD/.eslintrc*" > /dev/null 2>&1 && \
@@ -23,5 +21,4 @@ if [[ "$TOOL_NAME" == "Edit" ]] || [[ "$TOOL_NAME" == "Write" ]]; then
             ;;
     esac
 fi
-
 exit 0

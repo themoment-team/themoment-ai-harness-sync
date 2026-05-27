@@ -58,6 +58,16 @@ items:
     dest: .claude/skills/write-pr/
     groups: [claude]
 
+  - id: claude/skills/docker
+    src: .claude/skills/docker/
+    dest: .claude/skills/docker/
+    groups: [claude]
+
+  - id: claude/skills/database-schema
+    src: .claude/skills/database-schema/
+    dest: .claude/skills/database-schema/
+    groups: [claude]
+
   # ── Claude agents ─────────────────────────────────────────────
   - id: claude/agents/contradiction-finder
     src: .claude/agents/contradiction-finder.md
@@ -145,6 +155,26 @@ items:
     dest: .claude/hooks/modules/prettier/
     groups: []
 
+  - id: claude/hooks/secret-guard
+    src: .claude/hooks/modules/secret-guard/
+    dest: .claude/hooks/modules/secret-guard/
+    groups: []
+
+  - id: claude/hooks/jest
+    src: .claude/hooks/modules/jest/
+    dest: .claude/hooks/modules/jest/
+    groups: []
+
+  - id: claude/hooks/vitest
+    src: .claude/hooks/modules/vitest/
+    dest: .claude/hooks/modules/vitest/
+    groups: []
+
+  - id: claude/hooks/ruff
+    src: .claude/hooks/modules/ruff/
+    dest: .claude/hooks/modules/ruff/
+    groups: []
+
   # ── Codex (OpenAI Codex / Agents CLI) skills ─────────────────
   - id: codex/skills/api-design
     src: .agents/skills/api-design/
@@ -201,6 +231,16 @@ items:
     dest: .agents/skills/write-pr/
     groups: [codex]
 
+  - id: codex/skills/docker
+    src: .agents/skills/docker/
+    dest: .agents/skills/docker/
+    groups: [codex]
+
+  - id: codex/skills/database-schema
+    src: .agents/skills/database-schema/
+    dest: .agents/skills/database-schema/
+    groups: [codex]
+
   # ── Codex config & hooks ──────────────────────────────────────
   - id: codex/config
     src: .codex/config.toml
@@ -255,6 +295,26 @@ items:
   - id: codex/hooks/prettier
     src: .codex/hooks/modules/prettier/
     dest: .codex/hooks/modules/prettier/
+    groups: []
+
+  - id: codex/hooks/secret-guard
+    src: .codex/hooks/modules/secret-guard/
+    dest: .codex/hooks/modules/secret-guard/
+    groups: []
+
+  - id: codex/hooks/jest
+    src: .codex/hooks/modules/jest/
+    dest: .codex/hooks/modules/jest/
+    groups: []
+
+  - id: codex/hooks/vitest
+    src: .codex/hooks/modules/vitest/
+    dest: .codex/hooks/modules/vitest/
+    groups: []
+
+  - id: codex/hooks/ruff
+    src: .codex/hooks/modules/ruff/
+    dest: .codex/hooks/modules/ruff/
     groups: []
 
   - id: codex/hooks-json

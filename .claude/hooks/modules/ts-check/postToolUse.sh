@@ -1,11 +1,9 @@
 #!/bin/bash
 INPUT=$(cat)
 TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name')
-
 if [[ "$TOOL_NAME" == "Edit" ]] || [[ "$TOOL_NAME" == "Write" ]]; then
     FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
     CWD=$(echo "$INPUT" | jq -r '.cwd')
-
     case "$FILE_PATH" in
         *.ts|*.tsx)
             if [[ ! -f "$CWD/tsconfig.json" ]]; then
@@ -22,5 +20,4 @@ if [[ "$TOOL_NAME" == "Edit" ]] || [[ "$TOOL_NAME" == "Write" ]]; then
             ;;
     esac
 fi
-
 exit 0
