@@ -93,22 +93,22 @@ items:
   - id: claude/hooks/dispatcher
     src: .claude/hooks/dispatcher/
     dest: .claude/hooks/
-    groups: [claude]
+    groups: []
 
   - id: claude/settings
     src: .claude/settings.json
     dest: .claude/settings.json
-    groups: [claude]
+    groups: []
 
   - id: claude/hooks/logging
     src: .claude/hooks/modules/logging/
     dest: .claude/hooks/modules/logging/
-    groups: [claude]
+    groups: []
 
   - id: claude/hooks/command-guard
     src: .claude/hooks/modules/command-guard/
     dest: .claude/hooks/modules/command-guard/
-    groups: [claude]
+    groups: []
 
   - id: claude/hooks/ktlint
     src: .claude/hooks/modules/ktlint/
@@ -185,17 +185,17 @@ items:
   - id: codex/hooks/dispatcher
     src: .codex/hooks/dispatcher/
     dest: .codex/hooks/
-    groups: [codex]
+    groups: []
 
   - id: codex/hooks/logging
     src: .codex/hooks/modules/logging/
     dest: .codex/hooks/modules/logging/
-    groups: [codex]
+    groups: []
 
   - id: codex/hooks/command-guard
     src: .codex/hooks/modules/command-guard/
     dest: .codex/hooks/modules/command-guard/
-    groups: [codex]
+    groups: []
 
   - id: codex/hooks/ktlint
     src: .codex/hooks/modules/ktlint/
@@ -210,7 +210,7 @@ items:
   - id: codex/hooks-json
     src: .codex/hooks.json
     dest: .codex/hooks.json
-    groups: [codex]
+    groups: []
 
   # ── Gemini ────────────────────────────────────────────────────
   - id: gemini/settings
