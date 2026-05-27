@@ -1,9 +1,24 @@
 ---
 name: database-schema
-description: Database schema design guide — table naming, column conventions, index strategy, and Flyway migration file structure.
+description: Database schema design guide — table naming, column conventions, index strategy, and JPA entity mapping patterns.
+allowed-tools: AskUserQuestion
 ---
 
 # Database Schema Design Guide
+
+Before providing schema guidance, ask the user about their migration tooling:
+
+```
+AskUserQuestion: "DB 마이그레이션 도구로 무엇을 사용하고 있나요?"
+options:
+  - Flyway
+  - Liquibase
+  - 사용하지 않음 (JPA DDL auto)
+```
+
+Then provide the relevant migration section below along with the core conventions.
+
+---
 
 ## Naming Conventions
 
@@ -34,7 +49,9 @@ updated_at DATETIME(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_
 CREATE INDEX idx_posts_user_created ON posts (user_id, created_at DESC);
 ```
 
-## Flyway Migration
+## Migration — Flyway
+
+_(Include this section if the user selected Flyway)_
 
 File naming: `V{version}__{description}.sql`
 
@@ -56,6 +73,41 @@ CREATE TABLE api_keys (
     CONSTRAINT fk_api_keys_user FOREIGN KEY (user_id) REFERENCES users (id),
     CONSTRAINT uq_api_keys_value UNIQUE (key_value)
 );
+```
+
+## Migration — Liquibase
+
+_(Include this section if the user selected Liquibase)_
+
+File naming: `db/changelog/{version}-{description}.yaml`
+
+```yaml
+# db/changelog/002-add-api-keys.yaml
+databaseChangeLog:
+  - changeSet:
+      id: 002-add-api-keys
+      author: dev
+      changes:
+        - createTable:
+            tableName: api_keys
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: key_value
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+                    unique: true
 ```
 
 ## JPA Entity Mapping
