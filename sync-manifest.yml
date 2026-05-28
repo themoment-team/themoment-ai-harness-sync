@@ -87,9 +87,9 @@ items:
     dest: .claude/agents/contradiction-finder.md
     groups: [claude]
 
-  - id: claude/agents/convention-validator
-    src: .claude/agents/convention-validator.md
-    dest: .claude/agents/convention-validator.md
+  - id: claude/agents/kotlin-convention-validator
+    src: .claude/agents/kotlin-convention-validator.md
+    dest: .claude/agents/kotlin-convention-validator.md
     groups: [claude]
 
   - id: claude/agents/doc-polisher
@@ -102,9 +102,9 @@ items:
     dest: .claude/agents/prompt-polisher.md
     groups: [claude]
 
-  - id: claude/agents/test-fixer
-    src: .claude/agents/test-fixer.md
-    dest: .claude/agents/test-fixer.md
+  - id: claude/agents/kotlin-test-fixer
+    src: .claude/agents/kotlin-test-fixer.md
+    dest: .claude/agents/kotlin-test-fixer.md
     groups: [claude]
 
   - id: claude/agents/web-researcher
