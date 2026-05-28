@@ -162,8 +162,18 @@ def resolve_files(
         if any(g in selected_groups for g in groups):
             selected[item_id] = all_items[item_id]
 
-    for item_id, enabled in overrides.items():
-        if enabled:
+    for item_id, override in overrides.items():
+        if isinstance(override, str):
+            versioned_id = f"{item_id}@{override}"
+            if versioned_id in all_items:
+                canonical_dest = all_items.get(item_id, all_items[versioned_id])[1]
+                selected[item_id] = (all_items[versioned_id][0], canonical_dest)
+            else:
+                print(
+                    f"Warning: {versioned_id} not in manifest, skipping pin",
+                    file=sys.stderr,
+                )
+        elif override:
             if item_id in all_items:
                 selected[item_id] = all_items[item_id]
         else:

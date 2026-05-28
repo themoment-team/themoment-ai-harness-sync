@@ -1,6 +1,19 @@
 # 동기화 가능한 개별 항목 목록
 # 각 대상 레포는 .harness-sync.yml에서 groups/include/exclude로 원하는 항목을 선택합니다
 # 새 스킬/에이전트 추가 시 이 목록도 업데이트하세요
+#
+# 버전 아카이브 규칙:
+#   breaking change 전에 기존 파일을 _archive/<name>/<vN>/ 에 복사하고
+#   아래와 같이 @version ID로 등록한다. groups: [] 로 opt-in 전용 유지.
+#
+#   - id: claude/skills/git-commit@v1
+#     src: .claude/skills/_archive/git-commit/v1/
+#     dest: .claude/skills/git-commit/
+#     groups: []
+#
+#   타깃 레포 .harness/sync.yml:
+#     overrides:
+#       claude/skills/git-commit: "v1"   # 문자열 = 버전 고정
 items:
   # ── Claude skills ────────────────────────────────────────────
   - id: claude/skills/api-design

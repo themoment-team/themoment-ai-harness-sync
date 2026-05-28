@@ -38,6 +38,7 @@ groups:
 #   claude/hooks/prettier: true     # JS/TS 프로젝트
 #   claude/hooks/spotless: true     # Java/Kotlin 프로젝트
 #   claude/hooks/ruff: true         # Python 프로젝트
+#   claude/skills/git-commit: "v1"  # 특정 버전 고정 (아카이브에 해당 버전이 있어야 함)
 #   codex/hooks/dispatcher: true
 #   codex/hooks-json: true
 #   codex/hooks/logging: true

@@ -56,7 +56,24 @@ overrides:
 
 - `false`: groups에 포함된 항목을 제외 (구형 `exclude`)
 - `true`: groups에 없는 opt-in 항목을 추가 (구형 `include`)
+- `"v1"` (문자열): 해당 항목을 아카이브된 버전으로 고정
 - 구형 `exclude`/`include` 형식도 하위 호환으로 지원
+
+## Breaking Change 릴리스 (버전 아카이브)
+
+스킬/에이전트에 breaking change를 적용하기 전:
+
+1. 기존 파일을 `_archive/<name>/<vN>/` 에 복사
+   ```
+   cp -r .claude/skills/git-commit .claude/skills/_archive/git-commit/v1
+   cp -r .agents/skills/git-commit .agents/skills/_archive/git-commit/v1
+   ```
+2. `sync-manifest.yml`에 `@v1` 항목 등록 (`groups: []`)
+3. 최신 스킬을 수정한다
+4. Wiki Per-Repo-Config에 changelog 기재
+5. Commit: `update(claude): git-commit v2, archive v1`
+
+타깃 레포는 `overrides: { claude/skills/git-commit: "v1" }` 로 구 버전을 유지할 수 있다.
 
 ## Key Files
 
