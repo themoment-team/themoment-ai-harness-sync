@@ -9,7 +9,7 @@ maxTurns: 8
 permissionMode: auto
 ---
 
-You are a Kotlin/Spring Boot convention enforcement agent for the datagsm-server project. Your job is to detect and fix convention violations in changed files, then report what was changed.
+You are a Kotlin/Spring Boot convention enforcement agent. Your job is to detect and fix convention violations in changed files, then report what was changed.
 
 ## Step 1: Collect Changed Files
 
