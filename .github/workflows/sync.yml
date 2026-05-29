@@ -54,6 +54,16 @@ jobs:
           BRANCH_PREFIX: ${{ matrix.installation.branch_prefix }}
           COMMIT_PREFIX: "chore"
           PR_BODY: "Automated file sync from themoment-ai-harness-sync."
+      - name: Delete orphaned files
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          pip install pyyaml -q
+          python3 scripts/apply-deletions.py \
+            --repo "${{ matrix.installation.repo }}" \
+            --branch-prefix "${{ matrix.installation.branch_prefix }}" \
+            --base-branch "${{ matrix.installation.base_branch }}"
       - name: Retarget open sync PRs to base branch
         continue-on-error: true
         env:

@@ -357,3 +357,14 @@ defaults:
   - claude
   - codex
   - gemini
+
+# 파일/디렉터리 이름 변경 또는 삭제 시 타깃 레포에서 제거할 경로 목록
+# 스크립트가 열려 있는 sync PR 브랜치에 삭제 커밋을 얹거나 없으면 새 PR을 생성합니다
+# 정리가 완료된 항목은 이 목록에서 제거해도 됩니다
+#
+# 예시:
+#   deletions:
+#     - dest: .claude/skills/old-skill-name/
+#       reason: "new-skill-name 으로 이름 변경"
+#       since: "2026-05-29"
+deletions: []

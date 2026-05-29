@@ -59,6 +59,23 @@ overrides:
 - `"v1"` (문자열): 해당 항목을 아카이브된 버전으로 고정
 - 구형 `exclude`/`include` 형식도 하위 호환으로 지원
 
+## 파일 이름 변경 / 삭제 시 타깃 레포 정리
+
+파일명을 바꾸거나 항목을 삭제하면 타깃 레포에 구 파일이 그대로 남습니다.
+`sync-manifest.yml`의 `deletions` 목록에 등록하면 다음 sync 시 자동으로 PR이 생성됩니다.
+
+```yaml
+deletions:
+  - dest: .claude/skills/old-skill-name/
+    reason: "new-skill-name 으로 이름 변경"
+    since: "2026-05-29"
+```
+
+- `dest`: 타깃 레포에서 삭제할 경로 (파일 또는 디렉터리)
+- `reason`: 사람이 읽기 위한 메모 (선택)
+- `since`: 등록 날짜 (선택)
+- 모든 타깃 레포에서 정리가 완료된 것을 확인한 후 목록에서 제거
+
 ## Breaking Change 릴리스 (버전 아카이브)
 
 스킬/에이전트에 breaking change를 적용하기 전:
