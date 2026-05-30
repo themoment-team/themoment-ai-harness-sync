@@ -50,7 +50,7 @@ jobs:
         with:
           GH_INSTALLATION_TOKEN: ${{ steps.app-token.outputs.token }}
           CONFIG_PATH: /tmp/sync.yml
-          PR_LABELS: "harness-sync:하네스 동기화"
+          PR_LABELS: "harness sync:하네스 동기화"
           BRANCH_PREFIX: ${{ matrix.installation.branch_prefix }}
           COMMIT_PREFIX: "chore"
           PR_BODY: "Automated file sync from themoment-ai-harness-sync."

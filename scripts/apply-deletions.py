@@ -123,7 +123,7 @@ def main() -> None:
                  "--base", base_branch,
                  "--title", "chore: remove orphaned files from previous sync",
                  "--body", "Automated cleanup: removes files renamed or deleted in themoment-ai-harness-sync.",
-                 "--label", "harness-sync:하네스 동기화"],
+                 "--label", "harness sync:하네스 동기화"],
                 text=True, capture_output=True, env=gh_env, check=False,
             )
             if result.returncode == 0:
