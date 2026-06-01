@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  installation:
+    types: [created]
+  installation_repositories:
+    types: [added]
 
 jobs:
   prepare:
