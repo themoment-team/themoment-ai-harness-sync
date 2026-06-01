@@ -4,6 +4,12 @@ description: Generate PR title, body, and labels from commits since the base bra
 allowed-tools: Bash(git *:*), Bash(bash *create-pr.sh:*), Bash(cat *:*), Read, Write
 ---
 
+## Step 0 — Language Selection
+
+Use AskUserQuestion to ask the user which language to use for the PR title and body.
+Options: **English** (default) / **Korean (한국어)**.
+Record the choice as `LANG` (`en` or `ko`) and proceed.
+
 ## Step 1 — Gather Context
 
 ```bash
@@ -26,10 +32,26 @@ Read `${CLAUDE_SKILL_DIR}/references/commit-conventions.md` for commit type and 
 
 ## Step 3 — Generate PR Content
 
+### If LANG = en (English — default)
+
 **Title** — Generate 3 options in the format `[scope] description`:
 - Scope: determine from changed file paths and directory structure — infer the domain from path segments. Use `[global]` / `[ci/cd]` for cross-cutting changes only. Wrap in brackets: `[auth]`, `[user]`, etc.
-- Description: Korean, concise, no emojis, max 50 characters total
-- Wrap class names, method names, annotations, file names, and technical terms in backticks (e.g., `@Transactional`, `QueryProjectServiceImpl`, `SKILL.md`)
+- Description: English, concise, no emojis, max 50 characters total
+- Wrap class names, method names, annotations, file names, and technical terms in backticks
+
+**Body** — Follow the `.github/PULL_REQUEST_TEMPLATE.md` structure:
+- English
+- No emojis
+- Max 2500 characters
+- Wrap all proper nouns and technical identifiers in backticks: class names, method names, annotations, file names, field names, config keys, module names, and agent names.
+
+### If LANG = ko (Korean)
+
+**Title** — Single title in the format `[global] {description}`:
+- Identify the most impactful commit among all commits in the range (the one with the largest diff, or the primary feature commit)
+- Extract the text **after the first `: `** in that commit message (e.g., `chore: skill 개선` → `skill 개선`)
+- Final title: `[global] skill 개선`
+- No emojis, no backtick wrapping in the title itself
 
 **Body** — Follow the `.github/PULL_REQUEST_TEMPLATE.md` structure:
 - Korean 합쇼체: `~하였습니다`, `~되었습니다`, `~추가하였습니다`
@@ -41,11 +63,25 @@ Read `${CLAUDE_SKILL_DIR}/references/commit-conventions.md` for commit type and 
 
 Write the body to `PR_BODY.md`, then display:
 
+**English mode:**
 ```
-## PR 제목 후보
+## PR Title Options
 1. [title1]
 2. [title2]
 3. [title3]
+
+## Selected Labels
+- label1, label2
+
+## PR Body Preview
+[body content]
+```
+Use AskUserQuestion to ask the user which title to use (present options 1/2/3). Wait for the answer before proceeding.
+
+**Korean mode:**
+```
+## PR 제목
+[global] {extracted description}
 
 ## 선택된 라벨
 - label1, label2
@@ -53,8 +89,7 @@ Write the body to `PR_BODY.md`, then display:
 ## PR 본문 미리보기
 [body content]
 ```
-
-Use AskUserQuestion to ask the user which title to use (present options 1/2/3). Wait for the answer before proceeding.
+No title selection needed — proceed directly with the single generated title.
 
 ## Step 5 — Create PR
 
