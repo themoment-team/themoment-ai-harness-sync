@@ -272,11 +272,16 @@ def main():
             if not files:
                 continue
 
+            language = "en"
+            if config:
+                language = config.get("language", "en")
+
             matrix.append({
                 "inst_id": inst_id,
                 "repo": full_name,
                 "branch_prefix": branch_prefix,
                 "base_branch": base_branch,
+                "language": language,
                 "config": build_sync_config(full_name, files),
             })
 

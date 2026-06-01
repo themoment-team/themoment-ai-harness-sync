@@ -46,6 +46,38 @@ jobs:
         run: echo '${{ matrix.installation.config }}' > /tmp/sync.yml
       - name: Show sync config
         run: cat /tmp/sync.yml
+      - name: Compute PR metadata
+        id: pr-meta
+        env:
+          LANG_SETTING: ${{ matrix.installation.language }}
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          if [ "$LANG_SETTING" = "ko" ]; then
+            if [ "$BEFORE_SHA" = "0000000000000000000000000000000000000000" ] || [ -z "$BEFORE_SHA" ]; then
+              RANGE="HEAD~5..HEAD"
+            else
+              RANGE="$BEFORE_SHA..HEAD"
+            fi
+            COMMIT_MSG=$(git log --format="%H %s" "$RANGE" 2>/dev/null | while read hash subject; do
+              count=$(git diff-tree --no-commit-id -r "$hash" --name-only 2>/dev/null | wc -l)
+              printf '%d\t%s\n' "$count" "$subject"
+            done | sort -rn | head -1 | cut -f2-)
+            [ -z "$COMMIT_MSG" ] && COMMIT_MSG=$(git log -1 --format="%s")
+            DESCRIPTION="${COMMIT_MSG#*: }"
+            echo "title=[global] $DESCRIPTION" >> "$GITHUB_OUTPUT"
+            {
+              echo 'body<<EOF'
+              echo 'themoment-ai-harness-sync에서 파일이 자동으로 동기화되었습니다.'
+              echo 'EOF'
+            } >> "$GITHUB_OUTPUT"
+          else
+            echo "title=Sync files from themoment-ai-harness-sync" >> "$GITHUB_OUTPUT"
+            {
+              echo 'body<<EOF'
+              echo 'Automated file sync from themoment-ai-harness-sync.'
+              echo 'EOF'
+            } >> "$GITHUB_OUTPUT"
+          fi
       - uses: BetaHuhn/repo-file-sync-action@v1
         with:
           GH_INSTALLATION_TOKEN: ${{ steps.app-token.outputs.token }}
@@ -53,7 +85,8 @@ jobs:
           PR_LABELS: "harness sync:하네스 동기화"
           BRANCH_PREFIX: ${{ matrix.installation.branch_prefix }}
           COMMIT_PREFIX: "chore"
-          PR_BODY: "Automated file sync from themoment-ai-harness-sync."
+          PR_TITLE: ${{ steps.pr-meta.outputs.title }}
+          PR_BODY: ${{ steps.pr-meta.outputs.body }}
       - name: Delete orphaned files
         continue-on-error: true
         env:

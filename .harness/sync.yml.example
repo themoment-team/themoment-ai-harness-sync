@@ -50,3 +50,6 @@ groups:
 # 동기화 PR 설정 (선택 — 생략하면 기본값 적용)
 # branch_prefix: harness-sync/  # 기본값: harness-sync/ (슬래시 포함하여 명시)
 # base_branch: develop          # 기본값: 레포의 기본 브랜치 (main 또는 master)
+# language: ko                  # PR 제목·본문 언어 (기본값: en)
+#                               #   en: "Sync files from themoment-ai-harness-sync"
+#                               #   ko: "[global] {가장 규모가 큰 커밋의 ': ' 이후 텍스트}"
