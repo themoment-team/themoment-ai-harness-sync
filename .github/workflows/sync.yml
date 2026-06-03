@@ -87,8 +87,25 @@ jobs:
           PR_LABELS: "harness sync:하네스 동기화"
           BRANCH_PREFIX: ${{ matrix.installation.branch_prefix }}
           COMMIT_PREFIX: "chore"
-          PR_TITLE: ${{ steps.pr-meta.outputs.title }}
           PR_BODY: ${{ steps.pr-meta.outputs.body }}
+      # BetaHuhn 액션에는 PR_TITLE 입력이 없어 제목을 직접 지정할 수 없다.
+      # 액션이 만든 sync PR의 제목을 pr-meta에서 계산한 값으로 덮어쓴다.
+      - name: Set sync PR title
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PR_TITLE: ${{ steps.pr-meta.outputs.title }}
+        run: |
+          repo="${{ matrix.installation.repo }}"
+          branch="${{ matrix.installation.branch_prefix }}${{ matrix.installation.base_branch }}"
+          num=$(gh pr list --repo "$repo" --state open --head "$branch" \
+                  --json number --jq '.[0].number // empty')
+          if [ -n "$num" ] && [ -n "$PR_TITLE" ]; then
+            echo "set PR #$num title: $PR_TITLE"
+            gh pr edit "$num" --repo "$repo" --title "$PR_TITLE"
+          else
+            echo "no open sync PR ($branch) or empty title — skip"
+          fi
       - name: Delete orphaned files
         continue-on-error: true
         env:
