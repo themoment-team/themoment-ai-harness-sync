@@ -125,6 +125,49 @@ def get_repo_harness_config(full_name: str, token: str) -> dict | None:
     return yaml.safe_load(content)
 
 
+def sync_branch_name(branch_prefix: str, base_branch: str) -> str:
+    """repo-file-sync-action이 생성하는 sync 브랜치 이름.
+
+    액션은 `path.join(BRANCH_PREFIX, repo.branch)` 로 브랜치를 만든다.
+    repo.branch 는 repo 식별자의 '@<branch>' (= base_branch)다.
+    예: prefix='update/', base='develop' → 'update/develop'
+        prefix='harness-sync/', base='main' → 'harness-sync/main'
+    """
+    return f"{branch_prefix.rstrip('/')}/{base_branch}"
+
+
+def has_open_sync_pr(full_name: str, branch_prefix: str, base_branch: str, token: str) -> bool:
+    """이미 열린 sync PR(head ref가 정확히 sync 브랜치)이 있는지 확인.
+
+    있으면 동기화 대상에서 제외한다. repo-file-sync-action이 기존 sync 브랜치를
+    재사용하면서 동일 내용을 force-push하는 churn을 막기 위함.
+    PR이 머지/종료되면 다시 동기화 대상이 된다.
+
+    head ref를 prefix가 아닌 정확한 sync 브랜치 이름으로 비교해야 한다.
+    (사람이 만든 '<prefix>...' 작업 브랜치 PR과 충돌하면 안 되므로)
+    """
+    branch = sync_branch_name(branch_prefix, base_branch)
+    result = subprocess.run(
+        ["gh", "api", f"/repos/{full_name}/pulls?state=open&per_page=100", "--paginate"],
+        env={**os.environ, "GH_TOKEN": token},
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        # 조회 실패 시 보수적으로 '없음' 처리하여 동기화는 진행
+        return False
+    text = result.stdout.strip()
+    pulls = []
+    for chunk in text.replace("][", "]\n[").split("\n"):
+        chunk = chunk.strip()
+        if chunk:
+            pulls.extend(json.loads(chunk))
+    return any(
+        pr.get("head", {}).get("ref", "") == branch
+        for pr in pulls
+    )
+
+
 SETTINGS_WITH_HOOKS = ".claude/settings.json"
 SETTINGS_BASE = ".claude/templates/settings-base.json"
 
@@ -191,15 +234,21 @@ def resolve_files(
     return list(selected.values())
 
 
-def build_sync_config(full_name: str, files: list[tuple[str, str]]) -> str:
-    """BetaHuhn/repo-file-sync-action용 YAML 설정 문자열을 생성합니다 (레포 1개)."""
+def build_sync_config(full_name: str, files: list[tuple[str, str]], base_branch: str) -> str:
+    """BetaHuhn/repo-file-sync-action용 YAML 설정 문자열을 생성합니다 (레포 1개).
+
+    repo 식별자에 '@<base_branch>'를 붙여 액션이 sync 브랜치를 base_branch에서
+    분기하고 PR도 그 브랜치로 보내도록 한다. 이걸 지정하지 않으면 액션이 레포의
+    GitHub 기본 브랜치(예: master)에서 분기하는데, base_branch(develop)가 기본
+    브랜치보다 앞서 있으면 이미 동기화된 내용이 phantom diff로 PR에 올라온다.
+    """
     if not files:
         return "group: []"
 
     buf = io.StringIO()
     buf.write("group:\n")
     buf.write("  - repos: |\n")
-    buf.write(f"      {full_name}\n")
+    buf.write(f"      {full_name}@{base_branch}\n")
     buf.write("    files:\n")
     for src, dest in files:
         buf.write(f"      - source: {src}\n")
@@ -272,6 +321,16 @@ def main():
             if not files:
                 continue
 
+            # 이미 열린 sync PR이 있으면 건너뛴다 (phantom force-push churn 방지).
+            # PR이 머지/종료된 뒤 다음 실행에서 최신 내용으로 다시 동기화된다.
+            if has_open_sync_pr(full_name, branch_prefix, base_branch, inst_token):
+                print(
+                    f"  [{inst_id}] {full_name}: skip — 열린 sync PR 존재 "
+                    f"(branch_prefix={branch_prefix})",
+                    file=sys.stderr,
+                )
+                continue
+
             language = "en"
             if config:
                 language = config.get("language", "en")
@@ -282,7 +341,7 @@ def main():
                 "branch_prefix": branch_prefix,
                 "base_branch": base_branch,
                 "language": language,
-                "config": build_sync_config(full_name, files),
+                "config": build_sync_config(full_name, files, base_branch),
             })
 
     print(json.dumps(matrix))
