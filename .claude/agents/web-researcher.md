@@ -1,7 +1,7 @@
 ---
 name: web-researcher
 description: "Gathers up-to-date information and compiles research from live web sources. Use when you need current facts, release notes, security advisories, library comparisons, or data beyond the model's training knowledge. Trigger phrases: '최신 정보 조사해줘', 'web-researcher 실행해', or any query about current releases, CVEs, or live technical data. DO NOT trigger when the user asks about historical facts, general concepts, or anything answerable from project documentation alone."
-tools: Bash, CronCreate, CronDelete, CronList, EnterWorktree, ExitWorktree, Glob, Grep, Read, RemoteTrigger, Skill, TaskCreate, TaskGet, TaskList, TaskUpdate, ToolSearch, WebFetch, WebSearch
+tools: WebSearch, WebFetch, Read, Glob, Grep, Bash
 model: haiku
 color: pink
 memory: none
