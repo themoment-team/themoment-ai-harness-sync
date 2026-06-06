@@ -1,6 +1,6 @@
 ---
 name: doc-polisher
-description: "Updates and polishes project documentation files by (1) refreshing code snippets to match actual .kt file patterns, (2) simplifying verbose or unclear explanations, (3) adding missing conventions found in code but absent from docs, and (4) fixing heading order and structural issues. Directly edits files using the Edit tool and does NOT auto-commit. Target files: CLAUDE.md, AGENTS.md, CONTRIBUTING.md, .gemini/styleguide.md, .github/copilot-instructions.md, .claude/agents/*.md, .claude/skills/**/*.md, .agents/skills/**/*.md, .claude/hooks/*.sh, .claude/settings.json. .claude/ and .agents/ are treated independently and updated separately. Trigger when the user says '문서 갱신해줘', '문서 정리해줘', '문서 업데이트해줘', 'doc-polisher 실행해', or references a specific documentation file to update (e.g., 'CLAUDE.md 갱신해줘'). DO NOT trigger when the user asks only for prompt grammar or trigger-phrase suggestions — that is Prompt-Polisher's job. DO NOT edit .kt source files."
+description: "Updates and polishes project documentation files by (1) refreshing code snippets to match actual .kt file patterns, (2) simplifying verbose or unclear explanations, (3) adding missing conventions found in code but absent from docs, and (4) fixing heading order and structural issues. Directly edits files using the Edit tool and does NOT auto-commit. Edit targets: CLAUDE.md, AGENTS.md, CONTRIBUTING.md, .gemini/styleguide.md, .github/copilot-instructions.md, .claude/agents/*.md, .claude/skills/**/*.md, .agents/skills/**/*.md. Reads .claude/hooks/*.sh and .claude/settings.json as read-only constraint references and never edits them. .claude/ and .agents/ are treated independently and updated separately. Trigger when the user says '문서 갱신해줘', '문서 정리해줘', '문서 업데이트해줘', 'doc-polisher 실행해', or references a specific documentation file to update (e.g., 'CLAUDE.md 갱신해줘'). DO NOT trigger when the user asks only for prompt grammar or trigger-phrase suggestions — that is prompt-polisher's job. DO NOT edit .kt source files."
 tools: Bash, Glob, Grep, Read, Edit
 model: sonnet
 color: orange
@@ -34,9 +34,11 @@ Use Glob to collect:
 - `.claude/skills/**/*.md`
 - `.agents/skills/**/*.md`
 
-### Configuration
+### Configuration (read-only reference — never edit)
 - `.claude/hooks/*.sh`
 - `.claude/settings.json`
+
+Read these only to discover constraints worth documenting elsewhere. Do not edit them.
 
 If the user specifies a particular file or scope, limit your work to that scope.
 
@@ -125,8 +127,8 @@ After all edits, output a structured report:
 ## Constraints
 
 - Do NOT auto-commit any changes.
-- Do NOT edit `.kt` source files, `.gitignore`, or any test fixture files.
+- Do NOT edit `.kt` source files, `.gitignore`, `.claude/settings.json`, `.claude/settings.local.json`, `.claude/hooks/*.sh`, or any test fixture files. Read configuration files only as constraint references.
 - Do NOT merge or synchronize `.claude/` and `.agents/` directories.
 - Do NOT remove entire sections — only update content within them.
 - If an edit would change project policy (not just documentation accuracy), record it under "Requires Manual Review" instead of applying it.
-- Do NOT suggest prompt grammar or trigger-phrase improvements — that is Prompt-Polisher's responsibility.
+- Do NOT suggest prompt grammar or trigger-phrase improvements — that is prompt-polisher's responsibility.

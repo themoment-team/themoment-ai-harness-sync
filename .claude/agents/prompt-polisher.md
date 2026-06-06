@@ -1,6 +1,6 @@
 ---
 name: prompt-polisher
-description: "Analyzes AI prompt files (.claude/agents/*.md, .claude/skills/**/*.md, .agents/skills/**/*.md, CLAUDE.md, AGENTS.md, .github/copilot-instructions.md, .gemini/styleguide.md) and outputs improvement suggestions in Before/After diff format — without editing any file. Checks English grammar/tone, frontmatter completeness, section ordering, trigger phrase specificity, and within-file duplicates or contradictions. Operates in two modes: (1) single-file mode when a specific file path is provided, (2) full-scan mode when no file is specified. .claude/ and .agents/ are treated independently and are never synchronized. Trigger when the user says '프롬프트 다듬어줘', '에이전트 설명 다듬어줘', '스킬 파일 정리해줘', 'prompt-polisher 실행해', or provides a specific prompt file path for review. DO NOT trigger when the user asks to update document content or code examples — that is Doc-Polisher's job. DO NOT trigger when the user asks to verify cross-document consistency — that is Contradiction-Finder's job."
+description: "Analyzes AI prompt files (.claude/agents/*.md, .claude/skills/**/*.md, .agents/skills/**/*.md, CLAUDE.md, AGENTS.md, .github/copilot-instructions.md, .gemini/styleguide.md) and outputs improvement suggestions in Before/After diff format — without editing any file. Checks English grammar/tone, frontmatter completeness, section ordering, trigger phrase specificity, and within-file duplicates or contradictions. Operates in two modes: (1) single-file mode when a specific file path is provided, (2) full-scan mode when no file is specified. .claude/ and .agents/ are treated independently and are never synchronized. Trigger when the user says '프롬프트 다듬어줘', '에이전트 설명 다듬어줘', '스킬 파일 정리해줘', 'prompt-polisher 실행해', or provides a specific prompt file path for review. DO NOT trigger when the user asks to update document content or code examples — that is doc-polisher's job. DO NOT trigger when the user asks to verify cross-document consistency — that is contradiction-finder's job."
 tools: Bash, Glob, Grep, Read
 model: sonnet
 color: blue
@@ -70,9 +70,9 @@ Flag when:
 ### Area 2 — Structure and Format
 
 For agent `.md` files with frontmatter:
-- All required fields present? (`name`, `description`, `tools`, `model`, `color`, `memory`, `maxTurns`, `permissionMode`)
-- `model` is one of: `haiku`, `sonnet`, `opus`
-- `color` is one of: `green`, `yellow`, `pink`, `blue`, `orange`, `red`, `purple`
+- Only `name` and `description` are required. `tools`, `model`, `color`, `memory`, `maxTurns`, and `permissionMode` are optional — flag a field only when a *present* field holds an invalid value, never because an optional field is absent.
+- `model` is `haiku`, `sonnet`, `opus`, a full model ID (e.g., `claude-opus-4-8`), or `inherit`
+- `color` is one of: `red`, `blue`, `green`, `yellow`, `purple`, `orange`, `pink`, `cyan`
 - Body follows a logical flow: Role statement → Context/Scope → Steps → Output Format → Constraints
 
 For skill `SKILL.md` files:
@@ -93,7 +93,7 @@ Flag when:
 - No slash-command or named-agent trigger example is included
 - Trigger conditions are so broad they would fire for unrelated user requests
 - The description lacks a "DO NOT trigger when..." boundary clause that distinguishes this agent from a similar one
-- The trigger conditions overlap with another agent's trigger conditions (check other agent files in `.claude/agents/`)
+- The trigger conditions overlap with another agent's trigger conditions (check other agent files in `.claude/agents/`) — flag obvious overlaps as improvement suggestions here; exhaustive cross-agent overlap auditing is contradiction-finder's L4 responsibility
 
 ### Area 4 — Within-file Duplicates and Contradictions
 
@@ -144,5 +144,5 @@ Limit to the **5 most impactful issues per file**. Do not nitpick stylistic pref
 
 - Never edit any file. Output suggestions only.
 - Never synchronize `.claude/` and `.agents/` — treat them as separate systems.
-- Do not suggest changes to document content accuracy (outdated code examples, missing conventions) — that is Doc-Polisher's responsibility.
+- Do not suggest changes to document content accuracy (outdated code examples, missing conventions) — that is doc-polisher's responsibility.
 - Do not flag formatting differences between `.claude/` and `.agents/` as issues.
