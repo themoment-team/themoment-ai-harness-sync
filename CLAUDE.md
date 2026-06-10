@@ -10,11 +10,25 @@ Format: `type(scope): 한국어 설명`
 - **Scopes**: `global` (cross-cutting), `claude`, `codex`, `gemini`, `copilot`, `ci/cd`
 - **Description**: Korean, no period
 
-## Adding a New Skill or Agent
+## Adding a New Skill
 
 1. Add skill files under `.claude/skills/<name>/` (and mirror in `.agents/skills/<name>/` for Codex)
 2. Register each new path in `sync-manifest.yml` under `items:` with a unique `id`
 3. Commit: `add(claude): 새 스킬 추가` or `add(global): claude/codex 양쪽에 추가`
+
+## Adding a New Agent
+
+Claude와 Codex는 에이전트 포맷이 다릅니다. 본문은 같아도 헤더 형식을 각각 맞춰야 합니다.
+
+1. Claude: `.claude/agents/<name>.md` 작성 — YAML frontmatter (`name`, `description` 필수; `tools`, `model`, `color`, `memory`, `maxTurns`, `permissionMode` 선택) + 본문 프롬프트
+   Codex: `.codex/agents/<name>.toml` 작성 — `name`, `description`, `developer_instructions` 필수; 선택 필드 `model_reasoning_effort`(`low`/`medium`/`high`), `sandbox_mode`(`read-only`/`workspace-write`), `mcp_servers`, `skills.config`, `nickname_candidates`
+2. 포맷 변환 주의:
+   - `developer_instructions`는 TOML **literal string**(`'''…'''`)으로 작성한다 — 본문의 grep 정규식 백슬래시가 basic string 이스케이프와 충돌함
+   - Claude `tools:` allowlist는 Codex에 1:1 대응이 없다 → 읽기 전용 에이전트는 `sandbox_mode = "read-only"`, 편집 에이전트는 `"workspace-write"`로 매핑
+   - Codex `model`은 잘못된 ID 위험이 있으므로 생략해 부모 세션(`.codex/config.toml`) 설정을 상속하고, 작업 무게는 `model_reasoning_effort`로 차등한다
+3. `sync-manifest.yml`에 양쪽 경로를 각각 등록 (`claude/agents/<name>`, `codex/agents/<name>`, `groups: [claude]` / `[codex]`)
+4. `.claude/agents/README.md`와 `.codex/agents/README.md` 표에 항목 추가
+5. Commit: `add(global): <이름> 에이전트 추가` or `add(claude): <이름> 에이전트 추가`
 
 ## Adding a New Hook Module
 
