@@ -77,16 +77,16 @@ grep -rn "@param:JsonAlias" --include="*.kt" . --exclude-dir=build --exclude-dir
 grep -rn "@Autowired" --include="*.kt" . --exclude-dir=build --exclude-dir=.gradle
 
 # Class-level @Transactional (method-level is required)
-grep -rn "^@Transactional" --include="*.kt" . --exclude-dir=build --exclude-dir=.gradle -A2
+grep -rn "^\s*@Transactional" --include="*.kt" . --exclude-dir=build --exclude-dir=.gradle -A2
 
 # println() usage (SLF4J logger required)
 grep -rn "println(" --include="*.kt" . --exclude-dir=build --exclude-dir=.gradle
 
 # Korean characters in log messages (English-only rule)
-grep -rn 'logger\(\)\.[a-z]*("[^"]*[가-힣]' --include="*.kt" . --exclude-dir=build --exclude-dir=.gradle
+grep -rnE 'logger(\(\))?\.[a-z]+\("[^"]*[가-힣]' --include="*.kt" . --exclude-dir=build --exclude-dir=.gradle
 
 # String interpolation in log messages (${} forbidden, {} placeholder required)
-grep -rn 'logger\(\)\.[a-z]*(".*\$[{a-zA-Z]' --include="*.kt" . --exclude-dir=build --exclude-dir=.gradle
+grep -rnE 'logger(\(\))?\.[a-z]+\(".*\$[{a-zA-Z]' --include="*.kt" . --exclude-dir=build --exclude-dir=.gradle
 
 # ExpectedException with dynamic data in message (forbidden)
 grep -rn 'ExpectedException(".*\$' --include="*.kt" . --exclude-dir=build --exclude-dir=.gradle
