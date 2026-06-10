@@ -254,6 +254,37 @@ items:
     dest: .agents/skills/database-schema/
     groups: [codex]
 
+  # ── Codex agents (custom subagents) ───────────────────────────
+  - id: codex/agents/contradiction-finder
+    src: .codex/agents/contradiction-finder.toml
+    dest: .codex/agents/contradiction-finder.toml
+    groups: [codex]
+
+  - id: codex/agents/kotlin-convention-validator
+    src: .codex/agents/kotlin-convention-validator.toml
+    dest: .codex/agents/kotlin-convention-validator.toml
+    groups: [codex]
+
+  - id: codex/agents/doc-polisher
+    src: .codex/agents/doc-polisher.toml
+    dest: .codex/agents/doc-polisher.toml
+    groups: [codex]
+
+  - id: codex/agents/prompt-polisher
+    src: .codex/agents/prompt-polisher.toml
+    dest: .codex/agents/prompt-polisher.toml
+    groups: [codex]
+
+  - id: codex/agents/kotlin-test-fixer
+    src: .codex/agents/kotlin-test-fixer.toml
+    dest: .codex/agents/kotlin-test-fixer.toml
+    groups: [codex]
+
+  - id: codex/agents/web-researcher
+    src: .codex/agents/web-researcher.toml
+    dest: .codex/agents/web-researcher.toml
+    groups: [codex]
+
   # ── Codex config & hooks ──────────────────────────────────────
   - id: codex/config
     src: .codex/config.toml
