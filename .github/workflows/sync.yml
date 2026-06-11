@@ -130,3 +130,35 @@ jobs:
           | xargs -r -I{} gh pr edit {} \
               --repo "${{ matrix.installation.repo }}" \
               --base "${{ matrix.installation.base_branch }}"
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [prepare, sync]
+    if: always()
+    steps:
+      - name: Determine Status
+        id: status
+        run: |
+          if [[ "${{ needs.prepare.result }}" == "failure" ]] || \
+             [[ "${{ needs.sync.result }}" == "failure" ]]; then
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "color=0xFF4C4C" >> $GITHUB_OUTPUT
+          elif [[ "${{ needs.sync.result }}" == "success" ]] || \
+               [[ "${{ needs.sync.result }}" == "skipped" ]]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "color=0x4CAF50" >> $GITHUB_OUTPUT
+          else
+            echo "status=cancelled" >> $GITHUB_OUTPUT
+            echo "color=0xFFA500" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Discord Notification
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_INFORMATION_ALERT_CHANNEL_WEBHOOK }}
+          status: ${{ steps.status.outputs.status }}
+          color: ${{ steps.status.outputs.color }}
+          title: "AI Harness Sync"
+          description: |
+            **Prepare:** ${{ needs.prepare.result }}
+            **Sync:** ${{ needs.sync.result }}
