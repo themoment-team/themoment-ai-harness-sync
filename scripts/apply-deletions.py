@@ -38,6 +38,11 @@ def main() -> None:
     parser.add_argument("--repo", required=True)
     parser.add_argument("--branch-prefix", required=True)
     parser.add_argument("--base-branch", required=True)
+    parser.add_argument(
+        "--pr-label",
+        default="harness sync:하네스 동기화",
+        help="cleanup PR에 붙일 라벨. 빈 문자열이면 라벨을 붙이지 않는다.",
+    )
     args = parser.parse_args()
 
     with open(MANIFEST_PATH) as f:
@@ -116,14 +121,18 @@ def main() -> None:
         ).stdout.strip()
 
         if not existing_pr:
+            create_cmd = [
+                "gh", "pr", "create",
+                "--repo", repo,
+                "--head", sync_branch,
+                "--base", base_branch,
+                "--title", "chore: remove orphaned files from previous sync",
+                "--body", "Automated cleanup: removes files renamed or deleted in themoment-ai-harness-sync.",
+            ]
+            if args.pr_label:
+                create_cmd += ["--label", args.pr_label]
             result = subprocess.run(
-                ["gh", "pr", "create",
-                 "--repo", repo,
-                 "--head", sync_branch,
-                 "--base", base_branch,
-                 "--title", "chore: remove orphaned files from previous sync",
-                 "--body", "Automated cleanup: removes files renamed or deleted in themoment-ai-harness-sync.",
-                 "--label", "harness sync:하네스 동기화"],
+                create_cmd,
                 text=True, capture_output=True, env=gh_env, check=False,
             )
             if result.returncode == 0:

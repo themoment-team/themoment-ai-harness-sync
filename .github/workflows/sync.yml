@@ -84,7 +84,7 @@ jobs:
         with:
           GH_INSTALLATION_TOKEN: ${{ steps.app-token.outputs.token }}
           CONFIG_PATH: /tmp/sync.yml
-          PR_LABELS: "harness sync:하네스 동기화"
+          PR_LABELS: ${{ matrix.installation.pr_labels }}
           BRANCH_PREFIX: ${{ matrix.installation.branch_prefix }}
           COMMIT_PREFIX: "chore"
           COMMIT_EACH_FILE: false
@@ -116,7 +116,8 @@ jobs:
           python3 scripts/apply-deletions.py \
             --repo "${{ matrix.installation.repo }}" \
             --branch-prefix "${{ matrix.installation.branch_prefix }}" \
-            --base-branch "${{ matrix.installation.base_branch }}"
+            --base-branch "${{ matrix.installation.base_branch }}" \
+            --pr-label "${{ matrix.installation.pr_labels }}"
       - name: Retarget open sync PRs to base branch
         continue-on-error: true
         env:

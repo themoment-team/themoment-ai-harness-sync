@@ -17,6 +17,8 @@ GitHub Actions matrix용 JSON을 stdout으로 출력합니다.
     - claude/skills/kotest-guide
   include:       # groups 외에 추가할 항목 ID
     - copilot/instructions
+  pr_label:      # sync PR에 'harness sync:하네스 동기화' 라벨을 붙일지 (기본값: true)
+    false
 
 환경변수:
   APP_ID           - GitHub App ID
@@ -42,6 +44,9 @@ import yaml
 
 MANIFEST_PATH = Path(__file__).parent.parent / "sync-manifest.yml"
 GH_API_BASE = "https://api.github.com"
+
+# sync PR에 기본으로 붙는 라벨. .harness/sync.yml의 pr_label: false 로 비활성화 가능.
+SYNC_PR_LABEL = "harness sync:하네스 동기화"
 
 
 def load_manifest() -> dict:
@@ -332,8 +337,10 @@ def main():
                 continue
 
             language = "en"
+            pr_label_enabled = True
             if config:
                 language = config.get("language", "en")
+                pr_label_enabled = config.get("pr_label", True)
 
             matrix.append({
                 "inst_id": inst_id,
@@ -341,6 +348,7 @@ def main():
                 "branch_prefix": branch_prefix,
                 "base_branch": base_branch,
                 "language": language,
+                "pr_labels": SYNC_PR_LABEL if pr_label_enabled else "",
                 "config": build_sync_config(full_name, files, base_branch),
             })
 

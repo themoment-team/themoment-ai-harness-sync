@@ -81,6 +81,13 @@ language: ko   # PR 제목: "[global] {가장 규모가 큰 커밋의 ': ' 이�
                # 생략 시 기본값 en (영어 제목·본문)
 ```
 
+`pr_label` 필드로 sync PR에 붙는 `harness sync:하네스 동기화` 라벨을 끌 수 있습니다 (기본값: `true`):
+
+```yaml
+pr_label: false   # sync PR과 cleanup PR 모두 라벨을 붙이지 않는다
+                  # 생략 시 기본값 true (기존처럼 라벨 부착)
+```
+
 ## 파일 이름 변경 / 삭제 시 타깃 레포 정리
 
 파일명을 바꾸거나 항목을 삭제하면 타깃 레포에 구 파일이 그대로 남습니다.
