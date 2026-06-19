@@ -7,10 +7,10 @@ TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name')
 FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // .tool_input.path // empty')
 CWD=$(echo "$INPUT" | jq -r '.cwd // empty')
 
-[[ "$FILE_PATH" == *.kt ]] || exit 0
+[[ "$FILE_PATH" == *.kt || "$FILE_PATH" == *.java ]] || exit 0
 [[ "$FILE_PATH" == */test/* ]] && exit 0
 FILE_NAME=$(basename "$FILE_PATH")
-[[ "$FILE_NAME" == *ServiceImpl.kt ]] || exit 0
+[[ "$FILE_NAME" == *ServiceImpl.kt || "$FILE_NAME" == *ServiceImpl.java ]] || exit 0
 
 if [[ "$FILE_PATH" == /* ]]; then
     FILE_ABS="$FILE_PATH"
@@ -45,7 +45,8 @@ else
     TEST_TASK=":${REL//\//:}:test"
 fi
 
-TEST_CLASS="${FILE_NAME%Impl.kt}Test"
+BASE="${FILE_NAME%.*}"
+TEST_CLASS="${BASE%Impl}Test"
 echo "[Hook] Running $TEST_TASK --tests $TEST_CLASS ..." >&2
 TEST_OUTPUT=$(cd "$PROJECT_ROOT" && "$GRADLE_CMD" "$TEST_TASK" --tests "$TEST_CLASS" 2>&1)
 TEST_EXIT=$?
