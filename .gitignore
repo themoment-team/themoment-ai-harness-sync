@@ -14,3 +14,7 @@ PR_BODY.md
 
 ### Tool internals ###
 .antigravitycli/
+
+### Python ###
+__pycache__/
+*.py[cod]
