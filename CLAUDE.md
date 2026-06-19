@@ -51,7 +51,7 @@ Hook 모듈은 dispatcher가 자동으로 스캔하는 구조입니다.
     logging/           ← opt-in
     command-guard/     ← opt-in
     ktlint/            ← opt-in
-    kotest/            ← opt-in
+    gradle-test/       ← opt-in
 ```
 
 ## .harness/sync.yml 설정 포맷

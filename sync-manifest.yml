@@ -138,9 +138,9 @@ items:
     dest: .claude/hooks/modules/ktlint/
     groups: []
 
-  - id: claude/hooks/kotest
-    src: .claude/hooks/modules/kotest/
-    dest: .claude/hooks/modules/kotest/
+  - id: claude/hooks/gradle-test
+    src: .claude/hooks/modules/gradle-test/
+    dest: .claude/hooks/modules/gradle-test/
     groups: []
 
   - id: claude/hooks/biome
@@ -311,9 +311,9 @@ items:
     dest: .codex/hooks/modules/ktlint/
     groups: []
 
-  - id: codex/hooks/kotest
-    src: .codex/hooks/modules/kotest/
-    dest: .codex/hooks/modules/kotest/
+  - id: codex/hooks/gradle-test
+    src: .codex/hooks/modules/gradle-test/
+    dest: .codex/hooks/modules/gradle-test/
     groups: []
 
   - id: codex/hooks/biome
@@ -398,4 +398,10 @@ defaults:
 #     - dest: .claude/skills/old-skill-name/
 #       reason: "new-skill-name 으로 이름 변경"
 #       since: "2026-05-29"
-deletions: []
+deletions:
+  - dest: .claude/hooks/modules/kotest/
+    reason: "gradle-test 로 이름 변경 (프레임워크 중립)"
+    since: "2026-06-19"
+  - dest: .codex/hooks/modules/kotest/
+    reason: "gradle-test 로 이름 변경 (프레임워크 중립)"
+    since: "2026-06-19"
