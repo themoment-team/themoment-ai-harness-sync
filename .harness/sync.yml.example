@@ -1,7 +1,7 @@
 # themoment-ai-harness-sync 동기화 설정
 # 이 파일을 sync.yml로 이름을 바꾸고 .harness/ 디렉터리에 배치하세요
 #
-# 사용 가능한 그룹: claude, codex, gemini, copilot
+# 사용 가능한 그룹: claude, codex, gemini
 # 전체 항목 목록: sync-manifest.yml 참고 (id 기준)
 #
 # 이 파일이 없으면 기본값(claude, codex, gemini)이 적용됩니다
@@ -11,7 +11,6 @@ groups:
   - claude
   - codex
   - gemini
-  # - copilot
 
 # 개별 항목 활성화/비활성화 (sync-manifest.yml의 id 기준)
 # - false: 그룹에 포함된 항목을 제외

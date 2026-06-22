@@ -16,7 +16,7 @@ GitHub Actions matrix용 JSON을 stdout으로 출력합니다.
   exclude:       # groups에서 제외할 항목 ID
     - claude/skills/kotest-guide
   include:       # groups 외에 추가할 항목 ID
-    - copilot/instructions
+    - claude/hooks/ktlint
   pr_label:      # sync PR에 'harness sync:하네스 동기화' 라벨을 붙일지 (기본값: true)
     false
 

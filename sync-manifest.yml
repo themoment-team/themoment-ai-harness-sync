@@ -372,17 +372,6 @@ items:
     dest: .gemini/settings.json
     groups: [gemini]
 
-  - id: gemini/styleguide
-    src: .gemini/styleguide.md
-    dest: .gemini/styleguide.md
-    groups: [gemini]
-
-  # ── Copilot ───────────────────────────────────────────────────
-  - id: copilot/instructions
-    src: .github/copilot-instructions.md
-    dest: .github/copilot-instructions.md
-    groups: [copilot]
-
 # .harness-sync.yml이 없는 레포에 적용할 기본 그룹
 defaults:
   - claude
