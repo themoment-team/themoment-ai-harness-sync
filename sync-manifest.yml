@@ -81,6 +81,16 @@ items:
     dest: .claude/skills/database-schema/
     groups: [claude]
 
+  - id: claude/skills/the-sdk
+    src: .claude/skills/the-sdk/
+    dest: .claude/skills/the-sdk/
+    groups: [claude]
+
+  - id: claude/skills/java-spring-arch
+    src: .claude/skills/java-spring-arch/
+    dest: .claude/skills/java-spring-arch/
+    groups: [claude]
+
   # ── Claude agents ─────────────────────────────────────────────
   - id: claude/agents/contradiction-finder
     src: .claude/agents/contradiction-finder.md
@@ -252,6 +262,16 @@ items:
   - id: codex/skills/database-schema
     src: .agents/skills/database-schema/
     dest: .agents/skills/database-schema/
+    groups: [codex]
+
+  - id: codex/skills/the-sdk
+    src: .agents/skills/the-sdk/
+    dest: .agents/skills/the-sdk/
+    groups: [codex]
+
+  - id: codex/skills/java-spring-arch
+    src: .agents/skills/java-spring-arch/
+    dest: .agents/skills/java-spring-arch/
     groups: [codex]
 
   # ── Codex agents (custom subagents) ───────────────────────────
