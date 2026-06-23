@@ -52,7 +52,7 @@ List<Entity> findAllWithRelated();
 ## Exception Handling
 
 ```java
-throw new ExpectedException("Student not found", HttpStatus.NOT_FOUND);
+throw new ExpectedException("학생을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 ```
 
 ## DTO Conversion Pattern
