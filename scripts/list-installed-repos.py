@@ -291,6 +291,11 @@ def main():
     # 레포 단위 matrix (per-repo per-installation)
     matrix: list[dict] = []
 
+    # 보고서용 통계
+    total_repos = 0        # source repo 제외, 설치에 연결된 전체 레포 수
+    skipped_open_pr = 0    # 열린 sync PR이 있어 건너뛴 수
+    skipped_no_files = 0   # 대상 파일이 없어 건너뛴 수
+
     for inst in installations:
         inst_id = inst["id"]
         try:
@@ -307,6 +312,7 @@ def main():
             if full_name == source_repo:
                 continue
 
+            total_repos += 1
             default_branch = repo.get("default_branch", "main")
             config = get_repo_harness_config(full_name, inst_token)
 
@@ -333,11 +339,13 @@ def main():
 
             files = resolve_files(config, manifest, default_groups)
             if not files:
+                skipped_no_files += 1
                 continue
 
             # 이미 열린 sync PR이 있으면 건너뛴다 (phantom force-push churn 방지).
             # PR이 머지/종료된 뒤 다음 실행에서 최신 내용으로 다시 동기화된다.
             if has_open_sync_pr(full_name, branch_prefix, base_branch, inst_token):
+                skipped_open_pr += 1
                 print(
                     f"  [{inst_id}] {full_name}: skip — 열린 sync PR 존재 "
                     f"(branch_prefix={branch_prefix})",
@@ -360,6 +368,24 @@ def main():
                 "pr_labels": SYNC_PR_LABEL if pr_label_enabled else "",
                 "config": build_sync_config(full_name, files, base_branch),
             })
+
+    stats = {
+        "installations": len(installations),
+        "total_repos": total_repos,
+        "attempted": len(matrix),
+        "skipped_open_pr": skipped_open_pr,
+        "skipped_no_files": skipped_no_files,
+    }
+    print(
+        f"  stats: attempted={stats['attempted']}/{total_repos} repos "
+        f"(installations={stats['installations']}, "
+        f"skip_open_pr={skipped_open_pr}, skip_no_files={skipped_no_files})",
+        file=sys.stderr,
+    )
+    gh_output = os.environ.get("GITHUB_OUTPUT")
+    if gh_output:
+        with open(gh_output, "a") as f:
+            f.write(f"stats={json.dumps(stats)}\n")
 
     print(json.dumps(matrix))
 
