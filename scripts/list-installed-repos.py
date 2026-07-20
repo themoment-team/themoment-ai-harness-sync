@@ -109,9 +109,17 @@ def gh_api(endpoint: str, token: str) -> any:
     )
     text = result.stdout.strip()
     if text.startswith("["):
+        # --paginate는 여러 페이지의 JSON 배열을 구분자 없이 이어붙인다.
+        # 문자열 값 안에 '][' 가 있어도 안전하도록 raw_decode로 순차 파싱한다.
+        decoder = json.JSONDecoder()
         combined = []
-        for chunk in text.replace("][", "]\n[").split("\n"):
-            combined.extend(json.loads(chunk))
+        idx = 0
+        while idx < len(text):
+            obj, end = decoder.raw_decode(text, idx)
+            combined.extend(obj)
+            idx = end
+            while idx < len(text) and text[idx].isspace():
+                idx += 1
         return combined
     return json.loads(text)
 
@@ -152,8 +160,15 @@ def has_open_sync_pr(full_name: str, branch_prefix: str, base_branch: str, token
     (사람이 만든 '<prefix>...' 작업 브랜치 PR과 충돌하면 안 되므로)
     """
     branch = sync_branch_name(branch_prefix, base_branch)
+    # --jq로 head.ref만 뽑아 줄 단위로 받는다. PR 본문/제목에 '][' 같은
+    # 문자열이 들어가도 임의의 JSON을 직접 파싱하지 않으므로 안전하다.
     result = subprocess.run(
-        ["gh", "api", f"/repos/{full_name}/pulls?state=open&per_page=100", "--paginate"],
+        [
+            "gh", "api",
+            f"/repos/{full_name}/pulls?state=open&per_page=100",
+            "--paginate",
+            "--jq", ".[].head.ref",
+        ],
         env={**os.environ, "GH_TOKEN": token},
         capture_output=True,
         text=True,
@@ -161,15 +176,9 @@ def has_open_sync_pr(full_name: str, branch_prefix: str, base_branch: str, token
     if result.returncode != 0:
         # 조회 실패 시 보수적으로 '없음' 처리하여 동기화는 진행
         return False
-    text = result.stdout.strip()
-    pulls = []
-    for chunk in text.replace("][", "]\n[").split("\n"):
-        chunk = chunk.strip()
-        if chunk:
-            pulls.extend(json.loads(chunk))
     return any(
-        pr.get("head", {}).get("ref", "") == branch
-        for pr in pulls
+        line.strip() == branch
+        for line in result.stdout.splitlines()
     )
 
 
