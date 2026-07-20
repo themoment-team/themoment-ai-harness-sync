@@ -67,8 +67,18 @@ jobs:
           repo="${{ matrix.installation.repo }}"
           base="${{ matrix.installation.base_branch }}"
           # /branches/{name} 은 정확 매칭이 아니라 없는 브랜치에도 기본 브랜치를
-          # 돌려주므로 못 쓴다. git/ref/heads 는 정확 매칭이라 없으면 404 난다.
-          gh api "/repos/$repo/git/ref/heads/$base" --silent
+          # 돌려주므로 못 쓴다. git/ref/heads 는 정확 매칭이라 없으면 404,
+          # 커밋이 하나도 없는 빈 저장소는 409(empty)를 준다.
+          if err=$(gh api "/repos/$repo/git/ref/heads/$base" 2>&1); then
+            echo "reason=ok" >> "$GITHUB_OUTPUT"
+          else
+            if echo "$err" | grep -qi "empty"; then
+              echo "reason=repo-empty" >> "$GITHUB_OUTPUT"
+            else
+              echo "reason=base-branch-missing" >> "$GITHUB_OUTPUT"
+            fi
+            exit 1
+          fi
 
       - name: Write sync config
         if: steps.basecheck.outcome == 'success'
@@ -180,6 +190,7 @@ jobs:
           BASE_BRANCH: ${{ matrix.installation.base_branch }}
           TOKEN_OUTCOME: ${{ steps.app-token.outcome }}
           BASE_OUTCOME: ${{ steps.basecheck.outcome }}
+          BASE_REASON: ${{ steps.basecheck.outputs.reason }}
           SYNC_OUTCOME: ${{ steps.sync.outcome }}
         run: |
           mkdir -p results

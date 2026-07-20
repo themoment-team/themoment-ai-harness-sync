@@ -12,6 +12,7 @@ env:
   BASE_BRANCH    sync 대상 base branch
   TOKEN_OUTCOME  토큰 생성 스텝 outcome
   BASE_OUTCOME   base branch 확인 스텝 outcome
+  BASE_REASON    base branch 확인 사유 (ok|base-branch-missing|repo-empty)
   SYNC_OUTCOME   sync 액션 스텝 outcome
 """
 import json
@@ -19,6 +20,7 @@ import os
 
 token = os.environ.get("TOKEN_OUTCOME", "")
 base = os.environ.get("BASE_OUTCOME", "")
+base_reason = os.environ.get("BASE_REASON", "")
 sync = os.environ.get("SYNC_OUTCOME", "")
 base_branch = os.environ.get("BASE_BRANCH", "")
 
@@ -29,6 +31,9 @@ message = ""
 if token == "failure":
     status, error_class = "failed", "token-failed"
     message = "GitHub App 설치 토큰 생성에 실패했습니다 — 설치 권한을 확인하세요"
+elif base == "failure" and base_reason == "repo-empty":
+    status, error_class = "failed", "repo-empty"
+    message = "원격 저장소가 비어 있어(커밋 없음) 동기화할 수 없습니다"
 elif base == "failure":
     status, error_class = "failed", "base-branch-missing"
     message = f"`base_branch`로 지정된 `{base_branch}` 브랜치가 원격 저장소에 존재하지 않습니다"
