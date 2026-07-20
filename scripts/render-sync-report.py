@@ -101,86 +101,91 @@ def main() -> None:
     skipped = [r for r in results if r.get("status") == "skipped"]
     failures = [r for r in results if r.get("status") == "failed"]
 
+    known = [f for f in failures if f.get("error_class") != "sync-action-failed"]
+    unknown = [f for f in failures if f.get("error_class") == "sync-action-failed"]
+
     lines: list[str] = []
-    lines.append("# 🔄 AI Harness Sync 결과")
-    lines.append("")
-    lines.append(f"**Prepare:** `{PREPARE_RESULT}` · **Sync:** `{SYNC_RESULT}`")
+    lines.append("# AI Harness Sync 결과")
     lines.append("")
 
+    # 한눈 요약 표
+    lines.append("| 지표 | 값 |")
+    lines.append("| --- | --- |")
+    lines.append(f"| Prepare / Sync | `{PREPARE_RESULT}` / `{SYNC_RESULT}` |")
     if stats:
         lines.append(
-            f"- 동기화 시도: **{stats.get('attempted', 0)} / "
-            f"{stats.get('total_repos', 0)}** 레포 "
-            f"(설치 {stats.get('installations', 0)}개)"
+            f"| 동기화 시도 | **{stats.get('attempted', 0)} / "
+            f"{stats.get('total_repos', 0)}** 레포 (설치 {stats.get('installations', 0)}개) |"
         )
         lines.append(
-            f"- 건너뜀: 열린 PR {stats.get('skipped_open_pr', 0)} · "
-            f"대상 파일 없음 {stats.get('skipped_no_files', 0)}"
+            f"| 건너뜀 | 열린 PR {stats.get('skipped_open_pr', 0)} · "
+            f"대상 파일 없음 {stats.get('skipped_no_files', 0)} |"
         )
+    fail_cell = f"**{len(failures)}**" if failures else "0"
     lines.append(
-        f"- 결과: ✅ 성공 {len(successes)} · "
-        f"⏭️ 건너뜀 {len(skipped)} · ❌ 실패 {len(failures)}"
+        f"| 성공 · 건너뜀 · 실패 | {len(successes)} · {len(skipped)} · {fail_cell} |"
     )
     lines.append("")
 
     # prepare 자체가 실패한 경우(매트릭스 산출 크래시 등)
     if PREPARE_RESULT == "failure":
-        lines.append("---")
         lines.append("## 🚨 prepare 단계 실패")
         lines.append("")
         lines.append("매트릭스 산출 단계가 실패해 이번 실행은 동기화를 진행하지 못했습니다.")
-        jobs = fetch_jobs()
-        info = jobs.get("prepare")
+        lines.append("")
+        info = fetch_jobs().get("prepare")
         if info:
             log = fetch_log_tail(info["id"])
             if log:
-                lines.append("")
-                lines.append("<details><summary>로그 원문 보기</summary>")
+                lines.append(f"<details><summary>로그 원문 · <a href=\"{info['url']}\">전체 로그</a></summary>")
                 lines.append("")
                 lines.append("```text")
                 lines.append(log.rstrip())
                 lines.append("```")
                 lines.append("")
                 lines.append("</details>")
-            lines.append("")
-            lines.append(f"[전체 job 로그 열기]({info['url']})")
+                lines.append("")
 
     if failures:
-        lines.append("---")
-        lines.append("## 실패한 레포")
+        lines.append("## ❌ 실패한 레포")
         lines.append("")
-        # 원시 로그가 필요한 경우에만 잡 목록을 조회한다
-        needs_logs = any(f.get("error_class") == "sync-action-failed" for f in failures)
-        jobs = fetch_jobs() if needs_logs else {}
-
-        for f in failures:
+        # 실패 목록은 표 한 장으로 (알 수 없는 오류는 로그 링크로 연결)
+        lines.append("| 레포 | 원인 |")
+        lines.append("| --- | --- |")
+        for f in known:
             repo = f.get("repo", "?")
-            repo_url = f.get("repo_url", "")
-            error_class = f.get("error_class", "")
-            message = f.get("message", "")
+            lines.append(f"| [`{repo}`]({f.get('repo_url', '')}) | {f.get('message', '')} |")
+        for f in unknown:
+            repo = f.get("repo", "?")
+            lines.append(f"| [`{repo}`]({f.get('repo_url', '')}) | 알 수 없는 오류 — 아래 로그 참조 |")
+        lines.append("")
 
-            if error_class == "sync-action-failed":
-                lines.append(f"### [🚨]({repo_url}) `{repo}` — 알 수 없는 오류")
+        # 알 수 없는 오류만 원시 로그를 접이식으로 첨부
+        if unknown:
+            jobs = fetch_jobs()
+            for f in unknown:
+                repo = f.get("repo", "?")
                 info = jobs.get(f.get("job_name", ""))
-                if info:
-                    log = fetch_log_tail(info["id"])
-                    if log:
-                        lines.append("")
-                        lines.append("<details><summary>로그 원문 보기</summary>")
-                        lines.append("")
-                        lines.append("```text")
-                        lines.append(log.rstrip())
-                        lines.append("```")
-                        lines.append("")
-                        lines.append("</details>")
+                job_url = info["url"] if info else f.get("repo_url", "")
+                log = fetch_log_tail(info["id"]) if info else ""
+                if log:
+                    lines.append(
+                        f"<details><summary><code>{repo}</code> 로그 원문 · "
+                        f"<a href=\"{job_url}\">전체 로그</a></summary>"
+                    )
                     lines.append("")
-                    lines.append(f"[전체 job 로그 열기]({info['url']})")
-            else:
-                lines.append(f"### [⚠️]({repo_url}) `{repo}` — {message}")
-            lines.append("")
+                    lines.append("```text")
+                    lines.append(log.rstrip())
+                    lines.append("```")
+                    lines.append("")
+                    lines.append("</details>")
+                    lines.append("")
+                else:
+                    lines.append(f"- [`{repo}`]({job_url}) — 전체 job 로그에서 원인을 확인하세요")
+                    lines.append("")
 
     if not failures and PREPARE_RESULT != "failure":
-        lines.append("모든 동기화가 문제없이 처리되었습니다. 🎉")
+        lines.append("모든 동기화가 문제없이 처리되었습니다.")
         lines.append("")
 
     report = "\n".join(lines) + "\n"
