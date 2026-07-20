@@ -66,7 +66,9 @@ jobs:
         run: |
           repo="${{ matrix.installation.repo }}"
           base="${{ matrix.installation.base_branch }}"
-          gh api "/repos/$repo/branches/$base" --silent
+          # /branches/{name} 은 정확 매칭이 아니라 없는 브랜치에도 기본 브랜치를
+          # 돌려주므로 못 쓴다. git/ref/heads 는 정확 매칭이라 없으면 404 난다.
+          gh api "/repos/$repo/git/ref/heads/$base" --silent
 
       - name: Write sync config
         if: steps.basecheck.outcome == 'success'
