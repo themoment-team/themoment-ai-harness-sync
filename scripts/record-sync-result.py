@@ -54,4 +54,4 @@ record = {
     "error_class": error_class,
     "message": message,
 }
-print(json.dumps(record, ensure_ascii=False))
+print(json.dumps(record))

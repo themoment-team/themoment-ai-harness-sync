@@ -45,7 +45,7 @@ def load_results() -> list[dict]:
     results = []
     for path in sorted(glob.glob(os.path.join(RESULTS_DIR, "result-*.json"))):
         try:
-            with open(path) as f:
+            with open(path, encoding="utf-8") as f:
                 results.append(json.load(f))
         except (OSError, ValueError):
             pass
@@ -55,16 +55,22 @@ def load_results() -> list[dict]:
 def fetch_jobs() -> dict:
     """잡 이름 → {id, url} 매핑. continue-on-error가 conclusion을 감추므로
     상태 판정엔 쓰지 않고, 실패 레그의 원시 로그/링크를 찾는 데만 쓴다."""
-    result = subprocess.run(
-        [
-            "gh", "api",
-            f"/repos/{GH_REPO}/actions/runs/{RUN_ID}/jobs?per_page=100",
-            "--paginate",
-            "--jq", ".jobs[] | {name: .name, id: .id, url: .html_url}",
-        ],
-        capture_output=True,
-        text=True,
-    )
+    if not GH_REPO or not RUN_ID:
+        return {}
+    try:
+        result = subprocess.run(
+            [
+                "gh", "api",
+                f"/repos/{GH_REPO}/actions/runs/{RUN_ID}/jobs?per_page=100",
+                "--paginate",
+                "--jq", ".jobs[] | {name: .name, id: .id, url: .html_url}",
+            ],
+            capture_output=True,
+            text=True,
+            errors="replace",
+        )
+    except (FileNotFoundError, subprocess.SubprocessError):
+        return {}
     jobs = {}
     if result.returncode == 0:
         for line in result.stdout.splitlines():
@@ -80,11 +86,17 @@ def fetch_jobs() -> dict:
 
 
 def fetch_log_tail(job_id: int, max_chars: int = 12000) -> str:
-    result = subprocess.run(
-        ["gh", "api", f"/repos/{GH_REPO}/actions/jobs/{job_id}/logs"],
-        capture_output=True,
-        text=True,
-    )
+    if not GH_REPO:
+        return ""
+    try:
+        result = subprocess.run(
+            ["gh", "api", f"/repos/{GH_REPO}/actions/jobs/{job_id}/logs"],
+            capture_output=True,
+            text=True,
+            errors="replace",
+        )
+    except (FileNotFoundError, subprocess.SubprocessError):
+        return ""
     if result.returncode != 0 or not result.stdout:
         return ""
     log = result.stdout
@@ -192,7 +204,7 @@ def main() -> None:
 
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
     if summary_path:
-        with open(summary_path, "a") as f:
+        with open(summary_path, "a", encoding="utf-8") as f:
             f.write(report)
     else:
         # 로컬 실행 등 요약 파일이 없으면 stdout으로
