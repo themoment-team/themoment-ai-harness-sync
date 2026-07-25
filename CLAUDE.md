@@ -59,6 +59,8 @@ Hook 모듈은 dispatcher가 자동으로 스캔하는 구조입니다.
 타깃 레포의 `.harness/sync.yml`은 `groups` + `overrides` 구조를 사용합니다.
 
 ```yaml
+enabled: true   # 이 레포의 동기화 사용 여부 (기본값: true)
+
 groups:
   - claude
   - codex
@@ -72,6 +74,9 @@ overrides:
 - `true`: groups에 없는 opt-in 항목을 추가 (구형 `include`)
 - `"v1"` (문자열): 해당 항목을 아카이브된 버전으로 고정
 - 구형 `exclude`/`include` 형식도 하위 호환으로 지원
+
+`enabled: false`로 두면 해당 레포는 매트릭스 산출 단계에서 제외되어 sync PR도 cleanup PR도 생성되지 않습니다 (기본값: `true`).
+App을 제거하지 않고 일시적으로 동기화만 멈출 때 사용합니다.
 
 `language` 필드로 sync PR 제목·본문 언어를 설정할 수 있습니다 (기본값: `en`):
 

@@ -10,6 +10,8 @@ GitHub Actions matrix용 JSON을 stdout으로 출력합니다.
 파일이 없으면 sync-manifest.yml의 defaults 그룹을 모두 적용합니다.
 
 .harness/sync.yml 형식:
+  enabled:       # 이 레포의 동기화 여부 (기본값: true)
+    false        # false면 매트릭스에서 제외되어 아무 작업도 하지 않는다
   groups:        # 포함할 그룹 (기본값: defaults 그룹 전체)
     - claude
     - codex
@@ -293,6 +295,7 @@ def main():
 
     # 보고서용 통계
     total_repos = 0        # source repo 제외, 설치에 연결된 전체 레포 수
+    skipped_disabled = 0   # enabled: false 로 동기화를 끈 수
     skipped_open_pr = 0    # 열린 sync PR이 있어 건너뛴 수
     skipped_no_files = 0   # 대상 파일이 없어 건너뛴 수
 
@@ -315,6 +318,16 @@ def main():
             total_repos += 1
             default_branch = repo.get("default_branch", "main")
             config = get_repo_harness_config(full_name, inst_token)
+
+            # enabled: false 면 이 레포는 동기화 대상에서 완전히 제외한다.
+            # 설정 파일이 없거나 키가 없으면 기본값 true.
+            if config is not None and not config.get("enabled", True):
+                skipped_disabled += 1
+                print(
+                    f"  [{inst_id}] {full_name}: skip — enabled: false (동기화 비활성화)",
+                    file=sys.stderr,
+                )
+                continue
 
             branch_prefix = "harness-sync/"
             base_branch = default_branch
@@ -373,12 +386,14 @@ def main():
         "installations": len(installations),
         "total_repos": total_repos,
         "attempted": len(matrix),
+        "skipped_disabled": skipped_disabled,
         "skipped_open_pr": skipped_open_pr,
         "skipped_no_files": skipped_no_files,
     }
     print(
         f"  stats: attempted={stats['attempted']}/{total_repos} repos "
         f"(installations={stats['installations']}, "
+        f"skip_disabled={skipped_disabled}, "
         f"skip_open_pr={skipped_open_pr}, skip_no_files={skipped_no_files})",
         file=sys.stderr,
     )

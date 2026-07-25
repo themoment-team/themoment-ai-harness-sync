@@ -6,6 +6,11 @@
 #
 # 이 파일이 없으면 기본값(claude, codex, gemini)이 적용됩니다
 
+# 이 레포의 동기화 사용 여부 (생략하면 true)
+# false로 두면 이 레포는 동기화 대상에서 완전히 제외되어
+# sync PR도, cleanup PR도 생성되지 않습니다
+enabled: true
+
 # 포함할 그룹 (생략하면 기본값 적용)
 groups:
   - claude

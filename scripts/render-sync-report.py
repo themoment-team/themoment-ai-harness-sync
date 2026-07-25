@@ -130,7 +130,8 @@ def main() -> None:
             f"{stats.get('total_repos', 0)}** 레포 (설치 {stats.get('installations', 0)}개) |"
         )
         lines.append(
-            f"| 건너뜀 | 열린 PR {stats.get('skipped_open_pr', 0)} · "
+            f"| 건너뜀 | 동기화 비활성화 {stats.get('skipped_disabled', 0)} · "
+            f"열린 PR {stats.get('skipped_open_pr', 0)} · "
             f"대상 파일 없음 {stats.get('skipped_no_files', 0)} |"
         )
     fail_cell = f"**{len(failures)}**" if failures else "0"
