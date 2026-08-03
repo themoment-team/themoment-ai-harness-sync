@@ -9,6 +9,7 @@ Claude가 특정 트리거 문구 또는 상황을 감지하면 자동으로 위
 |-----------------------------------------------------------------|----------------------|-------------------------------------------------------------------------------------------------------------|
 | [kotlin-convention-validator](./kotlin-convention-validator.md) | `컨벤션 검사해줘`           | **Kotlin 전용.** git diff HEAD의 변경된 `.kt` 파일에서 컨벤션 위반 탐지 및 자동 수정 (DTO 어노테이션, 로깅, `val/var`, `@Transactional`) |
 | [contradiction-finder](./contradiction-finder.md)               | `모순 찾아줘`, `일관성 검사해줘` | 4계층 일관성 감사 — 문서↔문서, 문서↔코드, 문서↔에이전트/스킬, 에이전트↔에이전트 간 충돌 탐지. 파일 기반 리포트 출력                                      |
+| [frontend-convention-validator](./frontend-convention-validator.md) | `프론트엔드 컨벤션 검사해줘` | TypeScript/TSX 변경 파일의 FSD, Tailwind/shadcn, Query/Zod 규칙을 읽기 전용으로 검사 |
 
 ## 문서
 
