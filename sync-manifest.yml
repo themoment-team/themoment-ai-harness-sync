@@ -96,6 +96,26 @@ items:
     dest: .claude/skills/nextjs-fsd-architecture/
     groups: [claude]
 
+  - id: claude/skills/nextjs-turborepo-fsd
+    src: .claude/skills/nextjs-turborepo-fsd/
+    dest: .claude/skills/nextjs-turborepo-fsd/
+    groups: [claude]
+
+  - id: claude/skills/tailwind-shadcn
+    src: .claude/skills/tailwind-shadcn/
+    dest: .claude/skills/tailwind-shadcn/
+    groups: [claude]
+
+  - id: claude/skills/tanstack-query-zod
+    src: .claude/skills/tanstack-query-zod/
+    dest: .claude/skills/tanstack-query-zod/
+    groups: [claude]
+
+  - id: claude/skills/nextjs-package-boundaries
+    src: .claude/skills/nextjs-package-boundaries/
+    dest: .claude/skills/nextjs-package-boundaries/
+    groups: [claude]
+
   # ── Next.js FSD project files (opt-in) ────────────────────────
   # 대상 프로젝트의 기존 설정을 덮어쓰므로 FSD 프로젝트에서만 overrides로 활성화한다.
   - id: nextjs/fsd/steiger-config
@@ -117,6 +137,11 @@ items:
   - id: claude/agents/kotlin-convention-validator
     src: .claude/agents/kotlin-convention-validator.md
     dest: .claude/agents/kotlin-convention-validator.md
+    groups: [claude]
+
+  - id: claude/agents/frontend-convention-validator
+    src: .claude/agents/frontend-convention-validator.md
+    dest: .claude/agents/frontend-convention-validator.md
     groups: [claude]
 
   - id: claude/agents/doc-polisher
@@ -296,6 +321,26 @@ items:
     dest: .agents/skills/nextjs-fsd-architecture/
     groups: [codex]
 
+  - id: codex/skills/nextjs-turborepo-fsd
+    src: .agents/skills/nextjs-turborepo-fsd/
+    dest: .agents/skills/nextjs-turborepo-fsd/
+    groups: [codex]
+
+  - id: codex/skills/tailwind-shadcn
+    src: .agents/skills/tailwind-shadcn/
+    dest: .agents/skills/tailwind-shadcn/
+    groups: [codex]
+
+  - id: codex/skills/tanstack-query-zod
+    src: .agents/skills/tanstack-query-zod/
+    dest: .agents/skills/tanstack-query-zod/
+    groups: [codex]
+
+  - id: codex/skills/nextjs-package-boundaries
+    src: .agents/skills/nextjs-package-boundaries/
+    dest: .agents/skills/nextjs-package-boundaries/
+    groups: [codex]
+
   # ── Codex agents (custom subagents) ───────────────────────────
   - id: codex/agents/contradiction-finder
     src: .codex/agents/contradiction-finder.toml
@@ -305,6 +350,11 @@ items:
   - id: codex/agents/kotlin-convention-validator
     src: .codex/agents/kotlin-convention-validator.toml
     dest: .codex/agents/kotlin-convention-validator.toml
+    groups: [codex]
+
+  - id: codex/agents/frontend-convention-validator
+    src: .codex/agents/frontend-convention-validator.toml
+    dest: .codex/agents/frontend-convention-validator.toml
     groups: [codex]
 
   - id: codex/agents/doc-polisher

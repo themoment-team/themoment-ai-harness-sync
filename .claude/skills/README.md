@@ -28,9 +28,18 @@ Claude에서 `/skill-name` 으로 호출하는 재사용 가능한 작업 단위
 | [plan-deep-dive](./plan-deep-dive/SKILL.md)         | 숨겨진 요구사항·트레이드오프·제약을 발굴하는 구조화된 인터뷰 후 상세 구현 스펙 파일 생성                                                 |
 | [migration-guide](./migration-guide/SKILL.md)       | DB 스키마 변경·Entity 수정 영향 분석, 올바른 변경 순서(Entity → DTO → Repository → Service → 테스트), 2단계 컬럼 삭제         |
 | [nextjs-fsd-architecture](./nextjs-fsd-architecture/SKILL.md) | Next.js App Router + FSD — `views` 레이어, 슬라이스 세그먼트, import 경계, Server API 공개 규칙 |
+| [nextjs-turborepo-fsd](./nextjs-turborepo-fsd/SKILL.md) | Turborepo Next.js FSD — 앱·공유 패키지 경계, 엔티티 승격, 다중 앱 의존성 검사 |
+| [nextjs-package-boundaries](./nextjs-package-boundaries/SKILL.md) | Next.js 워크스페이스 패키지의 server-only export, 소스 소비·prebuilt 경계 |
 
 ## 테스트
 
 | 스킬                                      | 설명                                                                                    |
 |-----------------------------------------|---------------------------------------------------------------------------------------|
 | [kotest-guide](./kotest-guide/SKILL.md) | Kotest + MockK 패턴 — Given/When/Then 구조, mock 생성, stubbing, 코루틴 테스트, 예외 검증 (Kotlin 전용) |
+
+## 프론트엔드
+
+| 스킬 | 설명 |
+| --- | --- |
+| [tailwind-shadcn](./tailwind-shadcn/SKILL.md) | Tailwind 클래스, `cn()`, 디자인 토큰, shadcn·도메인 UI 소유권 |
+| [tanstack-query-zod](./tanstack-query-zod/SKILL.md) | TanStack Query 훅·Query Key, API 래퍼, Zod 스키마·추론 타입 |
