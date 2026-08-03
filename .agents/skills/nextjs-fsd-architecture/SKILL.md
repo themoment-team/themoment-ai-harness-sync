@@ -77,4 +77,6 @@ overrides:
 "lint:fsd": "node scripts/check-fsd-dependencies.mjs && steiger src --fail-on-warnings"
 ```
 
+For a Turborepo, pass every app source root to the same checker. See the `nextjs-turborepo-fsd` skill for package boundaries and the complete command.
+
 Steiger validates standard FSD rules. The bundled script additionally validates the non-standard `views` layer, same-layer slice imports, and dynamic `import()` calls.

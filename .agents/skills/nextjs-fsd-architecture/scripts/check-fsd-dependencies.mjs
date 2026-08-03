@@ -57,14 +57,17 @@ async function checkSourceRoot(sourceRoot) {
     return violations;
 }
 
-const sourceRoot = resolve(process.argv[2] ?? "src");
-if (!existsSync(sourceRoot)) {
-    console.error(`Source root not found: ${sourceRoot}`);
+const sourceRoots = process.argv.slice(2).map((path) => resolve(path));
+if (!sourceRoots.length) sourceRoots.push(resolve("src"));
+
+const missingRoots = sourceRoots.filter((sourceRoot) => !existsSync(sourceRoot));
+if (missingRoots.length) {
+    console.error(`Source roots not found: ${missingRoots.join(", ")}`);
     process.exitCode = 1;
 } else {
-    const violations = await checkSourceRoot(sourceRoot);
+    const violations = (await Promise.all(sourceRoots.map(checkSourceRoot))).flat();
     if (violations.length) {
-        console.error(violations.join("\n"));
-        process.exitCode = 1;
+      console.error(violations.join("\n"));
+      process.exitCode = 1;
     }
 }

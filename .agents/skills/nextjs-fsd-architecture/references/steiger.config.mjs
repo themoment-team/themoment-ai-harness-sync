@@ -17,4 +17,28 @@ export default defineConfig([
       "fsd/insignificant-slice": "off",
     },
   },
+  {
+    files: ["apps/*/src/app/providers.tsx"],
+    rules: {
+      "fsd/segments-by-purpose": "off",
+    },
+  },
+  {
+    files: ["apps/*/src/{entities,features,widgets}/**/*.{ts,tsx}"],
+    rules: {
+      "fsd/insignificant-slice": "off",
+    },
+  },
+  {
+    files: ["packages/core/src/{entities,shared}/index*.ts"],
+    rules: {
+      "fsd/no-layer-public-api": "off",
+    },
+  },
+  {
+    files: ["packages/core/src/entities/**/*.{ts,tsx}"],
+    rules: {
+      "fsd/insignificant-slice": "off",
+    },
+  },
 ]);
