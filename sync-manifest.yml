@@ -91,6 +91,23 @@ items:
     dest: .claude/skills/java-spring-arch/
     groups: [claude]
 
+  - id: claude/skills/nextjs-fsd-architecture
+    src: .claude/skills/nextjs-fsd-architecture/
+    dest: .claude/skills/nextjs-fsd-architecture/
+    groups: [claude]
+
+  # ── Next.js FSD project files (opt-in) ────────────────────────
+  # 대상 프로젝트의 기존 설정을 덮어쓰므로 FSD 프로젝트에서만 overrides로 활성화한다.
+  - id: nextjs/fsd/steiger-config
+    src: .claude/skills/nextjs-fsd-architecture/references/steiger.config.mjs
+    dest: steiger.config.mjs
+    groups: []
+
+  - id: nextjs/fsd/dependency-check
+    src: .claude/skills/nextjs-fsd-architecture/scripts/check-fsd-dependencies.mjs
+    dest: scripts/check-fsd-dependencies.mjs
+    groups: []
+
   # ── Claude agents ─────────────────────────────────────────────
   - id: claude/agents/contradiction-finder
     src: .claude/agents/contradiction-finder.md
@@ -272,6 +289,11 @@ items:
   - id: codex/skills/java-spring-arch
     src: .agents/skills/java-spring-arch/
     dest: .agents/skills/java-spring-arch/
+    groups: [codex]
+
+  - id: codex/skills/nextjs-fsd-architecture
+    src: .agents/skills/nextjs-fsd-architecture/
+    dest: .agents/skills/nextjs-fsd-architecture/
     groups: [codex]
 
   # ── Codex agents (custom subagents) ───────────────────────────

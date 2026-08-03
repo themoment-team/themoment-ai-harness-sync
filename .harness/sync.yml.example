@@ -50,6 +50,10 @@ groups:
 #   codex/hooks/ktlint: true
 #   codex/hooks/kotest: true
 #   codex/hooks/secret-guard: true
+#
+# ── Next.js App Router + FSD (기본 비포함) ─────────────────────────────────
+#   nextjs/fsd/steiger-config: true    # 프로젝트 루트의 steiger.config.mjs
+#   nextjs/fsd/dependency-check: true  # scripts/check-fsd-dependencies.mjs
 
 # 동기화 PR 설정 (선택 — 생략하면 기본값 적용)
 # branch_prefix: harness-sync/  # 기본값: harness-sync/ (슬래시 포함하여 명시)

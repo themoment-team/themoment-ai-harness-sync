@@ -27,6 +27,7 @@ Claude에서 `/skill-name` 으로 호출하는 재사용 가능한 작업 단위
 | [kotlin-spring-arch](./kotlin-spring-arch/SKILL.md) | Controller/Service/Repository 계층 책임, `@Transactional` 전략, `ExpectedException`, Entity↔DTO 변환 패턴 참조 |
 | [plan-deep-dive](./plan-deep-dive/SKILL.md)         | 숨겨진 요구사항·트레이드오프·제약을 발굴하는 구조화된 인터뷰 후 상세 구현 스펙 파일 생성                                                 |
 | [migration-guide](./migration-guide/SKILL.md)       | DB 스키마 변경·Entity 수정 영향 분석, 올바른 변경 순서(Entity → DTO → Repository → Service → 테스트), 2단계 컬럼 삭제         |
+| [nextjs-fsd-architecture](./nextjs-fsd-architecture/SKILL.md) | Next.js App Router + FSD — `views` 레이어, 슬라이스 세그먼트, import 경계, Server API 공개 규칙 |
 
 ## 테스트
 
