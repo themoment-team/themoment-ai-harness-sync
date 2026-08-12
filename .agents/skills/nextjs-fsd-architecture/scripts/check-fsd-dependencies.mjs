@@ -116,6 +116,13 @@ function importedPath(sourceRoot, file, specifier) {
     return null;
 }
 
+function isEntityCrossImport(sourceRoot, source, target, targetInfo) {
+    if (source.layer !== "entities" || targetInfo.layer !== "entities" || !source.slice) return false;
+
+    const [layer, slice, marker, consumer] = relative(sourceRoot, target).split(sep);
+    return layer === "entities" && slice === targetInfo.slice && marker === "@x" && consumer === source.slice;
+}
+
 async function checkSourceRoot(sourceRoot) {
     const violations = [];
     for (const file of await sourceFiles(sourceRoot)) {
@@ -133,7 +140,12 @@ async function checkSourceRoot(sourceRoot) {
             }
 
             const isBusinessLayer = !["app", "shared"].includes(source.layer);
-            if (isBusinessLayer && source.layer === targetInfo.layer && source.slice !== targetInfo.slice) {
+            if (
+                isBusinessLayer
+                && source.layer === targetInfo.layer
+                && source.slice !== targetInfo.slice
+                && !isEntityCrossImport(sourceRoot, source, target, targetInfo)
+            ) {
                 violations.push(`${relative(sourceRoot, file)}: ${source.layer} slices cannot import each other`);
             }
         }

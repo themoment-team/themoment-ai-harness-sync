@@ -16,7 +16,7 @@ src/
 ├── widgets/     # Reusable page sections
 ├── features/    # User actions, forms, mutations, feature schemas
 ├── entities/    # Domain types, API functions, query hooks, entity UI
-└── shared/      # Shared clients, hooks, stores, utilities, constants, assets
+└── shared/      # Shared clients, hooks, stores, utilities, config, constants, assets
 ```
 
 `views` replaces the standard FSD `pages` layer to avoid a collision with the Next.js Pages Router. The FSD `app` layer is intentionally combined with Next.js `src/app` so routes, providers, and global styles have one home.
@@ -29,8 +29,10 @@ Each business slice may contain:
 - `model/`: types, query/mutation hooks, schemas, constants
 - `api/`: server fetch functions; expose them through `index.server.ts`
 - `lib/`: slice-specific utilities
+- `config/`: slice-specific configuration and feature flags
 
 Do not put feature-specific code in `shared/`, and do not import an internal segment of another slice when that slice has a public entry point.
+Keep global configuration in `shared/config` and application bootstrap configuration in `app/config`.
 
 ## Dependency Boundaries
 
@@ -39,7 +41,7 @@ app → views → widgets → features → entities → shared
 ```
 
 - A layer may import only layers to its right.
-- Do not import another business slice in the same layer.
+- Do not import another business slice in the same layer, except an explicit `entities/<slice>/@x/<consumer>` public API for unavoidable entity relationships.
 - `app` and `shared` are exceptions: their own segments may import one another because they are not split by business domain.
 
 ```ts
