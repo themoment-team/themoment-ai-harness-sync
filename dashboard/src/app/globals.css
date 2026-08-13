@@ -1,0 +1,61 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500&display=swap");
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/packages/pretendard/dist/web/variable/pretendardvariable-dynamic-subset.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg: #fbfaff;
+  --bg-subtle: #f0eefb;
+  --fg: #16153a;
+  --fg-muted: #6b6a8c;
+  --accent: #3a36d6;
+  --accent-active: #2a27ab;
+  --border: #e4e0f5;
+}
+
+html[data-theme="dark"] {
+  --bg: #131225;
+  --bg-subtle: #1e1d3a;
+  --fg: #f4f3ff;
+  --fg-muted: #a3a1c2;
+  --accent: #7d79ff;
+  --accent-active: #9590ff;
+  --border: #322f55;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-accent: var(--accent);
+  --color-accent-active: var(--accent-active);
+  --color-border: var(--border);
+  --font-sans: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Noto Serif KR", "Georgia", "Times New Roman", serif;
+  --leading-display: 1;
+  --leading-heading: 1.1;
+  --tracking-display: -0.04em;
+  --tracking-heading: -0.03em;
+  --tracking-label: 0.06em;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
