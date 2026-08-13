@@ -140,7 +140,7 @@ export function DashboardView() {
         {repositoriesState === "ready" && repositories.length === 0 && (
           <section className="mt-10 max-w-xl rounded-xl border border-border bg-bg-subtle p-6">
             <h2 className="text-lg font-semibold">관리할 수 있는 프로젝트가 없습니다</h2>
-            <p className="mt-2 text-fg-muted text-sm leading-6">GitHub App이 설치되어 있고, 본인에게 maintain 또는 admin 권한이 있는 레포가 표시됩니다.</p>
+            <p className="mt-2 text-fg-muted text-sm leading-6">GitHub App이 설치되어 있고, 본인에게 write 이상 권한이 있는 레포가 표시됩니다.</p>
           </section>
         )}
 
@@ -169,7 +169,14 @@ export function DashboardView() {
             </section>
 
             <section className="border-border pt-8 lg:border-l lg:pt-0 lg:pl-8">
-              {dashboardData && selection && <ConfigPreview owner={owner} repo={repo} selection={selection} />}
+              {dashboardData && selection && (
+                <ConfigPreview
+                  owner={owner}
+                  repo={repo}
+                  currentYaml={dashboardData.syncConfigSource}
+                  selection={selection}
+                />
+              )}
               {dataState === "error" && <p className="text-[#8e3024] text-sm">설정을 표시할 수 없습니다.</p>}
             </section>
           </div>
