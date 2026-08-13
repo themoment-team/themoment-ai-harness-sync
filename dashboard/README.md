@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Harness Dashboard
 
-## Getting Started
+프로젝트 팀이 AI Harness 동기화 항목을 선택하고, 대상 레포의 `.harness/sync.yml`을 변경하는 설정 PR을 만드는 Next.js 애플리케이션입니다.
 
-First, run the development server:
+## 실행
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+cp .env.example .env.local
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`http://localhost:3000`에서 실행합니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 환경 변수
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| 변수 | 발급·설정 위치 |
+| --- | --- |
+| `GITHUB_CLIENT_ID` | GitHub App 설정의 **Client ID** |
+| `GITHUB_CLIENT_SECRET` | GitHub App 설정의 **Generate a new client secret** |
+| `GITHUB_APP_ID` | GitHub App 설정의 **App ID** |
+| `GITHUB_APP_PRIVATE_KEY` | GitHub App 설정의 **Generate a private key**로 받은 PEM 파일 전문 |
+| `AUTH_SECRET` | `openssl rand -base64 32`로 생성 |
+| `HARNESS_REPOSITORY` | Harness 원본 레포의 `owner/repository` 형식 이름 |
 
-## Learn More
+로컬에서는 GitHub App의 **Callback URL**에 다음 값을 등록합니다.
 
-To learn more about Next.js, take a look at the following resources:
+```text
+http://localhost:3000/api/auth/callback/github
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+배포 환경은 실제 도메인의 같은 경로를 Callback URL 목록에 추가합니다. GitHub App 설치 시 사용자 인증이 필요하다면 **Request user authorization (OAuth) during installation**을 활성화합니다.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 권한
 
-## Deploy on Vercel
+대시보드는 GitHub App이 설치된 레포 중 로그인한 사용자에게 `write`, `maintain`, `admin` 권한이 있는 레포만 보여 줍니다. 설정 변경은 사용자 OAuth 토큰으로 권한을 확인한 뒤, GitHub App 설치 토큰으로 `harness-config/<timestamp>` 브랜치와 PR을 생성합니다.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 검증
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pnpm test
+pnpm lint
+pnpm exec tsc --noEmit
+pnpm build
+```
