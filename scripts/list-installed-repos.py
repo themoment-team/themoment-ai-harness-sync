@@ -140,6 +140,12 @@ def get_repo_harness_config(full_name: str, token: str) -> dict | None:
     return yaml.safe_load(content)
 
 
+def select_target_repositories(repositories: list[dict], target_repo: str | None) -> list[dict]:
+    if not target_repo:
+        return repositories
+    return [repository for repository in repositories if repository["full_name"] == target_repo]
+
+
 def sync_branch_name(branch_prefix: str, base_branch: str) -> str:
     """repo-file-sync-action이 생성하는 sync 브랜치 이름.
 
@@ -276,6 +282,7 @@ def main():
     app_id = os.environ.get("APP_ID")
     private_key = os.environ.get("APP_PRIVATE_KEY")
     source_repo = os.environ.get("SOURCE_REPO", "themoment-team/themoment-ai-harness-sync")
+    target_repo = os.environ.get("TARGET_REPO")
 
     if not app_id or not private_key:
         print("Error: APP_ID and APP_PRIVATE_KEY must be set", file=sys.stderr)
@@ -298,6 +305,7 @@ def main():
     skipped_disabled = 0   # enabled: false 로 동기화를 끈 수
     skipped_open_pr = 0    # 열린 sync PR이 있어 건너뛴 수
     skipped_no_files = 0   # 대상 파일이 없어 건너뛴 수
+    target_repo_found = False
 
     for inst in installations:
         inst_id = inst["id"]
@@ -309,9 +317,11 @@ def main():
 
         data = gh_api("/installation/repositories", inst_token)
         repos = data if isinstance(data, list) else data.get("repositories", [])
+        repos = select_target_repositories(repos, target_repo)
 
         for repo in repos:
             full_name = repo["full_name"]
+            target_repo_found = target_repo_found or full_name == target_repo
             if full_name == source_repo:
                 continue
 
@@ -381,6 +391,10 @@ def main():
                 "pr_labels": SYNC_PR_LABEL if pr_label_enabled else "",
                 "config": build_sync_config(full_name, files, base_branch),
             })
+
+    if target_repo and not target_repo_found:
+        print(f"Error: target repository is not installed: {target_repo}", file=sys.stderr)
+        sys.exit(1)
 
     stats = {
         "installations": len(installations),

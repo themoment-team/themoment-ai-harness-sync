@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      target_repo:
+        description: 동기화할 설치 레포 (owner/repository)
+        required: false
+        type: string
   schedule:
     - cron: '0 0 * * *'
 
@@ -27,6 +32,7 @@ jobs:
           APP_ID: ${{ secrets.APP_ID }}
           APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
           SOURCE_REPO: themoment-team/themoment-ai-harness-sync
+          TARGET_REPO: ${{ inputs.target_repo }}
         run: |
           matrix=$(python3 scripts/list-installed-repos.py)
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
