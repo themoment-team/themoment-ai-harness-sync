@@ -14,14 +14,14 @@ pnpm dev
 
 ## 환경 변수
 
-| 변수 | 발급·설정 위치 |
-| --- | --- |
-| `GITHUB_CLIENT_ID` | GitHub App 설정의 **Client ID** |
-| `GITHUB_CLIENT_SECRET` | GitHub App 설정의 **Generate a new client secret** |
-| `GITHUB_APP_ID` | GitHub App 설정의 **App ID** |
+| 변수                     | 발급·설정 위치                                                    |
+| ------------------------ | ----------------------------------------------------------------- |
+| `GITHUB_CLIENT_ID`       | GitHub App 설정의 **Client ID**                                   |
+| `GITHUB_CLIENT_SECRET`   | GitHub App 설정의 **Generate a new client secret**                |
+| `GITHUB_APP_ID`          | GitHub App 설정의 **App ID**                                      |
 | `GITHUB_APP_PRIVATE_KEY` | GitHub App 설정의 **Generate a private key**로 받은 PEM 파일 전문 |
-| `AUTH_SECRET` | `openssl rand -base64 32`로 생성 |
-| `HARNESS_REPOSITORY` | Harness 원본 레포의 `owner/repository` 형식 이름 |
+| `AUTH_SECRET`            | `openssl rand -base64 32`로 생성                                  |
+| `HARNESS_REPOSITORY`     | Harness 원본 레포의 `owner/repository` 형식 이름                  |
 
 로컬에서는 GitHub App의 **Callback URL**에 다음 값을 등록합니다.
 

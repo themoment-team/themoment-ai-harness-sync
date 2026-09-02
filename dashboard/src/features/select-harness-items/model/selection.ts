@@ -1,8 +1,8 @@
-import type { HarnessItem, SyncConfig } from "@/entities/harness-config";
+import type { HarnessItem, SyncConfig } from '@/entities/harness-config';
 
 export type SelectionState = {
   enabled: boolean;
-  mode: "automatic" | "fixed";
+  mode: 'automatic' | 'fixed';
   itemIds: string[];
   groups: string[];
   overrides: Record<string, boolean | string>;
@@ -19,14 +19,20 @@ export function createSelectionState(config: SyncConfig, itemIds: string[]): Sel
 }
 
 export function isItemSelected(state: SelectionState, item: HarnessItem): boolean {
-  if (state.mode === "fixed") return state.itemIds.includes(item.id);
+  if (state.mode === 'fixed') return state.itemIds.includes(item.id);
 
   const override = state.overrides[item.id];
-  return override === false ? false : Boolean(override) || item.groups.some((group) => state.groups.includes(group));
+  return override === false
+    ? false
+    : Boolean(override) || item.groups.some((group) => state.groups.includes(group));
 }
 
-export function toggleItem(state: SelectionState, itemId: string, item?: HarnessItem): SelectionState {
-  if (state.mode === "fixed") {
+export function toggleItem(
+  state: SelectionState,
+  itemId: string,
+  item?: HarnessItem,
+): SelectionState {
+  if (state.mode === 'fixed') {
     const itemIds = state.itemIds.includes(itemId)
       ? state.itemIds.filter((candidate) => candidate !== itemId)
       : [...state.itemIds, itemId];
@@ -50,6 +56,9 @@ export function toggleGroup(state: SelectionState, group: string): SelectionStat
   return { ...state, groups };
 }
 
-export function switchToFixedSelection(state: SelectionState, selectedItemIds: string[]): SelectionState {
-  return { ...state, mode: "fixed", itemIds: selectedItemIds, groups: [], overrides: {} };
+export function switchToFixedSelection(
+  state: SelectionState,
+  selectedItemIds: string[],
+): SelectionState {
+  return { ...state, mode: 'fixed', itemIds: selectedItemIds, groups: [], overrides: {} };
 }
