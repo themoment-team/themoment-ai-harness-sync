@@ -1,9 +1,9 @@
 "use client";
 
 import { buildSyncConfig } from "@/entities/harness-config";
-import type { SelectionState } from "@/features/select-harness-items/model/selection";
+import { CreateConfigPrButton } from "@/features/create-config-pr";
+import type { SelectionState } from "@/features/select-harness-items";
 
-import { CreateConfigPrButton } from "@/features/create-config-pr/ui/create-config-pr-button";
 import { createYamlDiff } from "../model/yaml-diff";
 
 type ConfigPreviewProps = {
