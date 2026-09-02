@@ -1,18 +1,39 @@
 ---
-title: 시작하기
-description: AI Harness를 프로젝트에 설치하고 첫 동기화를 받는 방법
+title: AI Harness 가이드
+description: 하네스 설치와 문서 탐색
 order: 10
 ---
 
-# 시작하기
+# AI Harness 가이드
 
-AI Harness는 공통 AI 도구 설정을 GitHub App이 설치된 프로젝트에 동기화합니다.
+레포에 `.harness/sync.yml` 파일 하나를 추가하면 Claude, Codex, Gemini 설정이 자동으로 동기화됩니다.
 
-1. GitHub App을 프로젝트 또는 조직에 설치합니다.
-2. 대시보드에서 프로젝트를 열고 필요한 항목을 선택합니다.
-3. 생성된 설정 PR을 검토하고 병합합니다.
-4. 다음 정기 동기화 또는 **지금 동기화** 요청으로 변경을 받습니다.
+## 빠른 시작
 
-처음부터 필요한 항목만 받으려면 `groups: []`와 개별 `overrides`를 사용하는 고정 선택 구성을 권장합니다.
+```yaml
+# .harness/sync.yml
+groups:
+  - claude
+  - codex
+```
 
-다음 단계: [GitHub App 설정](/guide/github-app-setup)
+이것만으로 Claude Code 스킬·에이전트와 Codex 스킬이 자동 배포됩니다.  
+세부 제어가 필요하다면 [동기화 설정](/guide/sync-configuration)를 참고하세요.
+
+## 문서
+
+### 설정
+- [동기화 설정](/guide/sync-configuration) — 그룹 선택, 훅 활성화, 버전 고정 등 동기화 항목 제어
+
+### 레퍼런스
+- [스킬 레퍼런스](/guide/reference/skills) — 스킬 목록과 각 스킬의 역할
+- [에이전트 레퍼런스](/guide/reference/agents) — 서브에이전트 목록과 트리거 문구
+- [훅 레퍼런스](/guide/reference/hooks) — 훅 모듈 목록과 프로젝트 유형별 추천 조합
+- [프론트엔드 아키텍처](/guide/architecture/frontend) — Next.js App Router, FSD, Turborepo 프론트엔드 규칙
+
+### 컨벤션
+- [Claude 컨벤션](/guide/conventions/claude) — 스킬·에이전트·훅 작성 규칙
+- [Codex 컨벤션](/guide/conventions/codex) — Codex 설정·훅 작성 규칙
+- [Gemini 컨벤션](/guide/conventions/gemini) — Gemini 설정·스타일가이드 작성 규칙
+- [Copilot 컨벤션](/guide/conventions/copilot) — copilot-instructions.md 작성 규칙
+- [전역 컨벤션](/guide/conventions/global) — 커밋·PR·브랜치 공통 규칙

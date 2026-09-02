@@ -1,9 +1,72 @@
 ---
-title: Copilot 컨벤션
-description: GitHub Copilot 지침 파일 수신 규칙
+title: Copilot 지침
+description: Copilot 지침 작성 규칙
 order: 90
 ---
 
-# Copilot 컨벤션
+# Copilot Conventions
 
-Copilot 지침은 `.github/copilot-instructions.md`에 동기화됩니다. 대상 프로젝트의 기존 지침을 덮어쓸 수 있으므로 설정 PR의 diff를 확인한 뒤 병합합니다.
+`.github/copilot-instructions.md` 작성 규칙입니다.
+
+> **참고**: `copilot-instructions.md`는 harness 동기화 대상이 아닙니다. 각 레포가 직접 작성·관리하세요. 아래는 작성 가이드입니다.  
+> ai-harness의 `.github/copilot-instructions.md`는 이 레포 자체를 위한 파일입니다.
+
+## 파일 위치
+
+```
+project-root/
+└── .github/
+    └── copilot-instructions.md
+```
+
+## 기본 구조
+
+```markdown
+# [프로젝트명] Copilot Instructions
+
+**한국어로 응답해주세요.**
+
+## Project Overview
+[프로젝트 1-2줄 요약]
+
+## Tech Stack
+[핵심 기술 스택 목록]
+
+## Project Structure
+[디렉토리 구조 또는 모듈 설명]
+
+## Commands
+[빌드·테스트·실행 명령어]
+
+## Coding Conventions
+[핵심 컨벤션 — 상세 내용은 하위 섹션으로]
+
+## Common Mistakes (Avoid These!)
+[자주 틀리는 패턴 — Before/After 형식]
+```
+
+## 작성 원칙
+
+- **응답 언어 선언** 최상단 필수: `**한국어로 응답해주세요.**`
+- **Project Overview**는 2문장 이내
+- **Coding Conventions**는 핵심만 — 너무 길면 Copilot이 무시
+- **Common Mistakes** 섹션이 가장 효과적 — WRONG/CORRECT 형식 사용
+- Markdown 코드 블록에 언어 명시 (`kotlin`, `bash` 등)
+- API 키·시크릿 절대 포함 금지
+
+## Common Mistakes 작성 예시
+
+```markdown
+## Common Mistakes (Avoid These!)
+
+### DTO Annotations
+- WRONG: `@param:JsonProperty` → CORRECT: `@field:JsonProperty`
+
+### Commit Scope
+- WRONG: `fix(web):` (module name) → CORRECT: `fix(auth):` (domain name)
+```
+
+## 업데이트 주기
+
+프로젝트 컨벤션 변경 시 즉시 반영합니다.  
+`doc-polisher` 에이전트로 실제 코드와의 괴리를 주기적으로 점검하세요.+
