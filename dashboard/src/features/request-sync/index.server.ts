@@ -1,1 +1,1 @@
-export { requestSync, SyncRequestError } from "./api/request-sync.server";
+export { requestSync, SyncRequestError } from './api/request-sync.server';
