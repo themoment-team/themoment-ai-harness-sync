@@ -1,17 +1,19 @@
-import { stringify } from "yaml";
+import { stringify } from 'yaml';
 
-import type { SyncConfigInput, SyncOverride } from "../model/types";
+import type { SyncConfigInput, SyncOverride } from '../model/types';
 
 function sortedOverrides(overrides: Record<string, SyncOverride>): Record<string, SyncOverride> {
-  return Object.fromEntries(Object.entries(overrides).sort(([left], [right]) => left.localeCompare(right)));
+  return Object.fromEntries(
+    Object.entries(overrides).sort(([left], [right]) => left.localeCompare(right)),
+  );
 }
 
 export function buildSyncConfig(input: SyncConfigInput): string {
   const fixedOverrides = Object.fromEntries(input.itemIds.map((itemId) => [itemId, true]));
-  const overrides = input.mode === "fixed" ? fixedOverrides : input.overrides ?? {};
+  const overrides = input.mode === 'fixed' ? fixedOverrides : (input.overrides ?? {});
   const config: Record<string, unknown> = {
     enabled: input.enabled,
-    groups: input.mode === "fixed" ? [] : input.groups ?? [],
+    groups: input.mode === 'fixed' ? [] : (input.groups ?? []),
   };
 
   if (input.baseBranch) config.base_branch = input.baseBranch;

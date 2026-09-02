@@ -1,4 +1,4 @@
-import type { HarnessManifest, SyncConfig } from "@/entities/harness-config";
+import type { HarnessManifest, SyncConfig } from '@/entities/harness-config/@x/repository';
 
 export type DashboardRepository = {
   fullName: string;
@@ -10,5 +10,6 @@ export type RepositoryDashboardData = {
   repository: DashboardRepository;
   manifest: HarnessManifest;
   config: SyncConfig;
+  syncConfigSource: string | null;
   selectedItemIds: string[];
 };

@@ -1,7 +1,7 @@
-import { parse } from "yaml";
-import { z } from "zod";
+import { parse } from 'yaml';
+import { z } from 'zod';
 
-import type { HarnessManifest } from "../model/types";
+import type { HarnessManifest } from '../model/types';
 
 const manifestSchema = z.object({
   defaults: z.array(z.string()).default([]),

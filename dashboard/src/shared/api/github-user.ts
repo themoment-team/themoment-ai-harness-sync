@@ -1,12 +1,13 @@
-import "server-only";
+import type { NextRequest } from 'next/server';
 
-import { Octokit } from "@octokit/rest";
-import { getToken } from "next-auth/jwt";
-import type { NextRequest } from "next/server";
+import { Octokit } from '@octokit/rest';
+import { getToken } from 'next-auth/jwt';
 
-import { getServerEnv } from "@/shared/config/env";
+import { getServerEnv } from '@/shared/config/env';
 
-export type RepositoryPermission = "admin" | "maintain" | "write" | "triage" | "read" | "none";
+import 'server-only';
+
+export type RepositoryPermission = 'admin' | 'maintain' | 'write' | 'triage' | 'read' | 'none';
 type GitHubRepositoryPermissions = {
   admin?: boolean;
   maintain?: boolean;
@@ -21,7 +22,14 @@ export function createUserOctokit(accessToken: string) {
 
 export async function getGitHubAccessToken(request: NextRequest): Promise<string | null> {
   const token = await getToken({ req: request, secret: getServerEnv().AUTH_SECRET });
-  return typeof token?.githubAccessToken === "string" ? token.githubAccessToken : null;
+  if (
+    token?.githubTokenError ||
+    (token?.githubAccessTokenExpiresAt &&
+      token.githubAccessTokenExpiresAt - 60_000 <= Date.now())
+  ) {
+    return null;
+  }
+  return typeof token?.githubAccessToken === 'string' ? token.githubAccessToken : null;
 }
 
 export async function getAuthenticatedUsername(accessToken: string): Promise<string> {
@@ -46,20 +54,22 @@ export async function getUserRepositoryPermission(input: {
   return getRepositoryPermission(data.user?.permissions);
 }
 
-export function getRepositoryPermission(permissions: GitHubRepositoryPermissions | undefined): RepositoryPermission {
+export function getRepositoryPermission(
+  permissions: GitHubRepositoryPermissions | undefined,
+): RepositoryPermission {
   return permissions?.admin
-    ? "admin"
+    ? 'admin'
     : permissions?.maintain
-      ? "maintain"
+      ? 'maintain'
       : permissions?.push
-        ? "write"
+        ? 'write'
         : permissions?.triage
-          ? "triage"
+          ? 'triage'
           : permissions?.pull
-            ? "read"
-            : "none";
+            ? 'read'
+            : 'none';
 }
 
 export function canManageHarness(permission: RepositoryPermission): boolean {
-  return permission === "admin" || permission === "maintain" || permission === "write";
+  return permission === 'admin' || permission === 'maintain' || permission === 'write';
 }

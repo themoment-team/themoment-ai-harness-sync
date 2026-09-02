@@ -1,14 +1,12 @@
-import "server-only";
+import { Octokit } from '@octokit/rest';
+import { Buffer } from 'node:buffer';
 
-import { Buffer } from "node:buffer";
-
-import { Octokit } from "@octokit/rest";
-
-import { parseManifest, parseSyncConfig, resolveSelectedItemIds } from "@/entities/harness-config";
 import {
-  getInstallationTokenForApp,
-  getRepositoryInstallationId,
-} from "@/shared/api/github-app";
+  parseManifest,
+  parseSyncConfig,
+  resolveSelectedItemIds,
+} from '@/entities/harness-config/@x/repository';
+import { getInstallationTokenForApp, getRepositoryInstallationId } from '@/shared/api';
 import {
   canManageHarness,
   createUserOctokit,
@@ -16,13 +14,15 @@ import {
   getRepositoryPermission,
   getUserRepositoryPermission,
   type RepositoryPermission,
-} from "@/shared/api/github-user";
-import { getServerEnv } from "@/shared/config/env";
+} from '@/shared/api';
+import { getServerEnv } from '@/shared/config';
 
-import type { DashboardRepository, RepositoryDashboardData } from "../model/types";
+import type { DashboardRepository, RepositoryDashboardData } from '../model/types';
+
+import 'server-only';
 
 export class DashboardDataError extends Error {
-  constructor(readonly code: "FORBIDDEN" | "NOT_FOUND" | "INVALID_CONFIG" | "UPSTREAM") {
+  constructor(readonly code: 'FORBIDDEN' | 'NOT_FOUND' | 'INVALID_CONFIG' | 'UPSTREAM') {
     super(code);
   }
 }
@@ -42,11 +42,11 @@ type DashboardServices = {
 };
 
 function decodeRepositoryFile(content: { content?: string; encoding?: string }): string {
-  if (!content.content || content.encoding !== "base64") {
-    throw new DashboardDataError("UPSTREAM");
+  if (!content.content || content.encoding !== 'base64') {
+    throw new DashboardDataError('UPSTREAM');
   }
 
-  return Buffer.from(content.content, "base64").toString("utf8");
+  return Buffer.from(content.content, 'base64').toString('utf8');
 }
 
 async function readFile(input: {
@@ -61,10 +61,10 @@ async function readFile(input: {
 
   try {
     const { data } = await octokit.rest.repos.getContent(input);
-    if (Array.isArray(data) || data.type !== "file") throw new DashboardDataError("UPSTREAM");
+    if (Array.isArray(data) || data.type !== 'file') throw new DashboardDataError('UPSTREAM');
     return decodeRepositoryFile(data);
   } catch (error) {
-    if (typeof error === "object" && error !== null && "status" in error && error.status === 404) {
+    if (typeof error === 'object' && error !== null && 'status' in error && error.status === 404) {
       return null;
     }
 
@@ -75,18 +75,26 @@ async function readFile(input: {
 export async function getDashboardRepositories(userToken: string): Promise<DashboardRepository[]> {
   const env = getServerEnv();
   const userOctokit = createUserOctokit(userToken);
-  const { data } = await userOctokit.request("GET /user/installations");
-  const installations = data.installations.filter((installation) => installation.app_id === Number(env.GITHUB_APP_ID));
+  const { data } = await userOctokit.request('GET /user/installations');
+  const installations = data.installations.filter(
+    (installation) => installation.app_id === Number(env.GITHUB_APP_ID),
+  );
   const repositories = await Promise.all(
     installations.map(async (installation) => {
       const { data: installationRepositories } = await userOctokit.request(
-        "GET /user/installations/{installation_id}/repositories",
+        'GET /user/installations/{installation_id}/repositories',
         { installation_id: installation.id },
       );
 
       return installationRepositories.repositories.flatMap((repository) =>
         canManageHarness(getRepositoryPermission(repository.permissions))
-          ? [{ fullName: repository.full_name, installationId: installation.id, defaultBranch: repository.default_branch }]
+          ? [
+              {
+                fullName: repository.full_name,
+                installationId: installation.id,
+                defaultBranch: repository.default_branch,
+              },
+            ]
           : [],
       );
     }),
@@ -97,29 +105,31 @@ export async function getDashboardRepositories(userToken: string): Promise<Dashb
 
 async function readHarnessManifest(): Promise<string> {
   const env = getServerEnv();
-  const [owner, repo] = env.HARNESS_REPOSITORY.split("/");
+  const [owner, repo] = env.HARNESS_REPOSITORY.split('/');
   const installationId = await getRepositoryInstallationId(owner, repo);
-  const installationOctokit = new Octokit({ auth: await getInstallationTokenForApp(installationId) });
+  const installationOctokit = new Octokit({
+    auth: await getInstallationTokenForApp(installationId),
+  });
   const { data: repository } = await installationOctokit.rest.repos.get({ owner, repo });
   const content = await readFile({
     installationId,
     owner,
     repo,
-    path: "sync-manifest.yml",
+    path: 'sync-manifest.yml',
     ref: repository.default_branch,
   });
 
-  if (content === null) throw new DashboardDataError("UPSTREAM");
+  if (content === null) throw new DashboardDataError('UPSTREAM');
   return content;
 }
 
 async function readTargetSyncConfig(repository: DashboardRepository): Promise<string | null> {
-  const [owner, repo] = repository.fullName.split("/");
+  const [owner, repo] = repository.fullName.split('/');
   return readFile({
     installationId: repository.installationId,
     owner,
     repo,
-    path: ".harness/sync.yml",
+    path: '.harness/sync.yml',
     ref: repository.defaultBranch,
   });
 }
@@ -137,26 +147,33 @@ export async function getRepositoryDashboardData(
   input: RepositoryInput,
   services: DashboardServices = defaultServices,
 ): Promise<RepositoryDashboardData> {
-  const repository = (await services.getRepositories(input.userToken))
-    .find((candidate) => candidate.fullName === `${input.owner}/${input.repo}`);
+  const repository = (await services.getRepositories(input.userToken)).find(
+    (candidate) => candidate.fullName === `${input.owner}/${input.repo}`,
+  );
 
-  if (!repository) throw new DashboardDataError("NOT_FOUND");
+  if (!repository) throw new DashboardDataError('NOT_FOUND');
 
   const username = await services.getUsername(input.userToken);
   const permission = await services.getPermission({ ...input, username });
-  if (!canManageHarness(permission)) throw new DashboardDataError("FORBIDDEN");
+  if (!canManageHarness(permission)) throw new DashboardDataError('FORBIDDEN');
+
+  const [manifestSource, configSource] = await Promise.all([
+    services.readManifest(),
+    services.readSyncConfig(repository),
+  ]);
 
   try {
-    const [manifestSource, configSource] = await Promise.all([
-      services.readManifest(),
-      services.readSyncConfig(repository),
-    ]);
     const manifest = parseManifest(manifestSource);
     const config = parseSyncConfig(configSource, manifest.defaults);
 
-    return { repository, manifest, config, selectedItemIds: resolveSelectedItemIds(manifest, config) };
-  } catch (error) {
-    if (error instanceof DashboardDataError) throw error;
-    throw new DashboardDataError("INVALID_CONFIG");
+    return {
+      repository,
+      manifest,
+      config,
+      syncConfigSource: configSource,
+      selectedItemIds: resolveSelectedItemIds(manifest, config),
+    };
+  } catch {
+    throw new DashboardDataError('INVALID_CONFIG');
   }
 }

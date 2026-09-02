@@ -1,6 +1,6 @@
-export { buildSyncConfig } from "./lib/build-sync-config";
-export { parseManifest } from "./lib/parse-manifest";
-export { parseSyncConfig, resolveSelectedItemIds } from "./lib/parse-sync-config";
+export { buildSyncConfig } from './lib/build-sync-config';
+export { parseManifest } from './lib/parse-manifest';
+export { parseSyncConfig, resolveSelectedItemIds } from './lib/parse-sync-config';
 export type {
   HarnessItem,
   HarnessManifest,
@@ -8,4 +8,4 @@ export type {
   SyncConfigInput,
   SyncMode,
   SyncOverride,
-} from "./model/types";
+} from './model/types';

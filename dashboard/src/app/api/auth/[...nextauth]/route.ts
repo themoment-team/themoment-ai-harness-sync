@@ -1,7 +1,8 @@
-import NextAuth from "next-auth";
-import type { NextRequest } from "next/server";
+import type { NextRequest } from 'next/server';
 
-import { getAuthOptions } from "@/auth";
+import NextAuth from 'next-auth';
+
+import { getAuthOptions } from '@/auth';
 
 type AuthRouteContext = { params: Promise<{ nextauth: string[] }> };
 

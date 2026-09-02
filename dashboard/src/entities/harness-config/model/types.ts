@@ -11,7 +11,7 @@ export type HarnessManifest = {
 };
 
 export type SyncOverride = boolean | string;
-export type SyncMode = "automatic" | "fixed";
+export type SyncMode = 'automatic' | 'fixed';
 
 export type SyncConfig = {
   enabled: boolean;

@@ -1,6 +1,6 @@
-import "server-only";
+import { z } from 'zod';
 
-import { z } from "zod";
+import 'server-only';
 
 const serverEnvSchema = z.object({
   GITHUB_CLIENT_ID: z.string().min(1),

@@ -1,7 +1,7 @@
-import { parse } from "yaml";
-import { z } from "zod";
+import { parse } from 'yaml';
+import { z } from 'zod';
 
-import type { HarnessManifest, SyncConfig, SyncOverride } from "../model/types";
+import type { HarnessManifest, SyncConfig, SyncOverride } from '../model/types';
 
 const syncConfigSchema = z.object({
   enabled: z.boolean().default(true),
@@ -17,7 +17,7 @@ export function parseSyncConfig(source: string | null, defaultGroups: string[]):
   if (source === null) {
     return {
       enabled: true,
-      mode: "automatic",
+      mode: 'automatic',
       groups: defaultGroups,
       overrides: {},
     };
@@ -28,7 +28,7 @@ export function parseSyncConfig(source: string | null, defaultGroups: string[]):
 
   return {
     enabled: raw.enabled,
-    mode: groups.length === 0 ? "fixed" : "automatic",
+    mode: groups.length === 0 ? 'fixed' : 'automatic',
     groups,
     overrides: raw.overrides as Record<string, SyncOverride>,
     baseBranch: raw.base_branch,
@@ -42,7 +42,9 @@ export function resolveSelectedItemIds(manifest: HarnessManifest, config: SyncCo
   return manifest.items
     .filter((item) => {
       const override = config.overrides[item.id];
-      return override === false ? false : Boolean(override) || item.groups.some((group) => config.groups.includes(group));
+      return override === false
+        ? false
+        : Boolean(override) || item.groups.some((group) => config.groups.includes(group));
     })
     .map((item) => item.id);
 }
