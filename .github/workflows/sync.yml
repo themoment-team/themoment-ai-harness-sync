@@ -1,9 +1,15 @@
 name: Sync AI Harness files
+run-name: Sync AI Harness files${{ inputs.target_repo && format(' · {0}', inputs.target_repo) || '' }}
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      target_repo:
+        description: 동기화할 설치 레포 (owner/repository)
+        required: false
+        type: string
   schedule:
     - cron: '0 0 * * *'
 
@@ -27,6 +33,7 @@ jobs:
           APP_ID: ${{ secrets.APP_ID }}
           APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
           SOURCE_REPO: themoment-team/themoment-ai-harness-sync
+          TARGET_REPO: ${{ inputs.target_repo }}
         run: |
           matrix=$(python3 scripts/list-installed-repos.py)
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
@@ -35,6 +42,9 @@ jobs:
     needs: prepare
     if: ${{ needs.prepare.outputs.matrix != '[]' }}
     runs-on: ubuntu-latest
+    concurrency:
+      group: harness-sync-${{ matrix.installation.repo }}
+      cancel-in-progress: false
     # 잡 이름을 레포별로 유일하게 만들어 report 잡이 실패 레그의 로그를 찾을 수 있게 한다
     name: sync ${{ matrix.installation.repo }}
     strategy:
