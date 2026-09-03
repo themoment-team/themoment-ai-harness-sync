@@ -1,0 +1,173 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500&display=swap');
+@import 'tailwindcss';
+
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/packages/pretendard/dist/web/variable/pretendardvariable-dynamic-subset.woff2')
+    format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg: #fbfaff;
+  --bg-subtle: #f0eefb;
+  --fg: #16153a;
+  --fg-muted: #6b6a8c;
+  --accent: #3a36d6;
+  --accent-active: #2a27ab;
+  --border: #e4e0f5;
+}
+
+html[data-theme='dark'] {
+  --bg: #131225;
+  --bg-subtle: #1e1d3a;
+  --fg: #f4f3ff;
+  --fg-muted: #a3a1c2;
+  --accent: #7d79ff;
+  --accent-active: #9590ff;
+  --border: #322f55;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-accent: var(--accent);
+  --color-accent-active: var(--accent-active);
+  --color-border: var(--border);
+  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Noto Serif KR', 'Georgia', 'Times New Roman', serif;
+  --leading-display: 1;
+  --leading-heading: 1.1;
+  --tracking-display: -0.04em;
+  --tracking-heading: -0.03em;
+  --tracking-label: 0.06em;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.prose-guide {
+  color: var(--fg);
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.prose-guide h1 {
+  margin: 0 0 2rem;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+.prose-guide h1,
+.prose-guide h2,
+.prose-guide h3,
+.prose-guide h4 {
+  scroll-margin-top: 4.5rem;
+}
+.prose-guide h2 {
+  margin: 3rem 0 1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+.prose-guide h3 {
+  margin: 2rem 0 0.75rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.prose-guide h4 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.prose-guide p,
+.prose-guide ul,
+.prose-guide ol {
+  margin: 1rem 0;
+}
+.prose-guide ul,
+.prose-guide ol {
+  padding-left: 1.5rem;
+}
+.prose-guide ul {
+  list-style: disc;
+}
+.prose-guide ol {
+  list-style: decimal;
+}
+.prose-guide a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.prose-guide a:hover {
+  text-decoration-thickness: 2px;
+}
+.prose-guide :is(h1, h2, h3, h4) a.anchor-heading {
+  margin-left: 0.4em;
+  opacity: 0;
+  font-size: 0.75em;
+  font-weight: 400;
+  transition: opacity 0.15s;
+}
+.prose-guide :is(h1, h2, h3, h4):hover a.anchor-heading,
+.prose-guide :is(h1, h2, h3, h4) a.anchor-heading:focus-visible {
+  opacity: 1;
+}
+.prose-guide code {
+  border-radius: 0.25rem;
+  background: var(--bg-subtle);
+  padding: 0.1rem 0.3rem;
+  font-size: 0.875em;
+}
+.prose-guide pre {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--bg-subtle);
+  padding: 1rem;
+}
+.prose-guide pre code {
+  padding: 0;
+  background: transparent;
+}
+.prose-guide blockquote {
+  margin: 1.5rem 0;
+  border-left: 3px solid var(--accent);
+  color: var(--fg-muted);
+  padding-left: 1rem;
+}
+.prose-guide hr {
+  margin: 2.5rem 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+.prose-guide table {
+  display: block;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-collapse: collapse;
+}
+.prose-guide th,
+.prose-guide td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}

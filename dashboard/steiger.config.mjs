@@ -1,0 +1,25 @@
+import fsd from '@feature-sliced/steiger-plugin';
+import { defineConfig } from 'steiger';
+
+export default defineConfig([
+  ...fsd.configs.recommended,
+  {
+    files: ['src/app/providers.tsx'],
+    rules: {
+      'fsd/segments-by-purpose': 'off',
+    },
+  },
+  {
+    files: ['src/{entities,features,widgets}/**/*.{ts,tsx}'],
+    rules: {
+      // `views` is a project extension, so Steiger cannot trace its references.
+      'fsd/insignificant-slice': 'off',
+    },
+  },
+  {
+    files: ['src/shared/test/**/*.{ts,tsx}'],
+    rules: {
+      'fsd/public-api': 'off',
+    },
+  },
+]);
