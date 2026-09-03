@@ -1,5 +1,6 @@
 # AI tool logs & temp files
 .claude/command.log
+.codex/command.log
 .pr-tmp/
 .worktrees/
 PR_BODY.md
