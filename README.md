@@ -14,12 +14,12 @@ New projects are auto-detected the moment the App is installed — no `sync.yml`
 
 ## Documentation
 
-Full setup and usage guides are on the [Wiki](../../wiki):
+The Dashboard serves the public guide at `/guide`. The Markdown source is kept in this repository:
 
-- [Getting Started](../../wiki/Getting-Started) — end-to-end setup for harness operators
-- [GitHub App Setup](../../wiki/GitHub-App-Setup) — App creation, permissions, and secrets
-- [Per-Repo Config](../../wiki/Per-Repo-Config) — control what each repo receives via `.harness/sync.yml`
-- [Conventions](../../wiki/Global-Conventions) — commit, PR, and skill authoring conventions
+- [Getting Started](docs/guide/getting-started.md) — end-to-end setup for harness operators
+- [GitHub App Setup](docs/guide/github-app-setup.md) — App creation, permissions, and secrets
+- [Sync Configuration](docs/guide/sync-configuration.md) — control what each repo receives via `.harness/sync.yml`
+- [Conventions](docs/guide/conventions/global.md) — commit, PR, and skill authoring conventions
 
 ## Directory Docs
 
