@@ -51,14 +51,8 @@ overrides:
 ## 로깅
 
 ### logging `preToolUse`
-명령어를 **프로젝트 루트의 로그 파일에 타임스탬프와 함께 기록**합니다.
-
-- Claude: `Bash` 명령어를 `.claude/command.log`에 기록
-- Codex: `Bash`·`shell` 명령어를 `.codex/command.log`에 기록
-
-훅 입력의 `cwd`에서 Git 저장소 루트를 찾으므로 하위 디렉터리에서 작업해도 로그가 루트에 모입니다.
-Git worktree에서는 해당 worktree 루트를 사용하며, `cwd`가 없으면 훅 설치 위치에서 Git 루트를 찾습니다.
-Git 루트를 찾을 수 없으면 훅이 설치된 프로젝트 루트를 사용합니다.
+모든 `Bash` 명령어를 **`.claude/command.log`에 타임스탬프와 함께 기록**합니다.  
+감사 추적이나 디버깅 시 유용합니다.
 
 **적용 대상**: 모든 프로젝트
 
