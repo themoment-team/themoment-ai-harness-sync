@@ -1,6 +1,7 @@
 # AI tool logs & temp files
 .claude/command.log
 .pr-tmp/
+.worktrees/
 PR_BODY.md
 
 ### IntelliJ IDEA ###
