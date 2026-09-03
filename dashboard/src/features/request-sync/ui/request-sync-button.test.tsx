@@ -5,7 +5,7 @@ import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { CreateConfigPrButton } from './create-config-pr-button';
+import { RequestSyncButton } from './request-sync-button';
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 
@@ -18,8 +18,8 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('CreateConfigPrButton', () => {
-  it('PR 생성이 끝난 뒤 새 탭을 연다', async () => {
+describe('RequestSyncButton', () => {
+  it('동기화 요청이 끝난 뒤 새 탭을 연다', async () => {
     let resolveFetch!: (response: { ok: boolean; json: () => Promise<{ url: string }> }) => void;
     vi.stubGlobal(
       'fetch',
@@ -33,13 +33,7 @@ describe('CreateConfigPrButton', () => {
     const open = vi.spyOn(window, 'open').mockReturnValue(null);
 
     act(() => {
-      root.render(
-        <CreateConfigPrButton
-          owner="acme"
-          repo="api"
-          selection={{ enabled: true, mode: 'fixed', itemIds: [], groups: [], overrides: {} }}
-        />,
-      );
+      root.render(<RequestSyncButton owner="acme" repo="api" />);
     });
 
     const button = container.querySelector('button');
@@ -48,15 +42,19 @@ describe('CreateConfigPrButton', () => {
     });
 
     expect(open).not.toHaveBeenCalled();
-    expect(button?.textContent).toBe('설정 PR 생성 중…');
+    expect(button?.textContent).toBe('동기화 요청 중…');
 
     await act(async () => {
       resolveFetch({
         ok: true,
-        json: async () => ({ url: 'https://github.com/acme/api/pull/1' }),
+        json: async () => ({ url: 'https://github.com/acme/harness/actions/runs/1' }),
       });
     });
 
-    expect(open).toHaveBeenCalledWith('https://github.com/acme/api/pull/1', '_blank', 'noopener');
+    expect(open).toHaveBeenCalledWith(
+      'https://github.com/acme/harness/actions/runs/1',
+      '_blank',
+      'noopener',
+    );
   });
 });

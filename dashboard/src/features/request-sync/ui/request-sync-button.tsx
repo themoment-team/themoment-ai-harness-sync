@@ -18,7 +18,8 @@ export function RequestSyncButton({ owner, repo }: { owner: string; repo: string
         throw new Error(
           getApiErrorMessage(result.code, result.message ?? '동기화를 요청하지 못했습니다.'),
         );
-      window.location.assign(result.url);
+      setPending(false);
+      window.open(result.url, '_blank', 'noopener');
     } catch (caughtError) {
       setError(
         caughtError instanceof Error ? caughtError.message : '동기화를 요청하지 못했습니다.',
