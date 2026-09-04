@@ -31,7 +31,8 @@ Each business slice may contain:
 - `lib/`: slice-specific utilities
 - `config/`: slice-specific configuration and feature flags
 
-Do not put feature-specific code in `shared/`, and do not import an internal segment of another slice when that slice has a public entry point.
+Every business slice must expose its external API through `index.ts`; expose server-only APIs through `index.server.ts`. Modules outside a slice may import only from those public entry points, except the explicit `entities/<slice>/@x/<consumer>` public API permitted for unavoidable entity relationships; never import its internal segments.
+Do not put feature-specific code in `shared/`.
 Keep global configuration in `shared/config` and application bootstrap configuration in `app/config`.
 
 ## Dependency Boundaries
