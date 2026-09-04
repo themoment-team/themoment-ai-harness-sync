@@ -9,6 +9,9 @@ export function RequestSyncButton({ owner, repo }: { owner: string; repo: string
   const [pending, setPending] = useState(false);
 
   async function requestSync() {
+    const syncWindow = window.open('', '_blank');
+    if (syncWindow) syncWindow.opener = null;
+
     setPending(true);
     setError(null);
     try {
@@ -19,8 +22,10 @@ export function RequestSyncButton({ owner, repo }: { owner: string; repo: string
           getApiErrorMessage(result.code, result.message ?? '동기화를 요청하지 못했습니다.'),
         );
       setPending(false);
-      window.open(result.url, '_blank', 'noopener');
+      if (syncWindow) syncWindow.location.assign(result.url);
+      else window.location.assign(result.url);
     } catch (caughtError) {
+      syncWindow?.close();
       setError(
         caughtError instanceof Error ? caughtError.message : '동기화를 요청하지 못했습니다.',
       );

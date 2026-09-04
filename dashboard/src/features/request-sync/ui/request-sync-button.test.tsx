@@ -19,7 +19,7 @@ afterEach(() => {
 });
 
 describe('RequestSyncButton', () => {
-  it('동기화 요청이 끝난 뒤 새 탭을 연다', async () => {
+  it('클릭 시 새 탭을 열고 동기화 요청 후 이동한다', async () => {
     let resolveFetch!: (response: { ok: boolean; json: () => Promise<{ url: string }> }) => void;
     vi.stubGlobal(
       'fetch',
@@ -30,7 +30,12 @@ describe('RequestSyncButton', () => {
           }),
       ),
     );
-    const open = vi.spyOn(window, 'open').mockReturnValue(null);
+    const syncWindow = {
+      close: vi.fn(),
+      location: { assign: vi.fn() },
+      opener: window,
+    } as unknown as Window;
+    const open = vi.spyOn(window, 'open').mockReturnValue(syncWindow);
 
     act(() => {
       root.render(<RequestSyncButton owner="acme" repo="api" />);
@@ -41,7 +46,7 @@ describe('RequestSyncButton', () => {
       button?.click();
     });
 
-    expect(open).not.toHaveBeenCalled();
+    expect(open).toHaveBeenCalledWith('', '_blank');
     expect(button?.textContent).toBe('동기화 요청 중…');
 
     await act(async () => {
@@ -51,10 +56,8 @@ describe('RequestSyncButton', () => {
       });
     });
 
-    expect(open).toHaveBeenCalledWith(
+    expect(syncWindow.location.assign).toHaveBeenCalledWith(
       'https://github.com/acme/harness/actions/runs/1',
-      '_blank',
-      'noopener',
     );
   });
 });

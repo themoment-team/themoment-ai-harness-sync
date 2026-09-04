@@ -19,7 +19,7 @@ afterEach(() => {
 });
 
 describe('CreateConfigPrButton', () => {
-  it('PR 생성이 끝난 뒤 새 탭을 연다', async () => {
+  it('클릭 시 새 탭을 열고 PR 생성 후 이동한다', async () => {
     let resolveFetch!: (response: { ok: boolean; json: () => Promise<{ url: string }> }) => void;
     vi.stubGlobal(
       'fetch',
@@ -30,7 +30,12 @@ describe('CreateConfigPrButton', () => {
           }),
       ),
     );
-    const open = vi.spyOn(window, 'open').mockReturnValue(null);
+    const pullRequestWindow = {
+      close: vi.fn(),
+      location: { assign: vi.fn() },
+      opener: window,
+    } as unknown as Window;
+    const open = vi.spyOn(window, 'open').mockReturnValue(pullRequestWindow);
 
     act(() => {
       root.render(
@@ -47,7 +52,7 @@ describe('CreateConfigPrButton', () => {
       button?.click();
     });
 
-    expect(open).not.toHaveBeenCalled();
+    expect(open).toHaveBeenCalledWith('', '_blank');
     expect(button?.textContent).toBe('설정 PR 생성 중…');
 
     await act(async () => {
@@ -57,6 +62,8 @@ describe('CreateConfigPrButton', () => {
       });
     });
 
-    expect(open).toHaveBeenCalledWith('https://github.com/acme/api/pull/1', '_blank', 'noopener');
+    expect(pullRequestWindow.location.assign).toHaveBeenCalledWith(
+      'https://github.com/acme/api/pull/1',
+    );
   });
 });

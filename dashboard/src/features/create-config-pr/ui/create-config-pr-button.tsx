@@ -17,6 +17,9 @@ export function CreateConfigPrButton({ owner, repo, selection }: CreateConfigPrB
   const [pending, setPending] = useState(false);
 
   async function createPullRequest() {
+    const pullRequestWindow = window.open('', '_blank');
+    if (pullRequestWindow) pullRequestWindow.opener = null;
+
     setPending(true);
     setError(null);
 
@@ -34,8 +37,10 @@ export function CreateConfigPrButton({ owner, repo, selection }: CreateConfigPrB
       }
 
       setPending(false);
-      window.open(result.url, '_blank', 'noopener');
+      if (pullRequestWindow) pullRequestWindow.location.assign(result.url);
+      else window.location.assign(result.url);
     } catch (caughtError) {
+      pullRequestWindow?.close();
       setError(caughtError instanceof Error ? caughtError.message : '설정 PR을 만들지 못했습니다.');
       setPending(false);
     }
