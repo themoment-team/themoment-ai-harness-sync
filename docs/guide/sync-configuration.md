@@ -81,6 +81,7 @@ pr_label: false                # sync PR 라벨 부착 여부 (기본값: true)
 | `claude/skills/database-schema` | `.claude/skills/database-schema/` |
 | `claude/skills/docker` | `.claude/skills/docker/` |
 | `claude/skills/git-commit` | `.claude/skills/git-commit/` |
+| `claude/skills/humanizer` | `.claude/skills/humanizer/` |
 | `claude/skills/kotest-guide` | `.claude/skills/kotest-guide/` |
 | `claude/skills/kotlin-spring-arch` | `.claude/skills/kotlin-spring-arch/` |
 | `claude/skills/migration-guide` | `.claude/skills/migration-guide/` |
@@ -147,6 +148,7 @@ pr_label: false                # sync PR 라벨 부착 여부 (기본값: true)
 | `codex/skills/database-schema` | `.agents/skills/database-schema/` |
 | `codex/skills/docker` | `.agents/skills/docker/` |
 | `codex/skills/git-commit` | `.agents/skills/git-commit/` |
+| `codex/skills/humanizer` | `.agents/skills/humanizer/` |
 | `codex/skills/kotest-guide` | `.agents/skills/kotest-guide/` |
 | `codex/skills/kotlin-spring-arch` | `.agents/skills/kotlin-spring-arch/` |
 | `codex/skills/migration-guide` | `.agents/skills/migration-guide/` |
