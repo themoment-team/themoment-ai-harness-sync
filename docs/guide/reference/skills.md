@@ -21,6 +21,12 @@ Claude Code에서 `/skill-name` 으로 직접 호출하는 스킬 목록입니�
 | `planning` | `/planning [instructions]` | 요구사항 인터뷰를 진행하고 구현 스펙 문서(`.md`)를 생성 |
 | `resolve-reviews` | `/resolve-reviews` | 열린 PR의 리뷰 댓글을 수집해 유효한 것은 자동 적용, 무효한 것은 반박 댓글 작성 |
 
+## 문서 및 글쓰기
+
+| 스킬 | 호출 | 설명 |
+|------|------|------|
+| `humanizer` | `/humanizer` | 의미와 사실관계를 유지하면서 AI 특유의 과장, 정형화된 문장 구조, 장식적 표현을 자연스러운 문체로 다듬기 |
+
 ## 코드 품질
 
 | 스킬 | 호출 | 설명 |
@@ -58,4 +64,3 @@ Claude Code에서 `/skill-name` 으로 직접 호출하는 스킬 목록입니�
 | `tanstack-query-zod` | `/tanstack-query-zod` | typed API wrapper, TanStack Query key·hook, Zod schema와 inferred request type 규칙 |
 
 설치와 프로젝트 구조는 [프론트엔드 아키텍처](/guide/architecture/frontend)를 참고하세요.
-

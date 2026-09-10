@@ -116,6 +116,11 @@ items:
     dest: .claude/skills/nextjs-package-boundaries/
     groups: [claude]
 
+  - id: claude/skills/humanizer
+    src: .claude/skills/humanizer/
+    dest: .claude/skills/humanizer/
+    groups: [claude]
+
   # ── Next.js FSD project files (opt-in) ────────────────────────
   # 대상 프로젝트의 기존 설정을 덮어쓰므로 FSD 프로젝트에서만 overrides로 활성화한다.
   - id: nextjs/fsd/steiger-config
@@ -339,6 +344,11 @@ items:
   - id: codex/skills/nextjs-package-boundaries
     src: .agents/skills/nextjs-package-boundaries/
     dest: .agents/skills/nextjs-package-boundaries/
+    groups: [codex]
+
+  - id: codex/skills/humanizer
+    src: .agents/skills/humanizer/
+    dest: .agents/skills/humanizer/
     groups: [codex]
 
   # ── Codex agents (custom subagents) ───────────────────────────
