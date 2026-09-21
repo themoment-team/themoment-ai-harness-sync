@@ -71,7 +71,7 @@ pr_label: false                # sync PR 라벨 부착 여부 (기본값: true)
 
 ## 항목 ID 목록
 
-각 항목의 설명은 [스킬 레퍼런스](/guide/reference/skills), [에이전트 레퍼런스](/guide/reference/agents), [훅 레퍼런스](/guide/reference/hooks)를 참고하세요.
+각 항목의 설명은 [스킬 레퍼런스](./reference/skills.md), [에이전트 레퍼런스](./reference/agents.md), [훅 레퍼런스](./reference/hooks.md)를 참고하세요.
 
 ### claude 그룹
 
@@ -109,7 +109,7 @@ pr_label: false                # sync PR 라벨 부착 여부 (기본값: true)
 ### claude 훅 (opt-in 전용)
 
 훅 사용 시 `dispatcher`와 `settings`는 **반드시** 함께 활성화해야 합니다.  
-각 모듈 설명 및 추천 조합은 [훅 레퍼런스](/guide/reference/hooks)를 참고하세요.
+각 모듈 설명 및 추천 조합은 [훅 레퍼런스](./reference/hooks.md)를 참고하세요.
 
 `claude/settings`만 활성화하면 훅이 없는 기본 설정이 배포됩니다. 하나 이상의 Claude 훅을 함께 활성화하면 훅 등록이 포함된 설정이 배포됩니다.
 
@@ -133,7 +133,7 @@ pr_label: false                # sync PR 라벨 부착 여부 (기본값: true)
 
 ### Next.js FSD 프로젝트 파일 (opt-in 전용)
 
-기존 프로젝트 루트 설정을 덮어쓸 수 있으므로 Next.js FSD 프로젝트에서만 활성화하세요. 자세한 구조와 설치 방법은 [프론트엔드 아키텍처](/guide/architecture/frontend)를 참고하세요.
+기존 프로젝트 루트 설정을 덮어쓸 수 있으므로 Next.js FSD 프로젝트에서만 활성화하세요. 자세한 구조와 설치 방법은 [프론트엔드 아키텍처](./architecture/frontend.md)를 참고하세요.
 
 | ID | 배포 경로 |
 |----|----------|

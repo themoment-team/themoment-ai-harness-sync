@@ -71,7 +71,7 @@ dispatcher를 Codex 훅으로 등록하는 파일입니다. `codex/hooks-json` �
 ## `.codex/agents/` 서브에이전트
 
 `.claude/agents/`와 동일한 서브에이전트를 Codex TOML 포맷으로 제공합니다.  
-Codex는 명시적 위임 요청 또는 트리거 문구를 감지하면 이 에이전트를 스폰합니다. 에이전트 설명은 [에이전트 레퍼런스](/guide/reference/agents)를 참고하세요.
+Codex는 명시적 위임 요청 또는 트리거 문구를 감지하면 이 에이전트를 스폰합니다. 에이전트 설명은 [에이전트 레퍼런스](../reference/agents.md)를 참고하세요.
 
 각 `.toml` 파일의 필수 필드는 `name` / `description` / `developer_instructions`이며, 선택 필드로 `model_reasoning_effort`(`low`/`medium`/`high`)와 `sandbox_mode`(`read-only`/`workspace-write`)를 사용합니다.
 
@@ -103,7 +103,7 @@ dispatcher가 런타임에 `modules/` 디렉토리를 스캔하여 모듈을 자
 | `ktlint` | `post-tool-use.sh` | 도구 실행 후 |
 | `gradle-test` | `post-tool-use.sh` | 도구 실행 후 |
 
-모듈 작성 규칙 (`exit 0` / `exit 2` 등)은 [Claude 컨벤션 — 훅](/guide/conventions/claude#훅-hooks)과 동일합니다.  
+모듈 작성 규칙 (`exit 0` / `exit 2` 등)은 [Claude 컨벤션 — 훅](./claude.md#훅-hooks)과 동일합니다.
 모든 훅 항목은 어느 그룹에도 기본 포함되지 않으며 반드시 `include`에 명시해야 합니다.
 
 ## `.agents/skills/` 스킬

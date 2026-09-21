@@ -39,7 +39,7 @@ app → views → widgets → features → entities → shared
 
 ## 검증 도구
 
-FSD 프로젝트는 [동기화 설정](/guide/sync-configuration)에서 다음 opt-in 항목을 활성화합니다.
+FSD 프로젝트는 [동기화 설정](../sync-configuration.md)에서 다음 opt-in 항목을 활성화합니다.
 
 ```yaml
 overrides:
@@ -85,4 +85,4 @@ source-consumed workspace package가 RSC directive를 내보낼 때만 각 앱�
 
 `프론트엔드 컨벤션 검사해줘` 또는 `frontend-convention-validator 실행해`라고 요청하면 TypeScript/TSX 변경 파일을 읽기 전용으로 검사합니다. FSD, Tailwind/shadcn, TanStack Query/Zod, server-only 공개 API 규칙을 확인합니다.
 
-스킬 목록은 [스킬 레퍼런스](/guide/reference/skills), 에이전트 상세는 [에이전트 레퍼런스](/guide/reference/agents)를 참고하세요.
+스킬 목록은 [스킬 레퍼런스](../reference/skills.md), 에이전트 상세는 [에이전트 레퍼런스](../reference/agents.md)를 참고하세요.

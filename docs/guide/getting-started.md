@@ -18,22 +18,22 @@ groups:
 ```
 
 이것만으로 Claude Code 스킬·에이전트와 Codex 스킬이 자동 배포됩니다.  
-세부 제어가 필요하다면 [동기화 설정](/guide/sync-configuration)를 참고하세요.
+세부 제어가 필요하다면 [동기화 설정](./sync-configuration.md)를 참고하세요.
 
 ## 문서
 
 ### 설정
-- [동기화 설정](/guide/sync-configuration) — 그룹 선택, 훅 활성화, 버전 고정 등 동기화 항목 제어
+- [동기화 설정](./sync-configuration.md) — 그룹 선택, 훅 활성화, 버전 고정 등 동기화 항목 제어
 
 ### 레퍼런스
-- [스킬 레퍼런스](/guide/reference/skills) — 스킬 목록과 각 스킬의 역할
-- [에이전트 레퍼런스](/guide/reference/agents) — 서브에이전트 목록과 트리거 문구
-- [훅 레퍼런스](/guide/reference/hooks) — 훅 모듈 목록과 프로젝트 유형별 추천 조합
-- [프론트엔드 아키텍처](/guide/architecture/frontend) — Next.js App Router, FSD, Turborepo 프론트엔드 규칙
+- [스킬 레퍼런스](./reference/skills.md) — 스킬 목록과 각 스킬의 역할
+- [에이전트 레퍼런스](./reference/agents.md) — 서브에이전트 목록과 트리거 문구
+- [훅 레퍼런스](./reference/hooks.md) — 훅 모듈 목록과 프로젝트 유형별 추천 조합
+- [프론트엔드 아키텍처](./architecture/frontend.md) — Next.js App Router, FSD, Turborepo 프론트엔드 규칙
 
 ### 컨벤션
-- [Claude 컨벤션](/guide/conventions/claude) — 스킬·에이전트·훅 작성 규칙
-- [Codex 컨벤션](/guide/conventions/codex) — Codex 설정·훅 작성 규칙
-- [Gemini 컨벤션](/guide/conventions/gemini) — Gemini 설정·스타일가이드 작성 규칙
-- [Copilot 컨벤션](/guide/conventions/copilot) — copilot-instructions.md 작성 규칙
-- [전역 컨벤션](/guide/conventions/global) — 커밋·PR·브랜치 공통 규칙
+- [Claude 컨벤션](./conventions/claude.md) — 스킬·에이전트·훅 작성 규칙
+- [Codex 컨벤션](./conventions/codex.md) — Codex 설정·훅 작성 규칙
+- [Gemini 컨벤션](./conventions/gemini.md) — Gemini 설정·스타일가이드 작성 규칙
+- [Copilot 컨벤션](./conventions/copilot.md) — copilot-instructions.md 작성 규칙
+- [전역 컨벤션](./conventions/global.md) — 커밋·PR·브랜치 공통 규칙
