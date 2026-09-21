@@ -111,4 +111,4 @@ dispatcher가 런타임에 `modules/` 디렉토리를 스캔하여 모듈을 자
 `.claude/skills/`와 동일한 스킬을 Codex 호환 포맷으로 제공합니다.  
 새 스킬 추가 시 두 디렉토리 모두 업데이트해야 합니다.
 
-SKILL.md 작성 규칙은 [Claude Conventions — 스킬](Claude-Conventions#스킬-skills)을 따릅니다.+
+SKILL.md 작성 규칙은 [Claude Conventions — 스킬](./claude.md#스킬-skills)을 따릅니다.
