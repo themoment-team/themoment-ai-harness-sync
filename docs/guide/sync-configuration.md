@@ -13,6 +13,12 @@ order: 30
 `.harness/sync.yml`이 없으면 기본 그룹(`claude`, `codex`, `gemini`)이 모두 동기화됩니다.  
 훅 관련 항목은 기본 그룹에 포함되지 않으며 **`overrides`에 `true`로 명시**해야 합니다.
 
+## 프로젝트 지침은 각 저장소에서 관리
+
+`AGENTS.md`, `.claude/rules/**`, `.gemini/styleguide.md`, `.github/copilot-instructions.md`는 배포 항목이 아닙니다. 각 타깃 레포가 직접 관리하며, 하네스는 이를 생성·덮어쓰기·삭제하지 않습니다.
+
+`AGENTS.md`가 없어도 동기화와 스킬·에이전트 사용을 계속할 수 있습니다. 규칙 문서의 적용 범위·충돌·부재 시 처리 기준은 [전역 컨벤션](/guide/conventions/global#프로젝트-지침-agentsmd)을 참고하세요.
+
 ## 동기화 주기 및 실행 조건
 
 자동 동기화 워크플로우는 다음 시점에 실행됩니다:

@@ -8,6 +8,12 @@ order: 60
 
 `.claude/` 디렉토리 하위 파일 작성 규칙입니다.
 
+## 프로젝트 지침
+
+공통 지침은 저장소 루트의 `AGENTS.md`에 작성하고, 경로별 지침은 해당 디렉터리의 `AGENTS.md`에 둡니다. 하네스는 이 파일을 동기화하지 않습니다. 파일이 없는 저장소의 처리 기준은 [전역 컨벤션](/guide/conventions/global#프로젝트-지침-agentsmd)을 참고하세요.
+
+Claude Code의 직접 로딩 지원을 위해 v2.1.281 이상을 사용하고, `/config`의 **Project instructions** 설정과 `/memory`에서 지침 로딩을 확인하세요. 상위 디렉터리에 다른 프로젝트 지침이 있거나 내장 `agents-md` 플러그인이 비활성화되어 있으면 자동 로딩 결과가 달라질 수 있습니다. 세부 조건은 [Claude Code 공식 문서](https://code.claude.com/docs/en/memory#agentsmd)를 참고하세요.
+
 ## 디렉토리 구조
 
 ```
@@ -160,4 +166,4 @@ rules/
 ├── logging.md           # 로깅 규칙
 ├── exception.md         # 예외 처리 규칙
 └── api-conventions.md   # API 설계 규칙
-```+
+```
