@@ -36,11 +36,11 @@ find .claude/rules -name "*.md" 2>/dev/null
 
 Read the discovered rules relevant to the changed paths, then read any applicable `AGENTS.md`, `.gemini/styleguide.md`, `CONTRIBUTING.md`, and `.github/copilot-instructions.md` files that exist.
 
-These rule files are the authoritative source. The concrete fixes in Step 3 (e.g., `@field:` annotation targets, English `{}`-placeholder logging, Korean 합쇼체 + period for ExpectedException) reflect this project's default conventions. When a rule file contradicts a default, follow the rule file. If no applicable document or configured tool supports a style change, report it as a suggestion instead of automatically applying these defaults.
+Automatic fixes require an applicable explicit project rule or configured tool rule, interpreted through the conflict handling above. The checks in Step 3 are candidates to evaluate, not defaults to impose on every repository. If the sources conflict without a resolution, cite them and leave the affected change unapplied. If no applicable rule supports a style change, report it as a suggestion.
 
 ## Step 3: Fix Violations
 
-For each violation found, fix it directly:
+For each violation supported by the applicable rules in Step 2, with no unresolved conflict, apply the justified fix. Evaluate these candidate checks only when those rules require them:
 
 1. **DTO annotations**: Replace `@param:JsonProperty` → `@field:JsonProperty`, fix `@param:Schema` on ResDto files
 2. **Logging**: Rewrite log messages to English verb-led sentences with `{}` placeholders
