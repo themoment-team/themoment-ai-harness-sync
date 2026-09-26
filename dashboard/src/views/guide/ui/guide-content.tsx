@@ -5,10 +5,12 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 import { createGuideHeadingId, type GuideHeading } from '../model/guide-heading';
+import { resolveGuideLink } from '../model/guide-link';
 
 type GuideContentProps = {
   content: string;
   headings: GuideHeading[];
+  slug: string[];
 };
 
 function getText(children: ReactNode): string {
@@ -25,7 +27,7 @@ function isExternalLink(href?: string) {
   return href?.startsWith('https://') || href?.startsWith('http://');
 }
 
-export function GuideContent({ content, headings }: GuideContentProps) {
+export function GuideContent({ content, headings, slug }: GuideContentProps) {
   const headingIdByLine = new Map(headings.map((heading) => [heading.line, heading.id]));
   const getHeadingId = (line: number | undefined, children: ReactNode) =>
     (line === undefined ? undefined : headingIdByLine.get(line)) ??
@@ -34,7 +36,7 @@ export function GuideContent({ content, headings }: GuideContentProps) {
   const components: Components = {
     a: ({ href, ...props }) => (
       <a
-        href={href}
+        href={resolveGuideLink(href, slug)}
         rel={isExternalLink(href) ? 'noreferrer' : undefined}
         target={isExternalLink(href) ? '_blank' : undefined}
         {...props}

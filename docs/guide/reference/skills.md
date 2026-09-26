@@ -63,4 +63,4 @@ Claude Code에서 `/skill-name` 으로 직접 호출하는 스킬 목록입니�
 | `tailwind-shadcn` | `/tailwind-shadcn` | Tailwind 클래스와 `cn()`, 디자인 토큰, shadcn primitive·도메인 UI 소유권 |
 | `tanstack-query-zod` | `/tanstack-query-zod` | typed API wrapper, TanStack Query key·hook, Zod schema와 inferred request type 규칙 |
 
-설치와 프로젝트 구조는 [프론트엔드 아키텍처](/guide/architecture/frontend)를 참고하세요.
+설치와 프로젝트 구조는 [프론트엔드 아키텍처](../architecture/frontend.md)를 참고하세요.

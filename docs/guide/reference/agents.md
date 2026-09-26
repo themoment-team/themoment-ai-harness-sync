@@ -11,7 +11,7 @@ order: 110
 
 > 각 에이전트는 Claude용 `.claude/agents/<name>.md` 와 Codex용 `.codex/agents/<name>.toml` 에 동일한 본문으로 정의되어 있습니다.
 > 본문은 같지만 헤더 포맷이 다릅니다 — Claude는 YAML frontmatter, Codex는 TOML(`name`/`description`/`developer_instructions` + `sandbox_mode`·`model_reasoning_effort`). 두 디렉토리는 독립 시스템이라 각각 유지됩니다.
-> 작성 규칙은 [Claude 컨벤션](/guide/conventions/claude) / [Codex 컨벤션](/guide/conventions/codex)를 참고하세요.
+> 작성 규칙은 [Claude 컨벤션](../conventions/claude.md) / [Codex 컨벤션](../conventions/codex.md)를 참고하세요.
 
 ---
 
@@ -84,4 +84,3 @@ FSD 프로젝트에 `lint:fsd` 스크립트가 있으면 실행 결과를 보고
 **최신 웹 정보를 수집**합니다. 학습 데이터 범위 밖의 릴리스 노트, 보안 권고, 라이브러리 비교, CVE 등을 검색합니다.
 
 **트리거**: `최신 정보 조사해줘` / `web-researcher 실행해` / 최신 릴리스·CVE 관련 질문
-
