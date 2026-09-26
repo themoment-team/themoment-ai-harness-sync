@@ -11,13 +11,13 @@ order: 110
 
 > 각 에이전트는 Claude용 `.claude/agents/<name>.md`와 Codex용 `.codex/agents/<name>.toml`로 제공됩니다.
 > 역할은 같지만 도구별 실행 지침과 헤더 포맷이 다를 수 있습니다 — Claude는 YAML frontmatter, Codex는 TOML(`name`/`description`/`developer_instructions` + `sandbox_mode`·`model_reasoning_effort`). 두 디렉토리는 독립 시스템이라 각각 유지됩니다.
-> 작성 규칙은 [Claude 컨벤션](/guide/conventions/claude) / [Codex 컨벤션](/guide/conventions/codex)를 참고하세요.
+> 작성 규칙은 [Claude 컨벤션](../conventions/claude.md) / [Codex 컨벤션](../conventions/codex.md)를 참고하세요.
 
 ---
 
 ## 공통 지침 처리
 
-규칙을 참조하는 에이전트는 작업 경로에 적용되는 `AGENTS.md`와 존재하는 규칙 문서만 읽습니다. `AGENTS.md`가 없으면 다른 문서를 참고하며, 없는 파일을 만들거나 인용하지 않습니다. 하위 지침의 적용 범위와 문서 간 충돌 처리 기준은 [전역 컨벤션](/guide/conventions/global#프로젝트-지침-agentsmd)을 참고하세요.
+규칙을 참조하는 에이전트는 작업 경로에 적용되는 `AGENTS.md`와 존재하는 규칙 문서만 읽습니다. `AGENTS.md`가 없으면 다른 문서를 참고하며, 없는 파일을 만들거나 인용하지 않습니다. 하위 지침의 적용 범위와 문서 간 충돌 처리 기준은 [전역 컨벤션](../conventions/global.md#프로젝트-지침-agentsmd)을 참고하세요.
 
 문서가 전혀 없으면 `contradiction-finder`는 문서 기준 검사(L1–L3)의 한계를 보고하고 가능한 에이전트 간 검사(L4)를 계속합니다. `kotlin-convention-validator`는 명시된 규칙이나 도구 설정으로 뒷받침되지 않는 스타일 변경을 제안으로 남깁니다.
 
@@ -90,4 +90,3 @@ FSD 프로젝트에 `lint:fsd` 스크립트가 있으면 실행 결과를 보고
 **최신 웹 정보를 수집**합니다. 학습 데이터 범위 밖의 릴리스 노트, 보안 권고, 라이브러리 비교, CVE 등을 검색합니다.
 
 **트리거**: `최신 정보 조사해줘` / `web-researcher 실행해` / 최신 릴리스·CVE 관련 질문
-

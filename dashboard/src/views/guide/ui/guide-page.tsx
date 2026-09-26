@@ -41,7 +41,7 @@ export function GuidePage({
         </nav>
         {document ? (
           <article className="prose-guide min-w-0">
-            <GuideContent content={document.content} headings={headings} />
+            <GuideContent content={document.content} headings={headings} slug={document.slug} />
           </article>
         ) : (
           <section>

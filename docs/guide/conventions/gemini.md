@@ -31,7 +31,7 @@ order: 80
 
 - `context.fileName`으로 공통 프로젝트 지침 파일인 `AGENTS.md`를 지정합니다.
 - `general.defaultApprovalMode`는 기본 승인 모드를 설정합니다.
-- `AGENTS.md` 자체는 동기화하지 않습니다. 없는 문서의 처리와 경로별 적용 기준은 [전역 컨벤션](/guide/conventions/global#프로젝트-지침-agentsmd)을 참고하세요.
+- `AGENTS.md` 자체는 동기화하지 않습니다. 없는 문서의 처리와 경로별 적용 기준은 [전역 컨벤션](./global.md#프로젝트-지침-agentsmd)을 참고하세요.
 
 ## styleguide.md
 
