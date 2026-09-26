@@ -269,5 +269,6 @@ jobs:
           color: ${{ steps.status.outputs.color }}
           title: "AI Harness Sync"
           description: |
+            **대상 레포:** ${{ inputs.target_repo || '전체 설치 레포' }}
             **Prepare:** ${{ needs.prepare.result }}
             **Sync:** ${{ needs.sync.result }}

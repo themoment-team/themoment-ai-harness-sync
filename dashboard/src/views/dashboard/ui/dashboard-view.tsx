@@ -24,6 +24,9 @@ type LoadState = 'loading' | 'ready' | 'error';
 export function DashboardView() {
   const { status } = useSession();
   const [repositories, setRepositories] = useState<DashboardRepository[]>([]);
+  const [requestedRepository] = useState(() =>
+    typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('repo'),
+  );
   const [selectedRepository, setSelectedRepository] = useState<string | null>(null);
   const [dashboardData, setDashboardData] = useState<RepositoryDashboardData | null>(null);
   const [selection, setSelection] = useState<SelectionState | null>(null);
@@ -49,7 +52,11 @@ export function DashboardView() {
         throw new Error(nextRepositories.message ?? '관리 가능한 프로젝트를 불러오지 못했습니다.');
 
       setRepositories(nextRepositories);
-      setSelectedRepository(nextRepositories[0]?.fullName ?? null);
+      setSelectedRepository(
+        nextRepositories.find((repository) => repository.fullName === requestedRepository)?.fullName ??
+          nextRepositories[0]?.fullName ??
+          null,
+      );
       setRepositoriesState('ready');
     } catch (caughtError) {
       setRepositoriesState('error');
@@ -59,7 +66,7 @@ export function DashboardView() {
           : '관리 가능한 프로젝트를 불러오지 못했습니다.',
       );
     }
-  }, []);
+  }, [requestedRepository]);
 
   const loadRepositoryData = useCallback(async (fullName: string) => {
     setDataState('loading');
@@ -96,6 +103,17 @@ export function DashboardView() {
     if (!selectedRepository) return;
     void Promise.resolve().then(() => loadRepositoryData(selectedRepository));
   }, [loadRepositoryData, selectedRepository]);
+
+  const selectRepository = useCallback((fullName: string) => {
+    setSelectedRepository(fullName);
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set('repo', fullName);
+    window.history.replaceState(
+      null,
+      '',
+      `${window.location.pathname}?${searchParams.toString()}${window.location.hash}`,
+    );
+  }, []);
 
   const [owner = '', repo = ''] = selectedRepository?.split('/') ?? [];
 
@@ -146,7 +164,7 @@ export function DashboardView() {
               <RepositorySidebar
                 repositories={repositories}
                 selectedRepository={selectedRepository}
-                onSelect={setSelectedRepository}
+                onSelect={selectRepository}
               />
             </div>
 
