@@ -9,9 +9,9 @@
 ## 작업 시 주의사항
 
 - `.claude/rules/`는 이 레포 자체 규칙이므로 프로젝트 동기화 대상이 아님
-- `.github/sync.yml`이 동기화 대상 레포와 파일 매핑을 정의함
+- `sync-manifest.yml`이 배포 항목과 파일 매핑을 정의하며, 각 타깃 레포의 `.harness/sync.yml`이 받을 항목을 선택함
 - 스킬(`SKILL.md`)과 에이전트(`.claude/agents/*.md`)는 특정 언어에 종속되지 않게 작성 권장
-- 새 프로젝트 추가 시 `.github/sync.yml`에 레포 항목만 추가하면 됨
+- 새 프로젝트는 GitHub App을 설치하면 `scripts/list-installed-repos.py`가 자동으로 발견하며, `.github/workflows/sync.yml`이 동기화 PR을 생성함
 
 ## 커밋 컨벤션
 

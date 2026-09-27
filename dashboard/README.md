@@ -2,6 +2,10 @@
 
 프로젝트 팀이 AI Harness 동기화 항목을 선택하고, 대상 레포의 `.harness/sync.yml`을 변경하는 설정 PR을 만드는 Next.js 애플리케이션입니다.
 
+## 지침과 문서
+
+저장소 공통 지침은 루트 `AGENTS.md`, 대시보드의 Next.js 지침은 `dashboard/AGENTS.md`에서 관리합니다. 웹 가이드 `/guide`는 `docs/guide/`의 Markdown을 읽습니다. 관련 정책을 변경하면 GitHub Wiki의 대응 문서도 함께 점검하세요.
+
 ## 실행
 
 ```bash

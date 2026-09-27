@@ -8,6 +8,14 @@ order: 60
 
 `.claude/` 디렉토리 하위 파일 작성 규칙입니다.
 
+## 프로젝트 지침
+
+공통 지침은 저장소 루트의 `AGENTS.md`에 작성하고, 경로별 지침은 해당 디렉터리의 `AGENTS.md`에 둡니다. 하네스는 이 파일을 동기화하지 않습니다. 파일이 없는 저장소의 처리 기준은 [전역 컨벤션](./global.md#프로젝트-지침-agentsmd)을 참고하세요.
+
+Claude Code의 직접 로딩 지원을 위해 v2.1.281 이상을 사용하고, 내장 `agents-md` 플러그인이 활성화되어 있는지 확인하세요. 기본 **Project instructions** 값인 `claude-md-or-agents-md`에서는 작업 디렉터리 또는 그 상위 디렉터리에 `CLAUDE.md`, `.claude/CLAUDE.md`, `CLAUDE.local.md` 중 하나라도 있으면 `AGENTS.md`를 직접 로딩하지 않습니다. 사용자 전역 `~/.claude/CLAUDE.md`, 조직 관리 지침과 `.claude/rules/`는 이 조건에 포함되지 않습니다.
+
+기존 프로젝트 지침과 공존해야 한다면 `/config`에서 **Project instructions**를 `claude-md-and-agents-md`로 설정하거나, 기존 `CLAUDE.md`에서 `@AGENTS.md`로 공통 지침을 가져오세요. import 경로는 해당 파일 기준이므로 `.claude/CLAUDE.md`에서 루트 파일을 가져올 때는 `@../AGENTS.md`를 사용합니다. 공통 규칙은 `AGENTS.md` 한 곳에서 관리하고 `/memory`에서 실제 로딩을 확인하세요. 세부 조건은 [Claude Code 공식 문서](https://code.claude.com/docs/en/memory#agentsmd)를 참고하세요.
+
 ## 디렉토리 구조
 
 ```
@@ -160,4 +168,4 @@ rules/
 ├── logging.md           # 로깅 규칙
 ├── exception.md         # 예외 처리 규칙
 └── api-conventions.md   # API 설계 규칙
-```+
+```

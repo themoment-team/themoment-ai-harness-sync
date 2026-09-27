@@ -20,13 +20,18 @@ order: 80
 
 ```json
 {
-  "theme": "...",
-  "language": "korean"
+  "general": {
+    "defaultApprovalMode": "auto_edit"
+  },
+  "context": {
+    "fileName": ["AGENTS.md"]
+  }
 }
 ```
 
-- 응답 언어(`language`), 테마 등 Gemini CLI 동작 제어
-- 프로젝트 공통 설정만 포함
+- `context.fileName`으로 공통 프로젝트 지침 파일인 `AGENTS.md`를 지정합니다.
+- `general.defaultApprovalMode`는 기본 승인 모드를 설정합니다.
+- `AGENTS.md` 자체는 동기화하지 않습니다. 없는 문서의 처리와 경로별 적용 기준은 [전역 컨벤션](./global.md#프로젝트-지침-agentsmd)을 참고하세요.
 
 ## styleguide.md
 
@@ -47,4 +52,4 @@ Gemini가 코드 작성 시 참조하는 스타일 가이드입니다.
 
 ### 업데이트 주기
 
-실제 코드와 괴리가 생기면 `doc-polisher` 에이전트로 갱신합니다.+
+실제 코드와 괴리가 생기면 `doc-polisher` 에이전트로 갱신합니다.

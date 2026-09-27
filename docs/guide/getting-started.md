@@ -6,7 +6,7 @@ order: 10
 
 # AI Harness 가이드
 
-레포에 `.harness/sync.yml` 파일 하나를 추가하면 Claude, Codex, Gemini 설정이 자동으로 동기화됩니다.
+GitHub App이 설치된 레포는 Claude, Codex, Gemini 설정을 동기화받습니다. `.harness/sync.yml`로 받을 항목을 선택할 수 있습니다.
 
 ## 빠른 시작
 
@@ -17,12 +17,17 @@ groups:
   - codex
 ```
 
-이것만으로 Claude Code 스킬·에이전트와 Codex 스킬이 자동 배포됩니다.  
+GitHub App 설치 후 이 설정을 기본 브랜치에 두면 Claude Code 스킬·에이전트와 Codex 스킬·에이전트·설정이 동기화 PR로 전달됩니다. PR을 병합하면 파일이 적용됩니다.
+
 세부 제어가 필요하다면 [동기화 설정](./sync-configuration.md)를 참고하세요.
+
+프로젝트 지침인 `AGENTS.md`는 각 레포가 직접 관리하며 동기화 대상이 아닙니다. 파일이 없는 경우의 처리 기준은 [전역 컨벤션](./conventions/global.md#프로젝트-지침-agentsmd)을 참고하세요.
 
 ## 문서
 
 ### 설정
+- [GitHub App 설정](./github-app-setup.md) — App 설치, 로그인과 레포 접근 권한
+- [대시보드 사용법](./dashboard-guide.md) — 설정 PR 생성과 즉시 동기화
 - [동기화 설정](./sync-configuration.md) — 그룹 선택, 훅 활성화, 버전 고정 등 동기화 항목 제어
 
 ### 레퍼런스

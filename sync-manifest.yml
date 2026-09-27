@@ -1,5 +1,5 @@
 # 동기화 가능한 개별 항목 목록
-# 각 대상 레포는 .harness-sync.yml에서 groups/include/exclude로 원하는 항목을 선택합니다
+# 각 대상 레포는 .harness/sync.yml에서 groups/overrides로 원하는 항목을 선택합니다
 # 새 스킬/에이전트 추가 시 이 목록도 업데이트하세요
 #
 # 버전 아카이브 규칙:

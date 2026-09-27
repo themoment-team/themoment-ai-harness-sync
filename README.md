@@ -2,7 +2,7 @@
 
 > Distribute AI tool configurations across all your repositories — automatically.
 
-A central hub that shares Claude skills/agents/hooks, Codex skills, Gemini config, and Copilot instructions with every project that installs the GitHub App. Add a new project in seconds; no manual config editing required.
+A central hub that shares Claude and Codex skills/agents/hooks and Gemini settings with every project that installs the GitHub App. Add a new project in seconds; no manual config editing required.
 
 ## How It Works
 
@@ -20,6 +20,8 @@ The Dashboard serves the public guide at `/guide`. The Markdown source is kept i
 - [GitHub App Setup](docs/guide/github-app-setup.md) — App creation, permissions, and secrets
 - [Sync Configuration](docs/guide/sync-configuration.md) — control what each repo receives via `.harness/sync.yml`
 - [Conventions](docs/guide/conventions/global.md) — commit, PR, and skill authoring conventions
+
+Project instructions live in each repository’s `AGENTS.md` and are not synced. Skills and agents also work without that file by consulting existing convention documents and code. See [project instruction rules](docs/guide/conventions/global.md#프로젝트-지침-agentsmd).
 
 ## Directory Docs
 
