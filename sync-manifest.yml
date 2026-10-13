@@ -121,6 +121,16 @@ items:
     dest: .claude/skills/humanizer/
     groups: [claude]
 
+  - id: claude/skills/ponytail
+    src: .claude/skills/ponytail/
+    dest: .claude/skills/ponytail/
+    groups: [claude]
+
+  - id: claude/skills/ponytail-audit
+    src: .claude/skills/ponytail-audit/
+    dest: .claude/skills/ponytail-audit/
+    groups: [claude]
+
   # ── Next.js FSD project files (opt-in) ────────────────────────
   # 대상 프로젝트의 기존 설정을 덮어쓰므로 FSD 프로젝트에서만 overrides로 활성화한다.
   - id: nextjs/fsd/steiger-config
@@ -245,6 +255,7 @@ items:
     dest: .claude/hooks/modules/ruff/
     groups: []
 
+
   # ── Codex (OpenAI Codex / Agents CLI) skills ─────────────────
   - id: codex/skills/api-design
     src: .agents/skills/api-design/
@@ -349,6 +360,16 @@ items:
   - id: codex/skills/humanizer
     src: .agents/skills/humanizer/
     dest: .agents/skills/humanizer/
+    groups: [codex]
+
+  - id: codex/skills/ponytail
+    src: .agents/skills/ponytail/
+    dest: .agents/skills/ponytail/
+    groups: [codex]
+
+  - id: codex/skills/ponytail-audit
+    src: .agents/skills/ponytail-audit/
+    dest: .agents/skills/ponytail-audit/
     groups: [codex]
 
   # ── Codex agents (custom subagents) ───────────────────────────
@@ -462,6 +483,7 @@ items:
     src: .codex/hooks/modules/ruff/
     dest: .codex/hooks/modules/ruff/
     groups: []
+
 
   - id: codex/hooks-json
     src: .codex/hooks.json

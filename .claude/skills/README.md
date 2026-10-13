@@ -24,6 +24,8 @@ Claude에서 `/skill-name` 으로 호출하는 재사용 가능한 작업 단위
 | [security-checklist](./security-checklist/SKILL.md)     | 하드코딩 시크릿·SQL 인젝션·JWT 검증·API 키 마스킹·민감 로깅·인가 검사. auth·API 관련 PR 머지 전 필수 |
 | [systematic-debugging](./systematic-debugging/SKILL.md) | 버그·테스트 실패·예상 외 동작 발생 시 수정 제안 전에 실행. 근본 원인 추적 방법론 적용                   |
 | [test](./test/SKILL.md)                                 | 컨텍스트 기반으로 테스트 범위(단일/모듈/전체) 결정 후 실행, 커버리지 분석 및 실패 상세 보고                |
+| [ponytail](./ponytail/SKILL.md)                         | 필요한 만큼만 코드를 쓰게 함. 기존 코드·표준 라이브러리·설치된 의존성을 먼저 쓰고, 응답 끝에 확인하지 못한 부분과 리스크를 적음 |
+| [ponytail-audit](./ponytail-audit/SKILL.md)             | 레포 전체를 읽고 버그·보안·부하·테스트 누락·성능·지울 코드를 우선순위 리포트로 정리. 코드는 고치지 않음 |
 
 ## 설계 및 아키텍처
 
