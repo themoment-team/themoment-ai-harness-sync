@@ -128,9 +128,11 @@ dispatcher가 런타임에 `modules/` 디렉토리를 스캔하여 모듈을 자
 ```
 .claude/hooks/
 ├── dispatcher/
+│   ├── sessionStart.sh  ← modules/*/sessionStart.sh 자동 스캔·실행
 │   ├── preToolUse.sh    ← modules/*/preToolUse.sh 자동 스캔·실행
 │   └── postToolUse.sh
 └── modules/
+    ├── ponytail/        ← sessionStart.sh
     ├── logging/         ← preToolUse.sh
     ├── command-guard/   ← preToolUse.sh
     ├── ktlint/          ← postToolUse.sh
@@ -143,6 +145,7 @@ dispatcher가 런타임에 `modules/` 디렉토리를 스캔하여 모듈을 자
 
 | 파일 (타깃 레포 기준) | 실행 시점 |
 |----------------------|----------|
+| `.claude/hooks/sessionStart.sh` | 세션 시작, `/clear`, 컨텍스트 압축 직후 |
 | `.claude/hooks/preToolUse.sh` | 모든 도구 실행 전 |
 | `.claude/hooks/postToolUse.sh` | Edit·Write 실행 후 |
 
@@ -150,6 +153,7 @@ dispatcher가 런타임에 `modules/` 디렉토리를 스캔하여 모듈을 자
 
 - `#!/bin/bash` 또는 `#!/bin/sh` 헤더 필수
 - exit code: `0` = 정상 통과, `2` = 도구 실행 차단 (preToolUse), 그 외 = 오류
+- `sessionStart.sh` 모듈이 stdout에 쓴 내용은 세션 컨텍스트에 추가됨. 넣을 내용이 없으면 아무것도 출력하지 않고 `exit 0`
 - 무거운 작업 금지 — 훅은 빠르게 끝나야 함
 - 새 모듈 추가 시 `sync-manifest.yml`에 `groups: []`로 등록 (opt-in 전용)
 

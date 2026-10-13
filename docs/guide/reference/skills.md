@@ -34,6 +34,10 @@ Claude Code에서 `/skill-name` 으로 직접 호출하는 스킬 목록입니�
 | `systematic-debugging` | `/systematic-debugging` | 버그·테스트 실패·예상 외 동작 발생 시 픽스 전에 먼저 실행. 원인 분석 → 가설 수립 → 검증 순서로 안내 |
 | `security-checklist` | `/security-checklist` | 하드코딩 시크릿, SQL 인젝션, JWT 검증, API 키 마스킹, 민감 로깅, 인가 체크 등 보안 취약점 검증. auth·API 관련 변경 전 실행 |
 | `test` | `/test` | 테스트 실행 범위(단일 테스트 / 모듈 / 전체)를 컨텍스트로 판단하고 커버리지 결과 보고 |
+| `ponytail` | `/ponytail` | 작업을 끝내는 데 필요한 만큼만 코드를 쓰게 함. 기존 코드, 표준 라이브러리, 설치된 의존성을 먼저 찾고 요청하지 않은 추상화나 옵션은 만들지 않음. 응답 끝에 확인하지 못한 부분과 리스크를 적음 |
+| `ponytail-audit` | `/ponytail-audit [경로]` | 레포 전체나 지정 경로를 읽고 버그, 보안, 부하, 테스트 누락, 성능, 지울 수 있는 코드를 우선순위별 리포트로 정리. 코드는 고치지 않음 |
+
+`ponytail`과 `ponytail-audit`은 [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) v5.2.0(MIT)을 옮겨 온 스킬입니다. 원본의 레벨 전환(lite/ultra)과 `shortcut:` 주석 규칙은 뺐고, 프로젝트 지침과 충돌하면 프로젝트 지침을 따르도록 했습니다. 스킬 파일만 두면 모델이 알아서 불러오는 일이 드물어서, 세션마다 규칙을 적용하려면 [`ponytail` 훅](./hooks.md#ponytail-sessionstart)을 함께 켜야 합니다.
 
 ## 백엔드 (Kotlin / Spring Boot)
 
