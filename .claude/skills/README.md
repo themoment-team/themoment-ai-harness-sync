@@ -8,7 +8,7 @@ Claude에서 `/skill-name` 으로 호출하는 재사용 가능한 작업 단위
 |-----------------------------------------------|-----------------------------------------------------------------|
 | [git-commit](./git-commit/SKILL.md)           | 변경사항을 논리적 단위로 분리해 컨벤션에 맞는 커밋 생성. Git Flow 자동 감지(develop 브랜치 체크) |
 | [write-pr](./write-pr/SKILL.md)               | base 브랜치 이후 커밋 기반으로 PR 제목·본문·라벨 생성 및 GitHub PR 오픈까지 자동화         |
-| [resolve-reviews](./resolve-reviews/SKILL.md) | PR 리뷰 코멘트 수집 후 컨벤션 기준으로 판단 — 유효하면 자동 반영, 무효하면 반박 댓글 작성          |
+| [resolve-reviews](./resolve-reviews/SKILL.md) | 미해결 PR 리뷰 스레드 수집 후 컨벤션 기준으로 판단 — 유효하면 자동 반영, 무효하면 반박 댓글 작성 |
 
 ## 문서 및 글쓰기
 

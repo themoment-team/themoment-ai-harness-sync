@@ -19,7 +19,7 @@ Claude Code에서 `/skill-name` 으로 직접 호출하는 스킬 목록입니�
 | `git-commit` | `/git-commit` | 변경사항을 논리 단위로 분리해 커밋 생성. `develop` 브랜치 감지 시 feature 브랜치 자동 체크아웃 |
 | `write-pr` | `/write-pr` | 베이스 브랜치 이후 커밋을 분석해 PR 제목·본문·라벨 자동 생성 후 GitHub PR 오픈 |
 | `planning` | `/planning [instructions]` | 요구사항 인터뷰를 진행하고 구현 스펙 문서(`.md`)를 생성 |
-| `resolve-reviews` | `/resolve-reviews` | 열린 PR의 리뷰 댓글을 수집해 유효한 것은 자동 적용, 무효한 것은 반박 댓글 작성 |
+| `resolve-reviews` | `/resolve-reviews` | 열린 PR의 미해결 리뷰 스레드를 수집해 유효한 것은 자동 적용, 무효한 것은 반박 댓글 작성 |
 
 ## 문서 및 글쓰기
 
