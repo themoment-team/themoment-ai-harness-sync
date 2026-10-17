@@ -6,7 +6,7 @@ order: 120
 
 # Hooks Reference
 
-파일 저장·명령어 실행 등 도구 호출 시점에 자동으로 동작하는 훅 모듈 목록입니다.
+세션 시작, 명령어 실행, 파일 저장 시점에 자동으로 동작하는 훅 모듈 목록입니다.
 
 > 훅은 **opt-in** 방식입니다. `.harness/sync.yml`의 `overrides`에 명시해야 활성화됩니다.  
 > 사용하려면 반드시 `dispatcher`와 `settings`(Claude) 또는 `hooks-json`(Codex)을 함께 활성화해야 합니다.
@@ -139,6 +139,29 @@ Vitest 설정이 없으면 동작하지 않습니다.
 `.py` 파일 저장 시 **`ruff format` + `ruff check --fix`를 순서대로 실행**합니다.
 
 **적용 대상**: Python 프로젝트
+
+---
+
+## 코딩 방식
+
+### ponytail `sessionStart`
+세션이 시작될 때 `ponytail` 스킬 규칙을 컨텍스트에 넣어, 스킬을 따로 부르지 않아도 세션 내내 적용되게 합니다. Claude Code에서는 `/clear`나 컨텍스트 압축 뒤에도 다시 넣습니다.
+
+규칙은 스킬 파일(`.claude/skills/ponytail/SKILL.md`, Codex는 `.agents/skills/ponytail/SKILL.md`)에서 읽어 옵니다. 그래서 `claude/skills/ponytail`이나 `codex/skills/ponytail`이 함께 동기화되어 있어야 하고, 스킬이 없으면 아무것도 넣지 않습니다. 세션 중에 끄려면 "stop ponytail"이나 "normal mode"라고 말하면 됩니다.
+
+Codex는 새로 추가된 훅을 `/hooks`에서 신뢰로 등록해야 실행합니다.
+
+**적용 대상**: 모든 프로젝트
+
+```yaml
+overrides:
+  claude/hooks/dispatcher: true
+  claude/settings: true
+  claude/hooks/ponytail: true
+  codex/hooks/dispatcher: true
+  codex/hooks-json: true
+  codex/hooks/ponytail: true
+```
 
 ---
 

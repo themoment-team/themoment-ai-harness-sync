@@ -46,9 +46,9 @@ Claude와 Codex는 에이전트 포맷이 다릅니다. 본문은 같아도 헤�
 
 Hook 모듈은 dispatcher가 자동으로 스캔하는 구조입니다.
 
-1. Claude: `.claude/hooks/modules/<name>/preToolUse.sh` 또는 `postToolUse.sh` 작성
-   Codex: `.codex/hooks/modules/<name>/pre-tool-use.sh` 또는 `post-tool-use.sh` 작성
-2. 모듈 인터페이스: `exit 2` = 실행 차단, `exit 0` = 정상 통과
+1. Claude: `.claude/hooks/modules/<name>/preToolUse.sh`, `postToolUse.sh`, `sessionStart.sh` 중 필요한 파일 작성
+   Codex: `.codex/hooks/modules/<name>/pre-tool-use.sh`, `post-tool-use.sh`, `session-start.sh` 중 필요한 파일 작성
+2. 모듈 인터페이스: `exit 2` = 실행 차단, `exit 0` = 정상 통과. 세션 시작 모듈은 stdout으로 출력한 텍스트가 세션 컨텍스트에 추가된다
 3. `sync-manifest.yml`에 항목 등록 (`groups: []` = opt-in 전용)
 4. Commit: `add(claude): <이름> hook 모듈 추가`
 

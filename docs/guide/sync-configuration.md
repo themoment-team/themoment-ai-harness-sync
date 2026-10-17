@@ -88,6 +88,8 @@ pr_label: false                # sync PR 라벨 부착 여부 (기본값: true)
 | `claude/skills/docker` | `.claude/skills/docker/` |
 | `claude/skills/git-commit` | `.claude/skills/git-commit/` |
 | `claude/skills/humanizer` | `.claude/skills/humanizer/` |
+| `claude/skills/ponytail` | `.claude/skills/ponytail/` |
+| `claude/skills/ponytail-audit` | `.claude/skills/ponytail-audit/` |
 | `claude/skills/kotest-guide` | `.claude/skills/kotest-guide/` |
 | `claude/skills/kotlin-spring-arch` | `.claude/skills/kotlin-spring-arch/` |
 | `claude/skills/migration-guide` | `.claude/skills/migration-guide/` |
@@ -136,6 +138,7 @@ pr_label: false                # sync PR 라벨 부착 여부 (기본값: true)
 | `claude/hooks/jest`          | `.claude/hooks/modules/jest/`          |
 | `claude/hooks/vitest`        | `.claude/hooks/modules/vitest/`        |
 | `claude/hooks/ruff`          | `.claude/hooks/modules/ruff/`          |
+| `claude/hooks/ponytail`      | `.claude/hooks/modules/ponytail/`      |
 
 ### Next.js FSD 프로젝트 파일 (opt-in 전용)
 
@@ -155,6 +158,8 @@ pr_label: false                # sync PR 라벨 부착 여부 (기본값: true)
 | `codex/skills/docker` | `.agents/skills/docker/` |
 | `codex/skills/git-commit` | `.agents/skills/git-commit/` |
 | `codex/skills/humanizer` | `.agents/skills/humanizer/` |
+| `codex/skills/ponytail` | `.agents/skills/ponytail/` |
+| `codex/skills/ponytail-audit` | `.agents/skills/ponytail-audit/` |
 | `codex/skills/kotest-guide` | `.agents/skills/kotest-guide/` |
 | `codex/skills/kotlin-spring-arch` | `.agents/skills/kotlin-spring-arch/` |
 | `codex/skills/migration-guide` | `.agents/skills/migration-guide/` |
@@ -194,6 +199,7 @@ pr_label: false                # sync PR 라벨 부착 여부 (기본값: true)
 | `codex/hooks/jest` | `.codex/hooks/modules/jest/` |
 | `codex/hooks/vitest` | `.codex/hooks/modules/vitest/` |
 | `codex/hooks/ruff` | `.codex/hooks/modules/ruff/` |
+| `codex/hooks/ponytail` | `.codex/hooks/modules/ponytail/` |
 
 ### gemini 그룹
 

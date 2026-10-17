@@ -22,9 +22,11 @@ order: 70
 │   └── agent-name.toml
 └── hooks/
     ├── dispatcher/
+    │   ├── session-start.sh  ← modules/*/session-start.sh 자동 스캔·실행
     │   ├── pre-tool-use.sh   ← modules/*/pre-tool-use.sh 자동 스캔·실행
     │   └── post-tool-use.sh
     └── modules/
+        ├── ponytail/         ← session-start.sh
         ├── logging/          ← pre-tool-use.sh
         ├── command-guard/    ← pre-tool-use.sh
         ├── ktlint/           ← post-tool-use.sh
@@ -66,6 +68,7 @@ dispatcher를 Codex 훅으로 등록하는 파일입니다. `codex/hooks-json` �
 ```json
 {
   "hooks": {
+    "SessionStart": [{ "command": ".codex/hooks/session-start.sh" }],
     "PreToolUse": [{ "command": ".codex/hooks/pre-tool-use.sh" }],
     "PostToolUse": [{ "command": ".codex/hooks/post-tool-use.sh" }]
   }
@@ -102,12 +105,14 @@ dispatcher가 런타임에 `modules/` 디렉토리를 스캔하여 모듈을 자
 
 | 모듈 | 진입 파일 | 실행 시점 |
 |------|----------|----------|
+| `ponytail` | `session-start.sh` | 세션 시작 |
 | `logging` | `pre-tool-use.sh` | 도구 실행 전 |
 | `command-guard` | `pre-tool-use.sh` | 도구 실행 전 |
 | `ktlint` | `post-tool-use.sh` | 도구 실행 후 |
 | `gradle-test` | `post-tool-use.sh` | 도구 실행 후 |
 
 모듈 작성 규칙 (`exit 0` / `exit 2` 등)은 [Claude 컨벤션 — 훅](./claude.md#훅-hooks)과 동일합니다.
+`session-start.sh` 모듈은 컨텍스트에 넣을 내용을 일반 텍스트로 출력합니다. dispatcher가 모듈 출력을 모아 Codex가 읽는 `additionalContext` JSON으로 감쌉니다.
 모든 훅 항목은 어느 그룹에도 기본 포함되지 않으며 `overrides`에 `true`로 명시해야 합니다.
 
 ## `.agents/skills/` 스킬
