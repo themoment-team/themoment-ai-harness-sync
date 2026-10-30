@@ -103,27 +103,21 @@ def get_installation_token(inst_id: int, app_jwt: str) -> str:
 def gh_api(endpoint: str, token: str) -> any:
     """Installation token 인증이 필요한 엔드포인트 호출 (gh CLI 사용)."""
     result = subprocess.run(
-        ["gh", "api", endpoint, "--paginate"],
+        ["gh", "api", endpoint, "--paginate", "--slurp"],
         env={**os.environ, "GH_TOKEN": token},
         capture_output=True,
         text=True,
         check=True,
     )
-    text = result.stdout.strip()
-    if text.startswith("["):
-        # --paginate는 여러 페이지의 JSON 배열을 구분자 없이 이어붙인다.
-        # 문자열 값 안에 '][' 가 있어도 안전하도록 raw_decode로 순차 파싱한다.
-        decoder = json.JSONDecoder()
-        combined = []
-        idx = 0
-        while idx < len(text):
-            obj, end = decoder.raw_decode(text, idx)
-            combined.extend(obj)
-            idx = end
-            while idx < len(text) and text[idx].isspace():
-                idx += 1
-        return combined
-    return json.loads(text)
+    pages = json.loads(result.stdout)
+    if not pages:
+        return []
+    if isinstance(pages[0], list):
+        return [item for page in pages for item in page]
+    data = pages[0]
+    if "repositories" in data:
+        data["repositories"] = [repo for page in pages for repo in page["repositories"]]
+    return data
 
 
 def get_repo_harness_config(full_name: str, token: str) -> dict | None:
