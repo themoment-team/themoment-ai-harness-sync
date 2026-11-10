@@ -132,7 +132,8 @@ def main() -> None:
         lines.append(
             f"| 건너뜀 | 동기화 비활성화 {stats.get('skipped_disabled', 0)} · "
             f"열린 PR {stats.get('skipped_open_pr', 0)} · "
-            f"대상 파일 없음 {stats.get('skipped_no_files', 0)} |"
+            f"대상 파일 없음 {stats.get('skipped_no_files', 0)} · "
+            f"설정 조회 실패 {stats.get('skipped_config_error', 0)} |"
         )
     fail_cell = f"**{len(failures)}**" if failures else "0"
     lines.append(

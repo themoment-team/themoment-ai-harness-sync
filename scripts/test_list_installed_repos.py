@@ -13,8 +13,81 @@ assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
 yaml = types.ModuleType("yaml")
 yaml.safe_load = lambda source: source
+yaml.YAMLError = Exception
 sys.modules.setdefault("yaml", yaml)
 SPEC.loader.exec_module(MODULE)
+
+
+# Keep the tests independent of whether PyYAML is installed in the runner.
+MODULE.yaml.safe_load = lambda source: source
+MODULE.yaml.YAMLError = getattr(MODULE.yaml, "YAMLError", Exception)
+
+
+class GetRepoHarnessConfigTest(unittest.TestCase):
+    def call_config(self, result):
+        with patch.object(MODULE.subprocess, "run", return_value=result):
+            return MODULE.get_repo_harness_config("acme/api", "test-token")
+
+    def result(self, returncode=0, stdout="", stderr=""):
+        return types.SimpleNamespace(returncode=returncode, stdout=stdout, stderr=stderr)
+
+    def test_404_returns_none(self):
+        self.assertIsNone(self.call_config(self.result(1, stderr="gh: Not Found (HTTP 404)")))
+
+    def test_403_raises_config_fetch_error(self):
+        with self.assertRaisesRegex(MODULE.ConfigFetchError, "acme/api"):
+            self.call_config(self.result(1, stderr="gh: Forbidden (HTTP 403)"))
+
+    def test_valid_config_returns_dict(self):
+        payload = {"content": "Z3JvdXBzOiBbY2xhdWRlXQ=="}
+        with patch.object(MODULE.yaml, "safe_load", return_value={"groups": ["claude"]}):
+            self.assertEqual(self.call_config(self.result(stdout=json.dumps(payload))), {"groups": ["claude"]})
+
+    def test_empty_config_returns_empty_dict(self):
+        payload = {"content": ""}
+        with patch.object(MODULE.yaml, "safe_load", return_value=None):
+            self.assertEqual(self.call_config(self.result(stdout=json.dumps(payload))), {})
+
+    def test_non_dict_config_raises_error(self):
+        payload = {"content": "W10="}
+        with patch.object(MODULE.yaml, "safe_load", return_value=[]):
+            with self.assertRaises(MODULE.ConfigFetchError):
+                self.call_config(self.result(stdout=json.dumps(payload)))
+
+    def test_bad_json_raises_error(self):
+        with self.assertRaises(MODULE.ConfigFetchError):
+            self.call_config(self.result(stdout="not json"))
+
+
+class ResolveFilesTest(unittest.TestCase):
+    manifest = {"items": [
+        {"id": "a", "src": "a/", "dest": "a/", "groups": ["core"]},
+        {"id": "b", "src": "b/", "dest": "b/", "groups": ["extra"]},
+        {"id": "a@v2", "src": "archive/a/v2/", "dest": "a/", "groups": []},
+        {"id": "claude/settings", "src": "settings", "dest": ".claude/settings.json", "groups": []},
+        {"id": "claude/hooks/one", "src": "hook", "dest": ".claude/hooks/one", "groups": []},
+    ]}
+
+    def resolve(self, config, defaults=("core",)):
+        return MODULE.resolve_files(config, self.manifest, list(defaults))
+
+    def test_none_selects_default_groups(self):
+        self.assertEqual(self.resolve(None), [("a/", "a/")])
+
+    def test_groups_and_boolean_overrides(self):
+        self.assertEqual(self.resolve({"groups": ["extra"], "overrides": {"a": True, "b": False}}), [("a/", "a/")])
+
+    def test_version_pin_uses_version_source_and_canonical_destination(self):
+        self.assertEqual(self.resolve({"groups": [], "overrides": {"a": "v2"}}), [("archive/a/v2/", "a/")])
+
+    def test_legacy_exclude_include(self):
+        self.assertEqual(self.resolve({"groups": ["core"], "exclude": ["a"], "include": ["b"]}), [("b/", "b/")])
+
+    def test_settings_source_switches_with_hook_selection(self):
+        without_hook = self.resolve({"groups": [], "overrides": {"claude/settings": True}})
+        with_hook = self.resolve({"groups": [], "overrides": {"claude/settings": True, "claude/hooks/one": True}})
+        self.assertEqual(without_hook[0][0], MODULE.SETTINGS_BASE)
+        self.assertEqual(with_hook[0][0], MODULE.SETTINGS_WITH_HOOKS)
 
 
 class GhApiTest(unittest.TestCase):
