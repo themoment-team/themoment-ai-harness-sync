@@ -13,6 +13,8 @@ order: 30
 `.harness/sync.yml`이 없으면 기본 그룹(`claude`, `codex`, `gemini`)이 모두 동기화됩니다.  
 훅 관련 항목은 기본 그룹에 포함되지 않으며 **`overrides`에 `true`로 명시**해야 합니다.
 
+기본 그룹으로 대체되는 경우는 파일이 없다고 확인된 경우(HTTP 404)뿐이며, 빈 파일도 기본값이 적용됩니다. 권한 부족·rate limit·서버 오류로 파일을 조회하지 못하거나 내용을 YAML 매핑으로 해석할 수 없으면 해당 레포는 이번 회차에서 건너뛰고 동기화 PR을 만들지 않습니다. 건너뛴 레포는 워크플로우 Job Summary에 **설정 조회 실패**로 집계되며, 다음 실행 때 다시 시도합니다.
+
 ## 프로젝트 지침은 각 저장소에서 관리
 
 `AGENTS.md`, `.claude/rules/**`, `.gemini/styleguide.md`, `.github/copilot-instructions.md`는 배포 항목이 아닙니다. 각 타깃 레포가 직접 관리하며, 하네스는 이를 생성·덮어쓰기·삭제하지 않습니다.

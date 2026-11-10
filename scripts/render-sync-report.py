@@ -132,7 +132,8 @@ def main() -> None:
         lines.append(
             f"| 건너뜀 | 동기화 비활성화 {stats.get('skipped_disabled', 0)} · "
             f"열린 PR {stats.get('skipped_open_pr', 0)} · "
-            f"대상 파일 없음 {stats.get('skipped_no_files', 0)} |"
+            f"대상 파일 없음 {stats.get('skipped_no_files', 0)} · "
+            f"설정 조회 실패 {stats.get('skipped_config_error', 0)} |"
         )
     fail_cell = f"**{len(failures)}**" if failures else "0"
     lines.append(
@@ -197,7 +198,14 @@ def main() -> None:
                     lines.append(f"- [`{repo}`]({job_url}) — 전체 job 로그에서 원인을 확인하세요")
                     lines.append("")
 
-    if not failures and PREPARE_RESULT != "failure":
+    config_errors = stats.get("skipped_config_error", 0) if stats else 0
+    if config_errors:
+        lines.append(
+            f"⚠️ `.harness/sync.yml` 조회 실패로 {config_errors}개 레포가 이번 회차에서 건너뛰었습니다. "
+            "원인은 prepare 잡의 annotation에서 확인하세요. 다음 실행에서 다시 시도합니다."
+        )
+        lines.append("")
+    elif not failures and PREPARE_RESULT != "failure":
         lines.append("모든 동기화가 문제없이 처리되었습니다.")
         lines.append("")
 

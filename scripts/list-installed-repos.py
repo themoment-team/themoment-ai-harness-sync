@@ -7,7 +7,8 @@ GitHub Actions matrix용 JSON을 stdout으로 출력합니다.
   [{"id": 12345, "config": "group:\n  - repos: |..."}, ...]
 
 각 레포 루트의 .harness/sync.yml을 읽어 동기화할 항목을 결정합니다.
-파일이 없으면 sync-manifest.yml의 defaults 그룹을 모두 적용합니다.
+파일이 없으면 sync-manifest.yml의 defaults 그룹을 모두 적용합니다. 조회 오류나
+파싱 오류가 발생한 레포는 이번 실행에서 건너뜁니다.
 
 .harness/sync.yml 형식:
   enabled:       # 이 레포의 동기화 여부 (기본값: true)
@@ -19,6 +20,8 @@ GitHub Actions matrix용 JSON을 stdout으로 출력합니다.
     - claude/skills/kotest-guide
   include:       # groups 외에 추가할 항목 ID
     - claude/hooks/ktlint
+  overrides:     # 항목별 true/false 또는 버전 문자열("v1") 지정
+    claude/skills/git-commit: false
   pr_label:      # sync PR에 'harness sync:하네스 동기화' 라벨을 붙일지 (기본값: true)
     false
 
@@ -120,6 +123,10 @@ def gh_api(endpoint: str, token: str) -> any:
     return data
 
 
+class ConfigFetchError(Exception):
+    """레포별 sync.yml 조회 또는 파싱 실패."""
+
+
 def get_repo_harness_config(full_name: str, token: str) -> dict | None:
     result = subprocess.run(
         ["gh", "api", f"/repos/{full_name}/contents/.harness/sync.yml"],
@@ -128,10 +135,27 @@ def get_repo_harness_config(full_name: str, token: str) -> dict | None:
         text=True,
     )
     if result.returncode != 0:
-        return None
-    data = json.loads(result.stdout)
-    content = base64.b64decode(data["content"]).decode()
-    return yaml.safe_load(content)
+        # gh 상태 줄(`gh: <message> (HTTP <status>)`)로만 판정해 부가 메시지 속 404 문자열에 속지 않는다
+        lines = result.stderr.splitlines()
+        status_line = next((line for line in lines if line.startswith("gh: ")), "")
+        if status_line.endswith("(HTTP 404)"):
+            return None
+        detail = " / ".join(lines[:3]) or "알 수 없는 오류"
+        raise ConfigFetchError(f"{full_name}: gh api 실패(exit {result.returncode}): {detail}")
+    try:
+        data = json.loads(result.stdout)
+        content = base64.b64decode(data["content"]).decode()
+    except (ValueError, KeyError, TypeError, UnicodeDecodeError) as e:
+        raise ConfigFetchError(f"{full_name}: sync.yml 응답 파싱 실패 ({type(e).__name__})") from e
+    try:
+        config = yaml.safe_load(content)
+    except yaml.YAMLError as e:
+        raise ConfigFetchError(f"{full_name}: sync.yml YAML 파싱 실패 ({type(e).__name__})") from e
+    if config is None:
+        return {}
+    if not isinstance(config, dict):
+        raise ConfigFetchError(f"{full_name}: sync.yml 루트는 mapping이어야 합니다")
+    return config
 
 
 def select_target_repositories(repositories: list[dict], target_repo: str | None) -> list[dict]:
@@ -299,7 +323,9 @@ def main():
     skipped_disabled = 0   # enabled: false 로 동기화를 끈 수
     skipped_open_pr = 0    # 열린 sync PR이 있어 건너뛴 수
     skipped_no_files = 0   # 대상 파일이 없어 건너뛴 수
+    skipped_config_error = 0  # sync.yml 조회/파싱 실패로 건너뛴 수
     target_repo_found = False
+    target_config_error = False  # 수동 지정한 레포가 설정 조회 실패로 건너뛰어졌는지
 
     for inst in installations:
         inst_id = inst["id"]
@@ -321,7 +347,18 @@ def main():
 
             total_repos += 1
             default_branch = repo.get("default_branch", "main")
-            config = get_repo_harness_config(full_name, inst_token)
+            try:
+                config = get_repo_harness_config(full_name, inst_token)
+            except ConfigFetchError as e:
+                skipped_config_error += 1
+                target_config_error = target_config_error or full_name == target_repo
+                print(
+                    f"  [{inst_id}] {full_name}: skip — sync.yml 조회 실패 ({e})",
+                    file=sys.stderr,
+                )
+                # 실행 화면에 annotation으로 남겨 prepare 로그를 열지 않아도 보이게 한다
+                print(f"::warning title=sync.yml 조회 실패::{e}", file=sys.stderr)
+                continue
 
             # enabled: false 면 이 레포는 동기화 대상에서 완전히 제외한다.
             # 설정 파일이 없거나 키가 없으면 기본값 true.
@@ -389,6 +426,10 @@ def main():
     if target_repo and not target_repo_found:
         print(f"Error: target repository is not installed: {target_repo}", file=sys.stderr)
         sys.exit(1)
+    # 수동 실행은 그 레포를 동기화하려는 명시적 요청이므로 조용히 성공 처리하지 않는다
+    if target_repo and target_config_error:
+        print(f"Error: failed to read .harness/sync.yml of target repository: {target_repo}", file=sys.stderr)
+        sys.exit(1)
 
     stats = {
         "installations": len(installations),
@@ -397,12 +438,14 @@ def main():
         "skipped_disabled": skipped_disabled,
         "skipped_open_pr": skipped_open_pr,
         "skipped_no_files": skipped_no_files,
+        "skipped_config_error": skipped_config_error,
     }
     print(
         f"  stats: attempted={stats['attempted']}/{total_repos} repos "
         f"(installations={stats['installations']}, "
         f"skip_disabled={skipped_disabled}, "
-        f"skip_open_pr={skipped_open_pr}, skip_no_files={skipped_no_files})",
+        f"skip_open_pr={skipped_open_pr}, skip_no_files={skipped_no_files}, "
+        f"skip_config_error={skipped_config_error})",
         file=sys.stderr,
     )
     gh_output = os.environ.get("GITHUB_OUTPUT")
