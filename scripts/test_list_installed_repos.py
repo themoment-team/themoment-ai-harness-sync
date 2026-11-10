@@ -11,16 +11,18 @@ MODULE_PATH = pathlib.Path(__file__).with_name("list-installed-repos.py")
 SPEC = importlib.util.spec_from_file_location("list_installed_repos", MODULE_PATH)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
-yaml = types.ModuleType("yaml")
-yaml.safe_load = lambda source: source
-yaml.YAMLError = Exception
-sys.modules.setdefault("yaml", yaml)
+# PyYAML이 없는 환경에서도 모듈을 import할 수 있게 하는 용도로만 쓴다
+sys.modules.setdefault("yaml", types.ModuleType("yaml"))
 SPEC.loader.exec_module(MODULE)
 
 
-# Keep the tests independent of whether PyYAML is installed in the runner.
-MODULE.yaml.safe_load = lambda source: source
-MODULE.yaml.YAMLError = getattr(MODULE.yaml, "YAMLError", Exception)
+class _StubYAMLError(Exception):
+    pass
+
+
+# 실제 PyYAML 모듈을 건드리지 않도록 테스트 대상 모듈의 yaml만 private stub으로 재바인딩한다.
+_yaml_stub = types.SimpleNamespace(safe_load=lambda source: source, YAMLError=_StubYAMLError)
+setattr(MODULE, "yaml", _yaml_stub)
 
 
 class GetRepoHarnessConfigTest(unittest.TestCase):
@@ -35,8 +37,23 @@ class GetRepoHarnessConfigTest(unittest.TestCase):
         self.assertIsNone(self.call_config(self.result(1, stderr="gh: Not Found (HTTP 404)")))
 
     def test_403_raises_config_fetch_error(self):
-        with self.assertRaisesRegex(MODULE.ConfigFetchError, "acme/api"):
+        with self.assertRaisesRegex(MODULE.ConfigFetchError, r"acme/api: gh api 실패\(exit 1\)"):
             self.call_config(self.result(1, stderr="gh: Forbidden (HTTP 403)"))
+
+    def test_404_text_outside_status_line_is_not_treated_as_missing(self):
+        stderr = "gh: Forbidden (HTTP 403)\nsee docs for (HTTP 404) handling"
+        with self.assertRaises(MODULE.ConfigFetchError):
+            self.call_config(self.result(1, stderr=stderr))
+
+    def test_empty_stderr_reports_exit_code(self):
+        with self.assertRaisesRegex(MODULE.ConfigFetchError, r"exit 4\): 알 수 없는 오류"):
+            self.call_config(self.result(4))
+
+    def test_yaml_error_raises_config_fetch_error(self):
+        payload = {"content": "Z3JvdXBzOiBb"}
+        with patch.object(MODULE.yaml, "safe_load", side_effect=_StubYAMLError("bad")):
+            with self.assertRaisesRegex(MODULE.ConfigFetchError, "YAML 파싱 실패"):
+                self.call_config(self.result(stdout=json.dumps(payload)))
 
     def test_valid_config_returns_dict(self):
         payload = {"content": "Z3JvdXBzOiBbY2xhdWRlXQ=="}

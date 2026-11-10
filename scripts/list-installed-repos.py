@@ -135,10 +135,13 @@ def get_repo_harness_config(full_name: str, token: str) -> dict | None:
         text=True,
     )
     if result.returncode != 0:
-        if "(HTTP 404)" in result.stderr:
+        # gh 상태 줄(`gh: <message> (HTTP <status>)`)로만 판정해 부가 메시지 속 404 문자열에 속지 않는다
+        lines = result.stderr.splitlines()
+        status_line = next((line for line in lines if line.startswith("gh: ")), "")
+        if status_line.endswith("(HTTP 404)"):
             return None
-        detail = result.stderr.splitlines()[0] if result.stderr.splitlines() else "알 수 없는 오류"
-        raise ConfigFetchError(f"{full_name}: {detail}")
+        detail = " / ".join(lines[:3]) or "알 수 없는 오류"
+        raise ConfigFetchError(f"{full_name}: gh api 실패(exit {result.returncode}): {detail}")
     try:
         data = json.loads(result.stdout)
         content = base64.b64decode(data["content"]).decode()
@@ -322,6 +325,7 @@ def main():
     skipped_no_files = 0   # 대상 파일이 없어 건너뛴 수
     skipped_config_error = 0  # sync.yml 조회/파싱 실패로 건너뛴 수
     target_repo_found = False
+    target_config_error = False  # 수동 지정한 레포가 설정 조회 실패로 건너뛰어졌는지
 
     for inst in installations:
         inst_id = inst["id"]
@@ -347,10 +351,13 @@ def main():
                 config = get_repo_harness_config(full_name, inst_token)
             except ConfigFetchError as e:
                 skipped_config_error += 1
+                target_config_error = target_config_error or full_name == target_repo
                 print(
                     f"  [{inst_id}] {full_name}: skip — sync.yml 조회 실패 ({e})",
                     file=sys.stderr,
                 )
+                # 실행 화면에 annotation으로 남겨 prepare 로그를 열지 않아도 보이게 한다
+                print(f"::warning title=sync.yml 조회 실패::{e}", file=sys.stderr)
                 continue
 
             # enabled: false 면 이 레포는 동기화 대상에서 완전히 제외한다.
@@ -418,6 +425,10 @@ def main():
 
     if target_repo and not target_repo_found:
         print(f"Error: target repository is not installed: {target_repo}", file=sys.stderr)
+        sys.exit(1)
+    # 수동 실행은 그 레포를 동기화하려는 명시적 요청이므로 조용히 성공 처리하지 않는다
+    if target_repo and target_config_error:
+        print(f"Error: failed to read .harness/sync.yml of target repository: {target_repo}", file=sys.stderr)
         sys.exit(1)
 
     stats = {
