@@ -86,6 +86,11 @@ items:
     dest: .claude/skills/the-sdk/
     groups: [claude]
 
+  - id: claude/skills/the-sdk@v1
+    src: .claude/skills/_archive/the-sdk/v1/
+    dest: .claude/skills/the-sdk/
+    groups: []
+
   - id: claude/skills/java-spring-arch
     src: .claude/skills/java-spring-arch/
     dest: .claude/skills/java-spring-arch/
@@ -331,6 +336,11 @@ items:
     src: .agents/skills/the-sdk/
     dest: .agents/skills/the-sdk/
     groups: [codex]
+
+  - id: codex/skills/the-sdk@v1
+    src: .agents/skills/_archive/the-sdk/v1/
+    dest: .agents/skills/the-sdk/
+    groups: []
 
   - id: codex/skills/java-spring-arch
     src: .agents/skills/java-spring-arch/
