@@ -292,8 +292,21 @@ overrides:
   claude/skills/git-commit: "v1"  # v1 아카이브 고정
 ```
 
-아카이브가 없는 항목에 문자열을 지정하면 sync 시 경고 후 건너뜁니다.  
-현재 아카이브된 버전은 없습니다.
+아카이브가 없는 항목에 문자열을 지정하면 sync 시 경고 후 건너뜁니다.
+
+현재 아카이브된 버전은 다음과 같습니다.
+
+| 항목 | 버전 | 내용 |
+|------|------|------|
+| `claude/skills/the-sdk`, `codex/skills/the-sdk` | `v1` | the-sdk 1.5(JitPack, Spring Boot 3.x) 기준 안내. 최신 스킬은 the-sdk 2.0(Maven Central, Spring Boot 4.0.x) 기준입니다 |
+
+Spring Boot 3.x를 쓰며 the-sdk 1.x에 머무는 레포는 아래처럼 `v1`으로 고정합니다.
+
+```yaml
+overrides:
+  claude/skills/the-sdk: "v1"
+  codex/skills/the-sdk: "v1"
+```
 
 ## 예시 — 프론트엔드 (TypeScript)
 

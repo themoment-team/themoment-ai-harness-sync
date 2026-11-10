@@ -49,7 +49,7 @@ Claude Code에서 `/skill-name` 으로 직접 호출하는 스킬 목록입니�
 | `api-design` | `/api-design` | RESTful URL 구조, `@RequestParam` vs `@ModelAttribute` 바인딩 규칙, OpenAPI 어노테이션, `CommonApiResponse` 사용법 |
 | `database-schema` | `/database-schema` | 테이블·컬럼 네이밍 컨벤션, 인덱스 전략, JPA 엔티티 매핑 패턴 |
 | `java-spring-arch` | `/java-spring-arch` | Java + Spring Boot 4.0 레이어 구조 및 트랜잭션·DTO 패턴 가이드, `ExpectedException` 사용법, Entity↔DTO 변환 패턴 |
-| `the-sdk` | `/the-sdk` | the-sdk 공통 라이브러리 가이드. Logging(`Log-ID` 자동 부여), `CommonApiResponse` 래핑, `ExpectedException` 처리, Swagger 자동 구성 |
+| `the-sdk` | `/the-sdk` | the-sdk 2.0(Spring Boot 4.0.x, Maven Central) 공통 라이브러리 가이드. Logging(`Log-ID` 자동 부여), `CommonApiResponse` 래핑, `ExpectedException` 처리, Swagger 자동 구성 |
 
 ## 인프라
 
