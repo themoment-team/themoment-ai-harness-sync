@@ -91,5 +91,20 @@ export function switchToFixedSelection(
   state: SelectionState,
   selectedItemIds: string[],
 ): SelectionState {
-  return { ...state, mode: 'fixed', itemIds: selectedItemIds, groups: [], overrides: {} };
+  const pinnedVersions = {
+    ...state.pinnedVersions,
+    ...Object.fromEntries(
+      Object.entries(state.overrides).filter(
+        (entry): entry is [string, string] => typeof entry[1] === 'string',
+      ),
+    ),
+  };
+  return {
+    ...state,
+    mode: 'fixed',
+    itemIds: selectedItemIds,
+    groups: [],
+    overrides: pinnedVersions,
+    pinnedVersions,
+  };
 }

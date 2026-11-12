@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { createSelectionState, setItemsSelected, toggleItem } from './selection';
+import {
+  createSelectionState,
+  setItemsSelected,
+  switchToFixedSelection,
+  toggleItem,
+} from './selection';
 
 describe('toggleItem', () => {
   it('고정 모드에서 선택 해제한 항목은 override 목록에서 제거한다', () => {
@@ -83,5 +88,27 @@ describe('setItemsSelected', () => {
       'claude/skills/a': 'v1',
       'claude/skills/b': true,
     });
+  });
+});
+
+describe('switchToFixedSelection', () => {
+  it('고정 모드로 전환해도 버전 고정 값을 유지하고 해제 후 재선택에도 보존한다', () => {
+    const items = [{ id: 'claude/skills/the-sdk', src: '', dest: '', groups: ['claude'] }];
+    const state = createSelectionState(
+      {
+        enabled: true,
+        mode: 'automatic',
+        groups: ['claude'],
+        overrides: { 'claude/skills/the-sdk': 'v1' },
+      },
+      ['claude/skills/the-sdk'],
+    );
+
+    const fixed = switchToFixedSelection(state, ['claude/skills/the-sdk']);
+    expect(fixed.overrides).toEqual({ 'claude/skills/the-sdk': 'v1' });
+
+    const roundTrip = setItemsSelected(setItemsSelected(fixed, items, false), items, true);
+    expect(roundTrip.itemIds).toEqual(['claude/skills/the-sdk']);
+    expect(roundTrip.overrides).toEqual({ 'claude/skills/the-sdk': 'v1' });
   });
 });
