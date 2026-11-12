@@ -66,5 +66,8 @@ Claude Code에서 `/skill-name` 으로 직접 호출하는 스킬 목록입니�
 | `nextjs-package-boundaries` | `/nextjs-package-boundaries` | server-only 진입점, source-consumed package와 prebuilt UI package의 경계, `transpilePackages` 기준 |
 | `tailwind-shadcn` | `/tailwind-shadcn` | Tailwind 클래스와 `cn()`, 디자인 토큰, shadcn primitive·도메인 UI 소유권 |
 | `tanstack-query-zod` | `/tanstack-query-zod` | typed API wrapper, TanStack Query key·hook, Zod schema와 inferred request type 규칙 |
+| `react-best-practices` | `/react-best-practices` | React/Next.js 성능 규칙 70개. 요청 워터폴, 번들 크기, 서버 성능, 리렌더링, 렌더링, JavaScript 성능을 영향도 순으로 정리 (opt-in) |
+
+`react-best-practices`는 [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices) v1.0.0(MIT)을 옮겨 온 스킬입니다. 합본 문서(`AGENTS.md`)와 빌드용 파일은 빼고 규칙 파일만 가져왔습니다. FSD slice의 `index.ts` 공개 API, TanStack Query 등 프로젝트 컨벤션과 충돌하면 프로젝트 컨벤션을 따르도록 했습니다. 기본 그룹에 포함되지 않으므로 [동기화 설정](../sync-configuration.md#react-스킬-opt-in-전용)에서 직접 켜야 합니다.
 
 설치와 프로젝트 구조는 [프론트엔드 아키텍처](../architecture/frontend.md)를 참고하세요.

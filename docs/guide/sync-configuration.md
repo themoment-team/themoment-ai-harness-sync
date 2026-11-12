@@ -151,6 +151,21 @@ pr_label: false                # sync PR 라벨 부착 여부 (기본값: true)
 | `nextjs/fsd/steiger-config` | `steiger.config.mjs` |
 | `nextjs/fsd/dependency-check` | `scripts/check-fsd-dependencies.mjs` |
 
+### React 스킬 (opt-in 전용)
+
+React/Next.js 프로젝트에서만 필요하므로 기본 그룹에 포함하지 않습니다. 사용할 런타임에 맞춰 `overrides`에서 `true`로 켜세요.
+
+| ID | 배포 경로 |
+|----|----------|
+| `claude/skills/react-best-practices` | `.claude/skills/react-best-practices/` |
+| `codex/skills/react-best-practices` | `.agents/skills/react-best-practices/` |
+
+```yaml
+overrides:
+  claude/skills/react-best-practices: true
+  codex/skills/react-best-practices: true
+```
+
 ### codex 그룹
 
 | ID | 배포 경로 |
