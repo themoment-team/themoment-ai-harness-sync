@@ -154,3 +154,4 @@ These rules are general performance guidance. When a rule conflicts with the pro
 - `client-swr-dedup` and `client-event-listeners` use SWR as the example library. If the project already uses another data-fetching library such as TanStack Query, apply the same deduplication idea with that library.
 - Do not add a dependency such as `swr`, `better-all`, or `lru-cache` only to follow a rule. Use what the project already has, or ask before adding a package.
 - Rules that rely on Next.js APIs (`next/dynamic`, `after()`, `optimizePackageImports`) apply only to Next.js projects.
+- `useEffectEvent` returns a function whose identity changes on every render. Despite the "stable reference" wording in `advanced-event-handler-refs` and `advanced-use-latest`, call it only inside effects and never pass it to dependency arrays, props, or other hooks.
