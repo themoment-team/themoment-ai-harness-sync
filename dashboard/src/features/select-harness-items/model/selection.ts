@@ -6,6 +6,8 @@ export type SelectionState = {
   itemIds: string[];
   groups: string[];
   overrides: Record<string, boolean | string>;
+  /** 설정에서 읽은 버전 고정 값. 해제 후 재선택할 때 복원한다 */
+  pinnedVersions?: Record<string, string>;
 };
 
 export function createSelectionState(config: SyncConfig, itemIds: string[]): SelectionState {
@@ -15,6 +17,11 @@ export function createSelectionState(config: SyncConfig, itemIds: string[]): Sel
     itemIds,
     groups: config.groups,
     overrides: config.overrides,
+    pinnedVersions: Object.fromEntries(
+      Object.entries(config.overrides).filter(
+        (entry): entry is [string, string] => typeof entry[1] === 'string',
+      ),
+    ),
   };
 }
 
@@ -41,12 +48,26 @@ export function toggleItem(
 
   if (!item) return state;
   const selected = isItemSelected(state, item);
-  const overrides = { ...state.overrides, [itemId]: !selected };
+  const overrides = { ...state.overrides };
+  const override = automaticOverride(state, item, !selected);
+  if (override === undefined) delete overrides[itemId];
+  else overrides[itemId] = override;
   const itemIds = selected
     ? state.itemIds.filter((candidate) => candidate !== itemId)
     : [...state.itemIds, itemId];
 
   return { ...state, itemIds, overrides };
+}
+
+// 그룹 선택만으로 같은 결과가 나오면 override를 남기지 않고, 버전 고정 값은 유지한다
+function automaticOverride(
+  state: SelectionState,
+  item: HarnessItem,
+  selected: boolean,
+): boolean | string | undefined {
+  const coveredByGroup = item.groups.some((group) => state.groups.includes(group));
+  if (selected) return state.pinnedVersions?.[item.id] ?? (coveredByGroup ? undefined : true);
+  return coveredByGroup ? false : undefined;
 }
 
 export function setItemsSelected(
