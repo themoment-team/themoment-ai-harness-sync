@@ -49,6 +49,16 @@ export function toggleItem(
   return { ...state, itemIds, overrides };
 }
 
+export function setItemsSelected(
+  state: SelectionState,
+  items: HarnessItem[],
+  selected: boolean,
+): SelectionState {
+  return items
+    .filter((item) => isItemSelected(state, item) !== selected)
+    .reduce((next, item) => toggleItem(next, item.id, item), state);
+}
+
 export function toggleGroup(state: SelectionState, group: string): SelectionState {
   const groups = state.groups.includes(group)
     ? state.groups.filter((candidate) => candidate !== group)
