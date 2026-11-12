@@ -51,3 +51,4 @@ Claude에서 `/skill-name` 으로 호출하는 재사용 가능한 작업 단위
 | --- | --- |
 | [tailwind-shadcn](./tailwind-shadcn/SKILL.md) | Tailwind 클래스, `cn()`, 디자인 토큰, shadcn·도메인 UI 소유권 |
 | [tanstack-query-zod](./tanstack-query-zod/SKILL.md) | TanStack Query 훅·Query Key, API 래퍼, Zod 스키마·추론 타입 |
+| [react-best-practices](./react-best-practices/SKILL.md) | Vercel의 React/Next.js 성능 규칙 70개 — 워터폴, 번들 크기, 리렌더링 등 영향도 순 (opt-in) |
