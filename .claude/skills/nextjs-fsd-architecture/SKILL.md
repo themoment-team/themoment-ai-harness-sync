@@ -229,29 +229,3 @@ packages/core/src:   entities → shared
 4. Export from each slice's `index.ts`, and `index.server.ts` when needed.
 5. Compose in `_pages` and keep the route file a re-export.
 6. Run the project's FSD lint, type check, and related tests.
-
-## Migrating from the `views` layout (v1)
-
-Projects that used `src/app` as both the Next.js router and the FSD app layer, with `views` instead of `pages`, move as follows. Until a project migrates, pin the previous versions in `.harness/sync.yml`:
-
-```yaml
-overrides:
-  claude/skills/nextjs-fsd-architecture: "v1"
-  codex/skills/nextjs-fsd-architecture: "v1"
-  claude/agents/frontend-convention-validator: "v1"
-  codex/agents/frontend-convention-validator: "v1"
-  nextjs/fsd/steiger-config: "v1"
-  nextjs/fsd/dependency-check: true
-```
-
-| v1                                             | v2                                                                   |
-| ---------------------------------------------- | -------------------------------------------------------------------- |
-| `src/app/**` routes, layouts, route handlers   | root `app/**` (keep files thin)                                      |
-| `src/app` providers, global styles, app config | `src/_app/{providers,styles,config}`                                 |
-| `src/views/<slice>`                            | `src/_pages/<slice>`                                                 |
-| `scripts/check-fsd-dependencies.mjs`           | removed: Steiger understands `_pages` (plus the ESLint rule above in a Turborepo) |
-| `@scope/core` root barrel                      | `@scope/core/shared/<segment>`, `@scope/core/entities/<slice>`       |
-
-- Move folders with `git mv` so history follows, update the `@/` imports, and point `tsconfig.json` `paths`, Tailwind `@source`, and test globs at the new folders.
-- Replace the Steiger config with the deployed v2 config above (unpin `nextjs/fsd/steiger-config`), remove the `views`-specific exceptions, and drop `nextjs/fsd/dependency-check` from `.harness/sync.yml`.
-- Run the FSD lint, type check, build, and tests after each app, not once at the end.

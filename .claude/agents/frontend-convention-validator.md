@@ -18,7 +18,7 @@ git diff HEAD --name-only --diff-filter=ACMR
 git status --short
 ```
 
-If the user named a branch, PR, or files, use that scope instead (for a PR: `git diff origin/<base>...HEAD --name-only`). Include untracked files from `git status`. Judge `.ts` and `.tsx` files; read changed `.css`, `.env.example`, and CI files as evidence for the related checks. Exit with a short note if no files match. Read the project instructions and the relevant configuration before judging conventions. If the project still uses the `views` layout, say so and judge it by the project's own rules.
+If the user named a branch, PR, or files, use that scope instead (for a PR: `git diff origin/<base>...HEAD --name-only`). Include untracked files from `git status`. Judge `.ts` and `.tsx` files; read changed `.css`, `.env.example`, and CI files as evidence for the related checks. Exit with a short note if no files match. Read the project instructions and the relevant configuration before judging conventions.
 
 ## Step 2: Collect Tool Results
 

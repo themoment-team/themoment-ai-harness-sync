@@ -61,7 +61,7 @@ Claude Code에서 `/skill-name` 으로 직접 호출하는 스킬 목록입니�
 
 | 스킬 | 호출 | 설명 |
 |------|------|------|
-| `nextjs-fsd-architecture` | `/nextjs-fsd-architecture` | FSD 공식 Next.js 구조(`_app`, `_pages`), 레이어 고르기, slice·세그먼트, `index.server.ts`·`@x` 공개 API, 라우트 파일, Steiger, Turborepo 패키지 경계와 entity 승격, v1(`views`)에서 옮기기 |
+| `nextjs-fsd-architecture` | `/nextjs-fsd-architecture` | FSD 공식 Next.js 구조(`_app`, `_pages`), 레이어 고르기, slice·세그먼트, `index.server.ts`·`@x` 공개 API, 라우트 파일, Steiger, Turborepo 패키지 경계와 entity 승격 |
 | `tailwind-shadcn` | `/tailwind-shadcn` | Tailwind v4 클래스와 `cn()`, `@theme` 토큰, shadcn primitive·도메인 UI 소유권 |
 | `react-conventions` | `/react-conventions` | 파일·타입 이름(`Props`, `Type`, `ReqType`, `Schema`), `interface`/`type`, `enum` 대신 union, 화살표 함수 컴포넌트와 default export·이름 재수출, 컴포넌트 안 순서, `'use client'` 범위, import 순서 |
 | `data-and-forms` | `/data-and-forms` | typed API wrapper, TanStack Query key factory·훅 이름, RSC prefetch와 `HydrationBoundary`, 무효화 범위, Zod·React Hook Form 폼과 API 에러 표시 |
