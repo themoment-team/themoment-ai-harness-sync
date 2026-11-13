@@ -10,7 +10,7 @@ description: Use when building or reviewing Tailwind CSS v4 styles and shadcn/Ba
 - Use a plain string for static classes.
 - Use `cn()` only for conditional classes or when merging an external `className` prop.
 - Keep related classes in one string. When several places repeat a class set, extract a component; do not move class strings into constants (`styles.ts` and the like).
-- Let the formatter (`prettier-plugin-tailwindcss`) order classes; do not reorder them by hand. Add `"tailwindFunctions": ["cva"]` to the Prettier options so strings inside `cva(...)` are sorted too.
+- Let the formatter (`prettier-plugin-tailwindcss`) order classes; do not reorder them by hand. The plugin only sorts `className` attributes by default; add `"tailwindFunctions": ["cn", "cva"]` to the Prettier options so strings inside `cn(...)` and `cva(...)` are sorted too.
 
 ```tsx
 // Incorrect: cn() without a condition
