@@ -52,7 +52,13 @@ overrides:
 "lint:fsd": "steiger ./src --fail-on-warnings"
 ```
 
-배포되는 설정은 recommended 규칙에 `_app`·`_pages`의 `fsd/typo-in-layer-name`, `_app/providers`의 `fsd/segments-by-purpose` 예외만 둡니다. 공식 구조에서는 Steiger가 모든 레이어를 직접 검사하므로 v1의 `check-fsd-dependencies.mjs`가 필요하지 않습니다.
+Turborepo는 설정 파일이 레포 루트 한 곳에만 배포되므로, 패키지 안에서 `steiger ./src`를 실행하면 이 설정이 적용되지 않습니다. 루트 `package.json`에 두 패키지를 설치하고 소스 루트마다 루트에서 실행합니다.
+
+```json
+"lint:fsd": "steiger apps/client/src --fail-on-warnings && steiger apps/admin/src --fail-on-warnings && steiger packages/core/src --fail-on-warnings"
+```
+
+배포되는 설정은 recommended 규칙에 `_app`·`_pages`의 `fsd/typo-in-layer-name`, `_app/providers`의 `fsd/segments-by-purpose`, Turborepo의 `packages/core/src/entities`에 대한 `fsd/insignificant-slice` 예외만 둡니다. 공식 구조에서는 Steiger가 모든 레이어를 직접 검사하므로 v1의 `check-fsd-dependencies.mjs`가 필요하지 않습니다.
 
 ### Turborepo
 
