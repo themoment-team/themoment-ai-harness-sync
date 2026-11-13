@@ -170,6 +170,11 @@ items:
     dest: .claude/agents/frontend-convention-validator.md
     groups: [claude]
 
+  - id: claude/agents/frontend-convention-validator@v1
+    src: .claude/agents/_archive/frontend-convention-validator/v1.md
+    dest: .claude/agents/frontend-convention-validator.md
+    groups: []
+
   - id: claude/agents/doc-polisher
     src: .claude/agents/doc-polisher.md
     dest: .claude/agents/doc-polisher.md
@@ -408,6 +413,11 @@ items:
     src: .codex/agents/frontend-convention-validator.toml
     dest: .codex/agents/frontend-convention-validator.toml
     groups: [codex]
+
+  - id: codex/agents/frontend-convention-validator@v1
+    src: .codex/agents/_archive/frontend-convention-validator/v1.toml
+    dest: .codex/agents/frontend-convention-validator.toml
+    groups: []
 
   - id: codex/agents/doc-polisher
     src: .codex/agents/doc-polisher.toml
