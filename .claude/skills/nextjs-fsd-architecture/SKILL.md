@@ -49,7 +49,7 @@ Ask from the top and use the first layer that fits.
 
 | Segment   | Contents                                                          |
 | --------- | ----------------------------------------------------------------- |
-| `ui/`     | components, `styles.ts` for repeated class strings                |
+| `ui/`     | components (variants with `cva`)                                  |
 | `model/`  | types, schemas, constants, state hooks                            |
 | `api/`    | URL constants, request functions, query factories, mutation hooks |
 | `lib/`    | utilities used only by this slice                                 |
