@@ -68,7 +68,7 @@ Create a segment only when it has code.
 // src/entities/user/index.ts
 export { useGetUser } from './api/useGetUser';
 export { userQueryKeys } from './api/userQueryKeys';
-export type { UserResponseType } from './model/types';
+export type { UserResponse } from './model/types';
 
 // src/entities/user/index.server.ts
 export { getUserOnServer } from './api/getUserOnServer';
@@ -80,10 +80,10 @@ Entities do not import each other. Only when one entity's type is unavoidable in
 
 ```ts
 // src/entities/user/@x/post.ts — public API only for the post entity
-export type { UserResponseType } from '../model/types';
+export type { UserResponse } from '../model/types';
 
 // src/entities/post/model/types.ts
-import type { UserResponseType } from '@/entities/user/@x/post';
+import type { UserResponse } from '@/entities/user/@x/post';
 ```
 
 A growing number of `@x` files means the entity boundary is wrong: merge the entities or move the composition up a layer.

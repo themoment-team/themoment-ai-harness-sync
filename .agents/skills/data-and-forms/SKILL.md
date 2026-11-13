@@ -25,7 +25,7 @@ If there is no entity yet and only one feature uses the data, keep it in that fe
 ## HTTP calls
 
 - Call the project's typed method wrappers (`get`, `post`, `patch`, `put`, `del`) that return the response body. Do not call the raw Axios instance for ordinary requests; it returns `AxiosResponse`.
-- Pass the response type first and the body type second: `post<UserResponseType, UpdateProfileReqType>(url, body)`.
+- Pass the response type first and the body type second: `post<UserResponse, UpdateProfileRequest>(url, body)`.
 - Browser code uses the client module (for example `@/shared/api`); server code uses the server-only module (for example `@/shared/api/index.server`).
 - Follow the backend's real paths in URL constants. Do not add `/api` or version prefixes without evidence.
 - The server HTTP module is shared by every request on the server. Do not keep per-user state (tokens, user IDs) in it or register per-user interceptors on it; pass per-request values such as cookies explicitly.
@@ -67,14 +67,14 @@ import { useQuery } from '@tanstack/react-query';
 
 import { get } from '@/shared/api';
 
-import type { UserResponseType } from '../model/types';
+import type { UserResponse } from '../model/types';
 import { userQueryKeys } from './userQueryKeys';
 import { USER_URL } from './userUrl';
 
 export const useGetUser = (id: string) =>
   useQuery({
     queryKey: userQueryKeys.detail(id),
-    queryFn: () => get<UserResponseType>(USER_URL.detail(id)),
+    queryFn: () => get<UserResponse>(USER_URL.detail(id)),
   });
 ```
 
@@ -88,10 +88,10 @@ Fetch first-screen data on the server and put it in the client cache.
    // src/entities/user/api/getUserOnServer.ts
    import { get } from '@/shared/api/index.server';
 
-   import type { UserResponseType } from '../model/types';
+   import type { UserResponse } from '../model/types';
    import { USER_URL } from './userUrl';
 
-   export const getUserOnServer = (id: string) => get<UserResponseType>(USER_URL.detail(id));
+   export const getUserOnServer = (id: string) => get<UserResponse>(USER_URL.detail(id));
    ```
 
 2. In the async Server Component in `src/_pages/<slice>/ui/`, create a QueryClient with the project's `getQueryClient()`, prefetch with **the same key as the client hook**, and wrap the client UI in `HydrationBoundary`. The route file only re-exports the page.
@@ -104,7 +104,7 @@ Fetch first-screen data on the server and put it in the client cache.
    import { getUserOnServer } from '@/entities/user/index.server';
    import { getQueryClient } from '@/shared/api';
 
-   const UserPage = async ({ params }: PageProps<'/users/[id]'>) => {
+   export const UserPage = async ({ params }: PageProps<'/users/[id]'>) => {
      const { id } = await params;
      const queryClient = getQueryClient();
 
@@ -120,10 +120,8 @@ Fetch first-screen data on the server and put it in the client cache.
      );
    };
 
-   export default UserPage;
-
    // src/_pages/user/index.ts
-   export { default as UserPage } from './ui/UserPage';
+   export { UserPage } from './ui/UserPage';
 
    // app/users/[id]/page.tsx
    export { UserPage as default } from '@/_pages/user';
@@ -144,17 +142,17 @@ A successful mutation invalidates **the narrowest key that changed**.
 // src/features/edit-profile/api/usePatchProfile.ts
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { USER_URL, userQueryKeys, type UserResponseType } from '@/entities/user';
+import { USER_URL, userQueryKeys, type UserResponse } from '@/entities/user';
 import { patch } from '@/shared/api';
 
-import type { EditProfileReqType } from '../model/editProfileSchema';
+import type { EditProfileRequest } from '../model/editProfileSchema';
 
 export const usePatchProfile = (userId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (body: EditProfileReqType) =>
-      patch<UserResponseType, EditProfileReqType>(USER_URL.detail(userId), body),
+    mutationFn: (body: EditProfileRequest) =>
+      patch<UserResponse, EditProfileRequest>(USER_URL.detail(userId), body),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: userQueryKeys.detail(userId) }),
   });
 };
@@ -182,10 +180,10 @@ export const EditProfileSchema = z.object({
   nickname: z.string().trim().min(2, '닉네임은 2자 이상이어야 합니다.').max(20),
 });
 
-export type EditProfileReqType = z.infer<typeof EditProfileSchema>;
+export type EditProfileRequest = z.infer<typeof EditProfileSchema>;
 ```
 
-- Name schemas `<Action/Resource>Schema` and inferred request types `<Action/Resource>ReqType`. Do not rewrite a type the schema already defines.
+- Name schemas `<Action/Resource>Schema` and inferred request types `<Action/Resource>Request`. Do not rewrite a type the schema already defines.
 - Write error messages in the schema, in the language users see.
 - Prefer literal unions and `Record<Union, Metadata>` constants over `enum`.
 
@@ -201,19 +199,19 @@ import { useForm } from 'react-hook-form';
 import { ApiError } from '@/shared/api';
 
 import { usePatchProfile } from '../api/usePatchProfile';
-import { type EditProfileReqType, EditProfileSchema } from '../model/editProfileSchema';
+import { type EditProfileRequest, EditProfileSchema } from '../model/editProfileSchema';
 
 interface EditProfileFormProps {
   userId: string;
-  defaultValues: EditProfileReqType;
+  defaultValues: EditProfileRequest;
 }
 
 // Map server error codes to fields. Unknown codes become a form-level error.
-const FIELD_BY_ERROR_CODE: Partial<Record<string, keyof EditProfileReqType>> = {
+const FIELD_BY_ERROR_CODE: Partial<Record<string, keyof EditProfileRequest>> = {
   NICKNAME_TAKEN: 'nickname',
 };
 
-const EditProfileForm = ({ userId, defaultValues }: EditProfileFormProps) => {
+export const EditProfileForm = ({ userId, defaultValues }: EditProfileFormProps) => {
   const { mutateAsync, isPending } = usePatchProfile(userId);
   const {
     register,
@@ -225,7 +223,7 @@ const EditProfileForm = ({ userId, defaultValues }: EditProfileFormProps) => {
     defaultValues,
   });
 
-  const onSubmit = async (values: EditProfileReqType) => {
+  const onSubmit = async (values: EditProfileRequest) => {
     try {
       await mutateAsync(values);
     } catch (error) {
@@ -249,8 +247,6 @@ const EditProfileForm = ({ userId, defaultValues }: EditProfileFormProps) => {
     </form>
   );
 };
-
-export default EditProfileForm;
 ```
 
 - Do not pass generics to `useForm`; `zodResolver(Schema)` infers input and output types.

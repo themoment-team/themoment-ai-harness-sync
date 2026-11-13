@@ -9,26 +9,27 @@ These rules apply to `.ts` and `.tsx` files in a Next.js project. If the project
 
 ## Naming
 
-| What                    | Rule                   | Example                            |
-| ----------------------- | ---------------------- | ---------------------------------- |
-| slice folder            | kebab-case             | `user-profile/`                    |
+| What                    | Rule                                                    | Example                                   |
+| ----------------------- | ------------------------------------------------------- | ----------------------------------------- |
+| slice folder            | kebab-case                                              | `user-profile/`                           |
 | component file          | PascalCase (shadcn primitives keep upstream kebab-case) | `ui/HomePage.tsx`, `shared/ui/button.tsx` |
-| hook, util, other files | camelCase              | `getQueryClient.ts`, `cn.ts`       |
-| props type              | PascalCase + `Props`   | `HomePageProps`                    |
-| other types             | PascalCase + `Type`    | `ApiErrorType`, `UserResponseType` |
-| request type            | PascalCase + `ReqType` | `UpdateProfileReqType`             |
-| Zod schema              | PascalCase + `Schema`  | `EnvSchema`, `UpdateProfileSchema` |
+| hook, util, other files | camelCase                                               | `getQueryClient.ts`, `cn.ts`              |
+| props type              | PascalCase + `Props`                                    | `HomePageProps`                           |
+| other types             | PascalCase, no kind suffix                              | `User`, `UserResponse`                    |
+| request type            | PascalCase + `Request`                                  | `UpdateProfileRequest`                    |
+| Zod schema              | PascalCase + `Schema`                                   | `EnvSchema`, `UpdateProfileSchema`        |
 
 ## Types
 
 - Use `interface` for object shapes and `type` for unions and combinations.
 - Do not use `enum`. Use a literal union with an `as const` object or a `Record`. **(lint)**
 - Import types with `import type`. **(lint)**
+- Do not add kind suffixes such as `Type` to type names. Add a role word only when a value (class or constant) already uses the name: the constructor input of the `ApiError` class is `ApiErrorInit`.
 
 ## Components
 
 - Write components as arrow functions and destructure props.
-- A slice's component file default-exports the component, and the owning slice's `index.ts` re-exports it by name:
+- Modules under `src` use named exports only, and the owning slice's `index.ts` re-exports them by the same name. Default exports belong only to the files Next.js requires them in (`app/` route files and config files), which re-export the slice component as `default`:
 
   ```tsx
   // src/_pages/home/ui/HomePage.tsx
@@ -36,13 +37,16 @@ These rules apply to `.ts` and `.tsx` files in a Next.js project. If the project
     title: string;
   }
 
-  const HomePage = ({ title }: HomePageProps) => <h1>{title}</h1>;
-
-  export default HomePage;
+  export const HomePage = ({ title }: HomePageProps) => <h1>{title}</h1>;
 
   // src/_pages/home/index.ts
-  export { default as HomePage } from './ui/HomePage';
+  export { HomePage } from './ui/HomePage';
+
+  // app/page.tsx
+  export { HomePage as default } from '@/_pages/home';
   ```
+
+- To enforce this, add an ESLint `no-restricted-syntax` entry for `ExportDefaultDeclaration` and `ExportSpecifier[exported.name='default']` scoped to `src/**`. When that override also sets `no-restricted-syntax`, repeat any existing entries (such as the `enum` ban) because a later block replaces the rule's options.
 
 - Order inside a component: variables and hooks → handlers and other logic → `useEffect` (only when needed) → `return`.
 - Do not add state or effects just to follow this order. When React Compiler is enabled, do not add memoization by hand.

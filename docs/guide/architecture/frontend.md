@@ -82,7 +82,7 @@ packages/core/src:   entities → shared
 - shadcn primitive는 단일 앱의 `src/shared/ui` 또는 공유 UI 패키지에, 도메인 UI는 소유 slice에 둡니다.
 - API 호출은 프로젝트의 typed HTTP wrapper를 사용합니다. URL 상수, query key factory, 조회 훅은 소유 entity의 `api/`에, mutation 훅은 동작을 맡는 feature의 `api/`에 둡니다.
 - TanStack Query key는 `all()` 루트의 계층 factory로 만들고, mutation은 영향받는 가장 좁은 key만 무효화합니다.
-- Zod schema는 `PascalCaseSchema`, 추론 request type은 `ReqType` 접미사를 씁니다. `enum`보다 union과 `Record<Union, Metadata>`를 우선합니다.
+- Zod schema는 `PascalCaseSchema`, 추론 request type은 `Request` 접미사를 씁니다. 그 밖의 타입에는 `Type` 같은 종류 접미사를 붙이지 않고(`User`, `UserResponse`), `src` 안의 모듈은 named export만 씁니다(default export는 `app/` 라우트와 설정 파일에만). `enum`보다 union과 `Record<Union, Metadata>`를 우선합니다.
 
 ## v1에서 옮기기
 
