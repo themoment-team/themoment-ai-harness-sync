@@ -104,10 +104,9 @@ pr_label: false                # sync PR 라벨 부착 여부 (기본값: true)
 | `claude/skills/the-sdk` | `.claude/skills/the-sdk/` |
 | `claude/skills/java-spring-arch` | `.claude/skills/java-spring-arch/` |
 | `claude/skills/nextjs-fsd-architecture` | `.claude/skills/nextjs-fsd-architecture/` |
-| `claude/skills/nextjs-turborepo-fsd` | `.claude/skills/nextjs-turborepo-fsd/` |
-| `claude/skills/nextjs-package-boundaries` | `.claude/skills/nextjs-package-boundaries/` |
 | `claude/skills/tailwind-shadcn` | `.claude/skills/tailwind-shadcn/` |
-| `claude/skills/tanstack-query-zod` | `.claude/skills/tanstack-query-zod/` |
+| `claude/skills/data-and-forms` | `.claude/skills/data-and-forms/` |
+| `claude/skills/react-conventions` | `.claude/skills/react-conventions/` |
 | `claude/agents/contradiction-finder` | `.claude/agents/contradiction-finder.md` |
 | `claude/agents/kotlin-convention-validator` | `.claude/agents/kotlin-convention-validator.md` |
 | `claude/agents/frontend-convention-validator` | `.claude/agents/frontend-convention-validator.md` |
@@ -149,7 +148,7 @@ pr_label: false                # sync PR 라벨 부착 여부 (기본값: true)
 | ID | 배포 경로 |
 |----|----------|
 | `nextjs/fsd/steiger-config` | `steiger.config.mjs` |
-| `nextjs/fsd/dependency-check` | `scripts/check-fsd-dependencies.mjs` |
+| `nextjs/fsd/dependency-check` | `scripts/check-fsd-dependencies.mjs` (v1 `views` 레이아웃 전용) |
 
 ### codex 그룹
 
@@ -174,10 +173,9 @@ pr_label: false                # sync PR 라벨 부착 여부 (기본값: true)
 | `codex/skills/the-sdk` | `.agents/skills/the-sdk/` |
 | `codex/skills/java-spring-arch` | `.agents/skills/java-spring-arch/` |
 | `codex/skills/nextjs-fsd-architecture` | `.agents/skills/nextjs-fsd-architecture/` |
-| `codex/skills/nextjs-turborepo-fsd` | `.agents/skills/nextjs-turborepo-fsd/` |
-| `codex/skills/nextjs-package-boundaries` | `.agents/skills/nextjs-package-boundaries/` |
 | `codex/skills/tailwind-shadcn` | `.agents/skills/tailwind-shadcn/` |
-| `codex/skills/tanstack-query-zod` | `.agents/skills/tanstack-query-zod/` |
+| `codex/skills/data-and-forms` | `.agents/skills/data-and-forms/` |
+| `codex/skills/react-conventions` | `.agents/skills/react-conventions/` |
 | `codex/agents/contradiction-finder` | `.codex/agents/contradiction-finder.toml` |
 | `codex/agents/kotlin-convention-validator` | `.codex/agents/kotlin-convention-validator.toml` |
 | `codex/agents/frontend-convention-validator` | `.codex/agents/frontend-convention-validator.toml` |
@@ -301,6 +299,9 @@ overrides:
 | 항목 | 버전 | 내용 |
 |------|------|------|
 | `claude/skills/the-sdk`, `codex/skills/the-sdk` | `v1` | the-sdk 1.5(JitPack, Spring Boot 3.x) 기준 안내. 최신 스킬은 the-sdk 2.0(Maven Central, Spring Boot 4.0.x) 기준입니다 |
+| `claude/skills/nextjs-fsd-architecture`, `codex/skills/nextjs-fsd-architecture` | `v1` | `src/app` + `views` 레이아웃 기준 안내. 최신 스킬은 FSD 공식 Next.js 구조(`src/_app`, `src/_pages`) 기준입니다 |
+| `nextjs/fsd/steiger-config` | `v1` | `views` 레이아웃용 steiger 설정 |
+| `claude/agents/frontend-convention-validator`, `codex/agents/frontend-convention-validator` | `v1` | `views` 레이아웃 기준 검사 항목 |
 
 Spring Boot 3.x를 쓰며 the-sdk 1.x에 머무는 레포는 아래처럼 `v1`으로 고정합니다.
 
@@ -309,6 +310,20 @@ overrides:
   claude/skills/the-sdk: "v1"
   codex/skills/the-sdk: "v1"
 ```
+
+아직 `views` 레이아웃을 쓰는 Next.js FSD 레포는 공식 구조로 옮기기 전까지 아래처럼 고정합니다. 옮기는 방법은 [프론트엔드 아키텍처](./architecture/frontend.md)의 "v1에서 옮기기" 절를 참고하세요.
+
+```yaml
+overrides:
+  claude/skills/nextjs-fsd-architecture: "v1"
+  codex/skills/nextjs-fsd-architecture: "v1"
+  claude/agents/frontend-convention-validator: "v1"
+  codex/agents/frontend-convention-validator: "v1"
+  nextjs/fsd/steiger-config: "v1"
+  nextjs/fsd/dependency-check: true
+```
+
+`nextjs-turborepo-fsd`, `nextjs-package-boundaries`, `tanstack-query-zod` 스킬은 v2에서 없어졌으므로 고정할 수 없습니다. 앞의 두 스킬은 `nextjs-fsd-architecture`의 Turborepo 절로 합쳐졌고, `tanstack-query-zod`는 `data-and-forms`로 이름이 바뀌었습니다.
 
 ## 예시 — 프론트엔드 (TypeScript)
 
@@ -341,7 +356,6 @@ overrides:
   codex/hooks/secret-guard: true
   codex/hooks/command-guard: true
   nextjs/fsd/steiger-config: true
-  nextjs/fsd/dependency-check: true
 ```
 
 ## 예시 — Kotlin / Spring Boot 백엔드
