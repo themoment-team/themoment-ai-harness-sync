@@ -111,9 +111,9 @@ items:
     dest: .claude/skills/tailwind-shadcn/
     groups: [claude]
 
-  - id: claude/skills/tanstack-query-zod
-    src: .claude/skills/tanstack-query-zod/
-    dest: .claude/skills/tanstack-query-zod/
+  - id: claude/skills/data-and-forms
+    src: .claude/skills/data-and-forms/
+    dest: .claude/skills/data-and-forms/
     groups: [claude]
 
   - id: claude/skills/humanizer
@@ -363,9 +363,9 @@ items:
     dest: .agents/skills/tailwind-shadcn/
     groups: [codex]
 
-  - id: codex/skills/tanstack-query-zod
-    src: .agents/skills/tanstack-query-zod/
-    dest: .agents/skills/tanstack-query-zod/
+  - id: codex/skills/data-and-forms
+    src: .agents/skills/data-and-forms/
+    dest: .agents/skills/data-and-forms/
     groups: [codex]
 
   - id: codex/skills/humanizer
@@ -539,6 +539,12 @@ deletions:
     since: "2026-11-12"
   - dest: .agents/skills/nextjs-package-boundaries/
     reason: "nextjs-fsd-architecture v2의 Turborepo 절로 통합"
+    since: "2026-11-12"
+  - dest: .claude/skills/tanstack-query-zod/
+    reason: "data-and-forms 로 이름 변경"
+    since: "2026-11-12"
+  - dest: .agents/skills/tanstack-query-zod/
+    reason: "data-and-forms 로 이름 변경"
     since: "2026-11-12"
   - dest: .claude/hooks/modules/kotest/
     reason: "gradle-test 로 이름 변경 (프레임워크 중립)"
