@@ -19,7 +19,7 @@ src/
 ├── _pages/      # pages 레이어: 라우트 하나에 대응하는 화면
 ├── widgets/     # 여러 화면에 들어가는 큰 블록
 ├── features/    # 사용자 동작 하나 (폼·버튼과 mutation)
-├── entities/    # 도메인 개념과 조회 (타입, query key, 조회 훅, entity UI)
+├── entities/    # 도메인 개념과 조회 (타입, query 팩토리, entity UI)
 └── shared/      # 도메인을 모르는 공통 코드 (api, config, lib, ui)
 ```
 
@@ -80,7 +80,7 @@ packages/core/src:   entities → shared
 
 - Tailwind 정적 클래스는 문자열로 쓰고, 조건부 클래스나 외부 `className` 병합에만 `cn()`을 씁니다. 색·간격은 `@theme` 토큰을 씁니다.
 - shadcn primitive는 단일 앱의 `src/shared/ui` 또는 공유 UI 패키지에, 도메인 UI는 소유 slice에 둡니다.
-- API 호출은 프로젝트의 typed HTTP wrapper를 사용합니다. URL 상수, query key factory, 조회 훅은 소유 entity의 `api/`에, mutation 훅은 동작을 맡는 feature의 `api/`에 둡니다.
+- API 호출은 프로젝트의 typed HTTP wrapper를 사용합니다. URL 상수와 `queryOptions` 기반 query 팩토리(`<리소스>Queries`)는 소유 entity의 `api/`에, mutation 훅은 동작을 맡는 feature의 `api/`에 둡니다. 컴포넌트는 팩토리 옵션을 `useQuery`에 바로 넘기고, mutation 훅은 HTTP 메서드가 아니라 동작으로 이름 짓습니다(`useUpdateProfile`).
 - TanStack Query key는 `all()` 루트의 계층 factory로 만들고, mutation은 영향받는 가장 좁은 key만 무효화합니다.
 - Zod schema는 `PascalCaseSchema`, 추론 request type은 `Request` 접미사를 씁니다. 그 밖의 타입에는 `Type` 같은 종류 접미사를 붙이지 않고(`User`, `UserResponse`), `src` 안의 모듈은 named export만 씁니다(default export는 `app/` 라우트와 설정 파일에만). `enum`보다 union과 `Record<Union, Metadata>`를 우선합니다.
 

@@ -1,6 +1,6 @@
 ---
 name: data-and-forms
-description: Use when reading or changing server data with TanStack Query, or building forms with Zod and React Hook Form, in a Next.js FSD project — query key factories, hook names, RSC prefetch with HydrationBoundary, invalidation scope, schema naming, mutation submit, and mapping API errors to form errors.
+description: Use when reading or changing server data with TanStack Query, or building forms with Zod and React Hook Form, in a Next.js FSD project — query factories with `queryOptions`, mutation hook names, RSC prefetch with HydrationBoundary, invalidation scope, schema naming, mutation submit, and mapping API errors to form errors.
 ---
 
 # Data and Forms Guide
@@ -9,74 +9,83 @@ Paths such as `src/`, `app/`, and `@/` are relative to a web app: the project ro
 
 ## Where things go
 
-| What                                   | Where                                             |
-| -------------------------------------- | ------------------------------------------------- |
-| response types                         | owning entity `model/`                            |
-| URL constants, query key factory       | owning entity `api/`                              |
-| read hooks (`useGet...`)               | owning entity `api/`                              |
-| server-only read functions             | owning entity `api/`, exported from `index.server.ts` |
-| mutation hook for a user action        | the feature that owns the action, `api/`          |
-| form schema and request type           | feature `model/`                                  |
-| form component                         | feature `ui/`                                     |
-| prefetch and `HydrationBoundary`       | the page component in `src/_pages/<slice>/ui/`    |
+| What                             | Where                                                 |
+| -------------------------------- | ----------------------------------------------------- |
+| response types                   | owning entity `model/`                                |
+| URL constants, query factory     | owning entity `api/`                                  |
+| server-only read functions       | owning entity `api/`, exported from `index.server.ts` |
+| mutation hook for a user action  | the feature that owns the action, `api/`              |
+| form schema and request type     | feature `model/`                                      |
+| form component                   | feature `ui/`                                         |
+| prefetch and `HydrationBoundary` | the page component in `src/_pages/<slice>/ui/`        |
 
 If there is no entity yet and only one feature uses the data, keep it in that feature. Move it to an entity when a second consumer appears.
 
 ## HTTP calls
 
 - Call the project's typed method wrappers (`get`, `post`, `patch`, `put`, `del`) that return the response body. Do not call the raw Axios instance for ordinary requests; it returns `AxiosResponse`.
-- Pass the response type first and the body type second: `post<UserResponse, UpdateProfileRequest>(url, body)`.
+- Pass the response type first and the body type second: `post<User, UpdateProfileRequest>(url, body)`.
 - Browser code uses the client module (for example `@/shared/api`); server code uses the server-only module (for example `@/shared/api/index.server`).
 - Follow the backend's real paths in URL constants. Do not add `/api` or version prefixes without evidence.
 - The server HTTP module is shared by every request on the server. Do not keep per-user state (tokens, user IDs) in it or register per-user interceptors on it; pass per-request values such as cookies explicitly.
 - Requests made inside the interceptor's 401 handling (such as a token refresh) go through a separate instance without that interceptor. Sent through the same instance, a 401 on the refresh waits on itself and never settles.
 
-## Query key factory
+## Query factory
 
-One factory per resource. Every key is a hierarchical array that starts from `all()`.
+Keep one `<resource>Queries` object per resource that holds both query keys and read options. Entries that are actually fetched are built with TanStack Query's `queryOptions`; parent keys used only as invalidation scopes return plain arrays. Every key is a hierarchical array that starts from `all()`.
 
 ```ts
-// src/entities/user/api/userQueryKeys.ts
-export const userQueryKeys = {
+// src/entities/user/api/userQueries.ts
+import { queryOptions } from '@tanstack/react-query';
+
+import { get } from '@/shared/api';
+
+import type { User, UserListParams } from '../model/types';
+import { USER_URL } from './userUrl';
+
+export const userQueries = {
   all: () => ['users'] as const,
-  lists: () => [...userQueryKeys.all(), 'list'] as const,
-  list: (params: { page: number }) => [...userQueryKeys.lists(), params] as const,
-  details: () => [...userQueryKeys.all(), 'detail'] as const,
-  detail: (id: string) => [...userQueryKeys.details(), id] as const,
+  lists: () => [...userQueries.all(), 'list'] as const,
+  list: (params: UserListParams) =>
+    queryOptions({
+      queryKey: [...userQueries.lists(), params],
+      queryFn: () => get<User[]>(USER_URL.list, { params }),
+    }),
+  details: () => [...userQueries.all(), 'detail'] as const,
+  detail: (id: string) =>
+    queryOptions({
+      queryKey: [...userQueries.details(), id],
+      queryFn: () => get<User>(USER_URL.detail(id)),
+    }),
 };
 ```
 
 - Never write a key as a literal array at the call site; always go through the factory.
 - Put filters and pagination in the last element as an object.
+- `queryOptions` tags the key with the data type, so `getQueryData(userQueries.detail(id).queryKey)` infers `User | undefined` without a generic.
 
-## Hook names
+## Reading data
 
-| Action         | Name                  | TanStack hook |
-| -------------- | --------------------- | ------------- |
-| read           | `useGet<Resource>`    | `useQuery`    |
-| create         | `usePost<Resource>`   | `useMutation` |
-| partial update | `usePatch<Resource>`  | `useMutation` |
-| full update    | `usePut<Resource>`    | `useMutation` |
-| delete         | `useDelete<Resource>` | `useMutation` |
+Components pass the factory options straight to TanStack hooks. Do not wrap them in one-line read hooks (`useUser = (id) => useQuery(...)`): the same options are meant to be reused by `useQuery`, `useSuspenseQuery`, `useQueries`, `prefetchQuery`, `ensureQueryData`, and `getQueryData`.
 
-Match the name to the HTTP method (a `patch` request is `usePatch...`).
+```tsx
+// src/entities/user/ui/UserDetails.tsx
+'use client';
 
-```ts
-// src/entities/user/api/useGetUser.ts
 import { useQuery } from '@tanstack/react-query';
 
-import { get } from '@/shared/api';
+import { userQueries } from '../api/userQueries';
 
-import type { UserResponse } from '../model/types';
-import { userQueryKeys } from './userQueryKeys';
-import { USER_URL } from './userUrl';
+export const UserDetails = ({ userId }: { userId: string }) => {
+  const { data: user } = useQuery(userQueries.detail(userId));
 
-export const useGetUser = (id: string) =>
-  useQuery({
-    queryKey: userQueryKeys.detail(id),
-    queryFn: () => get<UserResponse>(USER_URL.detail(id)),
-  });
+  return <p>{user?.nickname}</p>;
+};
 ```
+
+- Add per-screen options by spreading: `useQuery({ ...userQueries.detail(id), select: (user) => user.nickname, enabled: Boolean(id) })`.
+- Write a custom read hook only when it carries logic: combining queries, a derived value that always comes with the data, or wiring to other hooks such as the router or auth state. Use the factory options inside it.
+- To fetch ahead without rendering the data (for example on link hover), call `queryClient.prefetchQuery(userQueries.detail(id))` from the event handler instead of mounting `useQuery`.
 
 ## RSC prefetch and HydrationBoundary
 
@@ -88,19 +97,19 @@ Fetch first-screen data on the server and put it in the client cache.
    // src/entities/user/api/getUserOnServer.ts
    import { get } from '@/shared/api/index.server';
 
-   import type { UserResponse } from '../model/types';
+   import type { User } from '../model/types';
    import { USER_URL } from './userUrl';
 
-   export const getUserOnServer = (id: string) => get<UserResponse>(USER_URL.detail(id));
+   export const getUserOnServer = (id: string) => get<User>(USER_URL.detail(id));
    ```
 
-2. In the async Server Component in `src/_pages/<slice>/ui/`, create a QueryClient with the project's `getQueryClient()`, prefetch with **the same key as the client hook**, and wrap the client UI in `HydrationBoundary`. The route file only re-exports the page.
+2. In the async Server Component in `src/_pages/<slice>/ui/`, create a QueryClient with the project's `getQueryClient()`, prefetch by **spreading the factory options and replacing only `queryFn` with the server function**, and wrap the client UI in `HydrationBoundary`. The key and the other options must stay identical to the client's so the client reads the hydrated cache. The route file only re-exports the page.
 
    ```tsx
    // src/_pages/user/ui/UserPage.tsx
    import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 
-   import { UserDetails, userQueryKeys } from '@/entities/user';
+   import { UserDetails, userQueries } from '@/entities/user';
    import { getUserOnServer } from '@/entities/user/index.server';
    import { getQueryClient } from '@/shared/api';
 
@@ -109,7 +118,7 @@ Fetch first-screen data on the server and put it in the client cache.
      const queryClient = getQueryClient();
 
      await queryClient.prefetchQuery({
-       queryKey: userQueryKeys.detail(id),
+       ...userQueries.detail(id),
        queryFn: () => getUserOnServer(id),
      });
 
@@ -127,45 +136,49 @@ Fetch first-screen data on the server and put it in the client cache.
    export { UserPage as default } from '@/_pages/user';
    ```
 
-3. Client components keep using `useGetUser(id)`. While the cached data is within `staleTime`, it is not requested again. Set the QueryClient's default `staleTime` above 0; with the default of 0 the client refetches right after hydration and the prefetch is wasted.
+3. Client components keep using `useQuery(userQueries.detail(id))`. While the cached data is within `staleTime`, it is not requested again. Set the QueryClient's default `staleTime` above 0; with the default of 0 the client refetches right after hydration and the prefetch is wasted.
 
 - `await` the prefetch unless the project's QueryClient is configured to dehydrate pending queries.
 - `getQueryClient()` returns a new instance per call on the server. Call it once per page component and use that instance for both prefetch and dehydrate. On the browser it returns a singleton.
 - `prefetchQuery` does not throw. On failure the client hook requests again and exposes the error through `error`.
+- Why `queryFn` is replaced: browser requests go through a relative proxy path and the 401 interceptor, the server has neither, and a Server Component cannot write refreshed cookies. A server prefetch that fails with 401 is not dehydrated, so the client retries through the browser instance and its 401 handling.
 - `getQueryClient` is shared by server and client code, so the client API module must not import `server-only` code or server environment variables.
 
 ## Mutations and invalidation scope
 
+Mutations carry logic (invalidation, navigation after success), so keep them in custom hooks. Name them by the action, not the HTTP method: `use<Action><Target>` (`useUpdateProfile`, `useCreatePost`, `useDeletePost`, `useFollowUser`). The name survives the backend switching `PATCH` to `PUT`.
+
 A successful mutation invalidates **the narrowest key that changed**.
 
 ```ts
-// src/features/edit-profile/api/usePatchProfile.ts
+// src/features/edit-profile/api/useUpdateProfile.ts
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { USER_URL, userQueryKeys, type UserResponse } from '@/entities/user';
+import { type User, USER_URL, userQueries } from '@/entities/user';
 import { patch } from '@/shared/api';
 
 import type { EditProfileRequest } from '../model/editProfileSchema';
 
-export const usePatchProfile = (userId: string) => {
+export const useUpdateProfile = (userId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (body: EditProfileRequest) =>
-      patch<UserResponse, EditProfileRequest>(USER_URL.detail(userId), body),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: userQueryKeys.detail(userId) }),
+      patch<User, EditProfileRequest>(USER_URL.detail(userId), body),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: userQueries.detail(userId).queryKey }),
   });
 };
 ```
 
-| Change                        | Invalidate                                              |
-| ----------------------------- | ------------------------------------------------------- |
-| one field of one item         | `detail(id)`, plus `lists()` if lists show that field   |
-| create or delete              | `lists()`                                               |
-| affects the whole resource    | `all()`                                                 |
+| Change                     | Invalidate                                                     |
+| -------------------------- | -------------------------------------------------------------- |
+| one field of one item      | `detail(id).queryKey`, plus `lists()` if lists show that field |
+| create or delete           | `lists()`                                                      |
+| affects the whole resource | `all()`                                                        |
 
 - Return the `invalidateQueries` promise from `onSuccess` so the mutation stays pending until the refetch finishes.
-- When the response already contains the new data for a single key, `setQueryData` is fine.
+- When the response already contains the new data for a single key, `setQueryData(userQueries.detail(id).queryKey, user)` is fine; the key checks the data type.
 - Do not call `queryClient.invalidateQueries()` without a key unless you can justify it.
 
 ## Forms
@@ -198,7 +211,7 @@ import { useForm } from 'react-hook-form';
 
 import { ApiError } from '@/shared/api';
 
-import { usePatchProfile } from '../api/usePatchProfile';
+import { useUpdateProfile } from '../api/useUpdateProfile';
 import { type EditProfileRequest, EditProfileSchema } from '../model/editProfileSchema';
 
 interface EditProfileFormProps {
@@ -212,7 +225,7 @@ const FIELD_BY_ERROR_CODE: Partial<Record<string, keyof EditProfileRequest>> = {
 };
 
 export const EditProfileForm = ({ userId, defaultValues }: EditProfileFormProps) => {
-  const { mutateAsync, isPending } = usePatchProfile(userId);
+  const { mutateAsync, isPending } = useUpdateProfile(userId);
   const {
     register,
     handleSubmit,
@@ -258,5 +271,5 @@ export const EditProfileForm = ({ userId, defaultValues }: EditProfileFormProps)
 
 ## Tests
 
-- Query key factories and schemas are pure; unit-test boundary values (empty string, max length).
+- Query factory keys and schemas are pure; unit-test boundary values (empty string, max length).
 - Test form components with Testing Library by typing and submitting, and replace the mutation with a module mock. Do not depend on the network.

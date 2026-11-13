@@ -47,13 +47,13 @@ Ask from the top and use the first layer that fits.
 - Slice names are kebab-case domain names (`user`, `edit-profile`).
 - Name segments by purpose, not by kind. Do not use `components`, `hooks`, `utils`, or `types` (Steiger `fsd/segments-by-purpose`).
 
-| Segment   | Contents                                                  |
-| --------- | --------------------------------------------------------- |
-| `ui/`     | components, `styles.ts` for repeated class strings        |
-| `model/`  | types, schemas, constants, state hooks                    |
-| `api/`    | URL constants, request functions, query keys, query and mutation hooks |
-| `lib/`    | utilities used only by this slice                         |
-| `config/` | configuration values and feature flags                    |
+| Segment   | Contents                                                          |
+| --------- | ----------------------------------------------------------------- |
+| `ui/`     | components, `styles.ts` for repeated class strings                |
+| `model/`  | types, schemas, constants, state hooks                            |
+| `api/`    | URL constants, request functions, query factories, mutation hooks |
+| `lib/`    | utilities used only by this slice                                 |
+| `config/` | configuration values and feature flags                            |
 
 Create a segment only when it has code.
 
@@ -66,9 +66,10 @@ Create a segment only when it has code.
 
 ```ts
 // src/entities/user/index.ts
-export { useGetUser } from './api/useGetUser';
-export { userQueryKeys } from './api/userQueryKeys';
-export type { UserResponse } from './model/types';
+export { userQueries } from './api/userQueries';
+export { USER_URL } from './api/userUrl';
+export type { User } from './model/types';
+export { UserDetails } from './ui/UserDetails';
 
 // src/entities/user/index.server.ts
 export { getUserOnServer } from './api/getUserOnServer';
@@ -80,10 +81,10 @@ Entities do not import each other. Only when one entity's type is unavoidable in
 
 ```ts
 // src/entities/user/@x/post.ts — public API only for the post entity
-export type { UserResponse } from '../model/types';
+export type { User } from '../model/types';
 
 // src/entities/post/model/types.ts
-import type { UserResponse } from '@/entities/user/@x/post';
+import type { User } from '@/entities/user/@x/post';
 ```
 
 A growing number of `@x` files means the entity boundary is wrong: merge the entities or move the composition up a layer.
@@ -224,7 +225,7 @@ packages/core/src:   entities → shared
 ## Adding a feature (example: edit profile)
 
 1. If there is no screen yet, create `src/_pages/<slice>` and `app/<route>/page.tsx`.
-2. Put domain data the screen reads in `src/entities/<slice>`: types, URL, query key, read hook.
+2. Put domain data the screen reads in `src/entities/<slice>`: types, URL, query factory (`<slice>Queries`).
 3. Put the user action in `src/features/<slice>`: schema (`model/`), mutation hook (`api/`), form (`ui/`).
 4. Export from each slice's `index.ts`, and `index.server.ts` when needed.
 5. Compose in `_pages` and keep the route file a re-export.
