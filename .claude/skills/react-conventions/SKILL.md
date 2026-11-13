@@ -12,7 +12,7 @@ These rules apply to `.ts` and `.tsx` files in a Next.js project. If the project
 | What                    | Rule                   | Example                            |
 | ----------------------- | ---------------------- | ---------------------------------- |
 | slice folder            | kebab-case             | `user-profile/`                    |
-| component file          | PascalCase             | `ui/HomePage.tsx`                  |
+| component file          | PascalCase (shadcn primitives keep upstream kebab-case) | `ui/HomePage.tsx`, `shared/ui/button.tsx` |
 | hook, util, other files | camelCase              | `getQueryClient.ts`, `cn.ts`       |
 | props type              | PascalCase + `Props`   | `HomePageProps`                    |
 | other types             | PascalCase + `Type`    | `ApiErrorType`, `UserResponseType` |

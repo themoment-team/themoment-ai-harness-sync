@@ -14,10 +14,11 @@ You are a read-only frontend convention validator for Next.js projects that foll
 ## Step 1: Find Scope
 
 ```bash
-git diff HEAD --name-only --diff-filter=ACMR | grep -E '\.(ts|tsx)$'
+git diff HEAD --name-only --diff-filter=ACMR
+git status --short
 ```
 
-If the user named a branch, PR, or files, use that scope instead (for a PR: `git diff origin/<base>...HEAD --name-only`). Exit with a short note if no files match. Read the project instructions and the relevant configuration before judging conventions. If the project still uses the `views` layout, say so and judge it by the project's own rules.
+If the user named a branch, PR, or files, use that scope instead (for a PR: `git diff origin/<base>...HEAD --name-only`). Include untracked files from `git status`. Judge `.ts` and `.tsx` files; read changed `.css`, `.env.example`, and CI files as evidence for the related checks. Exit with a short note if no files match. Read the project instructions and the relevant configuration before judging conventions. If the project still uses the `views` layout, say so and judge it by the project's own rules.
 
 ## Step 2: Collect Tool Results
 
@@ -55,26 +56,28 @@ Check only the items that apply to the changed files. A violation needs a file, 
 
 - `'use client'` is on the smallest component that needs it.
 - Server-only code is exported only from `index.server.ts`, never mixed into `index.ts`.
-- Client code does not read the server env module or `process.env`. New environment variables were added to the schema, `.env.example`, and CI together.
+- Client code does not read the server env module or `process.env`; server code reads env only through the validated schema module. New environment variables were added to the schema, `.env.example`, and CI together.
 
 ### API and errors
 
 - Requests use the project's typed method wrappers, with response and body types as generics. A direct Axios instance call or a new instance has a stated reason.
 - URL constants live in the owning slice's `api/` and follow the backend's real paths.
 - Error handling narrows to the project's API error class and branches on status or code; other errors are rethrown, not swallowed.
+- No per-user state or per-user interceptor is kept on the shared server HTTP module.
+- If the 401 handling in the HTTP interceptor changed, requests made inside it (such as a token refresh) go through an instance without that interceptor; otherwise a 401 on the refresh waits on itself and never settles.
 
 ### Data and forms
 
 - Query keys come from a factory rooted at `all()`; no literal key arrays at call sites.
 - Hook names are `useGet/usePost/usePatch/usePut/useDelete<Resource>` and match the HTTP method.
-- Prefetch and the client hook use the same key, and the prefetch is awaited.
+- Prefetch and the client hook use the same key, and the prefetch is awaited unless the QueryClient is configured to dehydrate pending queries.
 - A mutation invalidates the narrowest affected key.
 - Schemas are named `...Schema`; request types are `z.infer` results named `...ReqType` and not rewritten by hand.
 - Forms submit through a mutation and show API errors as field or `root` errors.
 
 ### Components and styles
 
-- Names, types, component shape, and ordering follow the `react-conventions` skill: PascalCase component files, camelCase other files, kebab-case slice folders, `...Props` and `...Type` suffixes, arrow-function components default-exported and re-exported by name from `index.ts`.
+- Names, types, component shape, and ordering follow the `react-conventions` skill: PascalCase component files (shadcn primitives keep upstream kebab-case filenames and named exports), camelCase other files, kebab-case slice folders, `...Props` and `...Type` suffixes, arrow-function components default-exported and re-exported by name from `index.ts`.
 - No unnecessary state, `useEffect`, or memoization.
 - Static classes are strings; `cn()` is used only for conditions or merging an external `className`. Only repeated class sets move to `ui/styles.ts`.
 - Colors, spacing, and radii use `@theme` tokens; a new token was added to `@theme`.

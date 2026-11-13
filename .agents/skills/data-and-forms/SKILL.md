@@ -28,6 +28,8 @@ If there is no entity yet and only one feature uses the data, keep it in that fe
 - Pass the response type first and the body type second: `post<UserResponseType, UpdateProfileReqType>(url, body)`.
 - Browser code uses the client module (for example `@/shared/api`); server code uses the server-only module (for example `@/shared/api/index.server`).
 - Follow the backend's real paths in URL constants. Do not add `/api` or version prefixes without evidence.
+- The server HTTP module is shared by every request on the server. Do not keep per-user state (tokens, user IDs) in it or register per-user interceptors on it; pass per-request values such as cookies explicitly.
+- Requests made inside the interceptor's 401 handling (such as a token refresh) go through a separate instance without that interceptor. Sent through the same instance, a 401 on the refresh waits on itself and never settles.
 
 ## Query key factory
 
@@ -120,11 +122,14 @@ Fetch first-screen data on the server and put it in the client cache.
 
    export default UserPage;
 
+   // src/_pages/user/index.ts
+   export { default as UserPage } from './ui/UserPage';
+
    // app/users/[id]/page.tsx
    export { UserPage as default } from '@/_pages/user';
    ```
 
-3. Client components keep using `useGetUser(id)`. While the cached data is within `staleTime`, it is not requested again.
+3. Client components keep using `useGetUser(id)`. While the cached data is within `staleTime`, it is not requested again. Set the QueryClient's default `staleTime` above 0; with the default of 0 the client refetches right after hydration and the prefetch is wasted.
 
 - `await` the prefetch unless the project's QueryClient is configured to dehydrate pending queries.
 - `getQueryClient()` returns a new instance per call on the server. Call it once per page component and use that instance for both prefetch and dehydrate. On the browser it returns a singleton.
