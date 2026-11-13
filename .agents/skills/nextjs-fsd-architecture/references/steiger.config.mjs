@@ -1,41 +1,28 @@
 import fsd from '@feature-sliced/steiger-plugin';
 import { defineConfig } from 'steiger';
 
+// Steiger config for the official FSD layout in Next.js (`src/_app`, `src/_pages`).
+// The same file works for a single app (`src/`) and for a Turborepo checked from the root (`apps/*/src`, `packages/core/src`).
 export default defineConfig([
   ...fsd.configs.recommended,
   {
-    files: ['src/app/providers.tsx'],
+    // Underscored layer folders are recognized as layers, but the typo rule compares raw folder names.
+    files: ['./src/_app/**', './src/_pages/**', './apps/*/src/_app/**', './apps/*/src/_pages/**'],
+    rules: {
+      'fsd/typo-in-layer-name': 'off',
+    },
+  },
+  {
+    // `providers` is the conventional segment name in the app layer.
+    files: ['./src/_app/providers/**', './apps/*/src/_app/providers/**'],
     rules: {
       'fsd/segments-by-purpose': 'off',
     },
   },
   {
-    files: ['src/{entities,features,widgets}/**/*.{ts,tsx}'],
-    rules: {
-      // `views` is a project extension, so Steiger cannot trace its references.
-      'fsd/insignificant-slice': 'off',
-    },
-  },
-  {
-    files: ['apps/*/src/app/providers.tsx'],
-    rules: {
-      'fsd/segments-by-purpose': 'off',
-    },
-  },
-  {
-    files: ['apps/*/src/{entities,features,widgets}/**/*.{ts,tsx}'],
-    rules: {
-      'fsd/insignificant-slice': 'off',
-    },
-  },
-  {
-    files: ['packages/core/src/{entities,shared}/index*.ts'],
-    rules: {
-      'fsd/no-layer-public-api': 'off',
-    },
-  },
-  {
-    files: ['packages/core/src/entities/**/*.{ts,tsx}'],
+    // Apps consume core entities through package exports, which are outside core's source root,
+    // so Steiger would report every promoted entity as unused.
+    files: ['./packages/core/src/entities/**'],
     rules: {
       'fsd/insignificant-slice': 'off',
     },
