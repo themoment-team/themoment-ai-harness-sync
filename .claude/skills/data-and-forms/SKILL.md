@@ -80,7 +80,7 @@ export const useGetUser = (id: string) =>
 
 Fetch first-screen data on the server and put it in the client cache.
 
-1. Export a server-only read function from the entity's `index.server.ts`. The server cannot use the browser's proxied path, so it uses the server-only HTTP module.
+1. Export a server-only read function from the entity's `index.server.ts`. It uses the server-only HTTP module, which carries the server's base URL and must never reach the client bundle.
 
    ```ts
    // src/entities/user/api/getUserOnServer.ts
