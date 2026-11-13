@@ -116,6 +116,11 @@ items:
     dest: .claude/skills/data-and-forms/
     groups: [claude]
 
+  - id: claude/skills/react-conventions
+    src: .claude/skills/react-conventions/
+    dest: .claude/skills/react-conventions/
+    groups: [claude]
+
   - id: claude/skills/humanizer
     src: .claude/skills/humanizer/
     dest: .claude/skills/humanizer/
@@ -366,6 +371,11 @@ items:
   - id: codex/skills/data-and-forms
     src: .agents/skills/data-and-forms/
     dest: .agents/skills/data-and-forms/
+    groups: [codex]
+
+  - id: codex/skills/react-conventions
+    src: .agents/skills/react-conventions/
+    dest: .agents/skills/react-conventions/
     groups: [codex]
 
   - id: codex/skills/humanizer
