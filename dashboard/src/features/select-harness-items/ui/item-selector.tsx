@@ -4,7 +4,13 @@ import { useState } from 'react';
 
 import type { HarnessItem, HarnessManifest } from '@/entities/harness-config';
 
-import { isItemSelected, type SelectionState, toggleGroup, toggleItem } from '../model/selection';
+import {
+  isItemSelected,
+  type SelectionState,
+  setItemsSelected,
+  toggleGroup,
+  toggleItem,
+} from '../model/selection';
 
 type ItemSelectorProps = {
   manifest: HarnessManifest;
@@ -147,30 +153,45 @@ function ItemCategory({
 }) {
   const selectedCount = category.items.filter((item) => isItemSelected(selection, item)).length;
   const [isOpen, setIsOpen] = useState(false);
+  const allSelected = selectedCount === category.items.length;
+  const partiallySelected = selectedCount > 0 && !allSelected;
 
   return (
-    <details
-      open={isOpen}
-      onToggle={(event) => setIsOpen(event.currentTarget.open)}
-      className="border-border rounded-lg border"
-    >
-      <summary className="flex cursor-pointer items-center justify-between px-3 py-3 text-sm font-medium">
-        <span>{category.label}</span>
-        <span className="text-fg-muted text-xs">
-          {selectedCount}/{category.items.length}개 선택
-        </span>
-      </summary>
-      <div className="border-border space-y-2 border-t p-2">
-        {category.items.map((item) => (
-          <ItemRow
-            key={item.id}
-            item={item}
-            selected={isItemSelected(selection, item)}
-            onToggle={() => onChange(toggleItem(selection, item.id, item))}
-          />
-        ))}
-      </div>
-    </details>
+    <div className="relative">
+      {/* summary는 버튼 역할이라 내부에 컨트롤을 두지 않고 위에 겹쳐 배치한다 */}
+      <input
+        type="checkbox"
+        aria-label={`${category.label} 전체 선택`}
+        checked={allSelected}
+        ref={(element) => {
+          if (element) element.indeterminate = partiallySelected;
+        }}
+        onChange={() => onChange(setItemsSelected(selection, category.items, !allSelected))}
+        className="accent-accent absolute top-3.5 left-3 size-4"
+      />
+      <details
+        open={isOpen}
+        onToggle={(event) => setIsOpen(event.currentTarget.open)}
+        className="border-border rounded-lg border"
+      >
+        <summary className="flex cursor-pointer items-center justify-between py-3 pr-3 pl-10 text-sm font-medium">
+          <span>{category.label}</span>
+          <span className="text-fg-muted text-xs">
+            {selectedCount}/{category.items.length}개 선택
+          </span>
+        </summary>
+        <div className="border-border space-y-2 border-t p-2">
+          {category.items.map((item) => (
+            <ItemRow
+              key={item.id}
+              item={item}
+              selected={isItemSelected(selection, item)}
+              onToggle={() => onChange(toggleItem(selection, item.id, item))}
+            />
+          ))}
+        </div>
+      </details>
+    </div>
   );
 }
 

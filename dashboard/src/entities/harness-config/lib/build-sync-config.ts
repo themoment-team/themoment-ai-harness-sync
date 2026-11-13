@@ -9,7 +9,13 @@ function sortedOverrides(overrides: Record<string, SyncOverride>): Record<string
 }
 
 export function buildSyncConfig(input: SyncConfigInput): string {
-  const fixedOverrides = Object.fromEntries(input.itemIds.map((itemId) => [itemId, true]));
+  // 고정 모드에서도 선택된 항목의 버전 고정 값("v1" 등)은 유지한다
+  const fixedOverrides = Object.fromEntries(
+    input.itemIds.map((itemId) => {
+      const override = input.overrides?.[itemId];
+      return [itemId, typeof override === 'string' ? override : true];
+    }),
+  );
   const overrides = input.mode === 'fixed' ? fixedOverrides : (input.overrides ?? {});
   const config: Record<string, unknown> = {
     enabled: input.enabled,
