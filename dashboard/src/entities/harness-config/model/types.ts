@@ -1,8 +1,13 @@
+export const harnessDomains = ['frontend', 'backend', 'common'] as const;
+
+export type HarnessDomain = (typeof harnessDomains)[number];
+
 export type HarnessItem = {
   id: string;
   src: string;
   dest: string;
   groups: string[];
+  domain?: HarnessDomain;
 };
 
 export type HarnessManifest = {
