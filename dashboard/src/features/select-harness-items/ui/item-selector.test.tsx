@@ -43,6 +43,58 @@ describe('ItemSelector', () => {
     expect(html).toContain('<details');
   });
 
+  it('도메인이 있는 항목은 Frontend, Backend, 공통 순서로 나눠 표시한다', () => {
+    const html = renderToStaticMarkup(
+      <ItemSelector
+        manifest={{
+          defaults: [],
+          items: [
+            { id: 'claude/skills/git-commit', src: '', dest: '', groups: [], domain: 'common' },
+            { id: 'claude/skills/api-design', src: '', dest: '', groups: [], domain: 'backend' },
+            { id: 'claude/skills/legacy', src: '', dest: '', groups: [] },
+            {
+              id: 'claude/skills/tailwind-shadcn',
+              src: '',
+              dest: '',
+              groups: [],
+              domain: 'frontend',
+            },
+          ],
+        }}
+        selection={{
+          enabled: true,
+          mode: 'fixed',
+          itemIds: ['claude/skills/api-design'],
+          groups: [],
+          overrides: {},
+        }}
+        onChange={() => undefined}
+      />,
+    );
+
+    const sectionOrder = ['Skills Frontend', 'Skills Backend', 'Skills 공통', 'Skills 기타'].map(
+      (label) => html.indexOf(`aria-label="${label}"`),
+    );
+    expect(sectionOrder.every((index) => index !== -1)).toBe(true);
+    expect(sectionOrder).toEqual([...sectionOrder].sort((left, right) => left - right));
+    expect(html.indexOf('tailwind-shadcn')).toBeLessThan(html.indexOf('api-design'));
+  });
+
+  it('도메인이 없는 유형은 하위 구분 없이 표시한다', () => {
+    const html = renderToStaticMarkup(
+      <ItemSelector
+        manifest={{
+          defaults: [],
+          items: [{ id: 'claude/hooks/secret-guard', src: '', dest: '', groups: [] }],
+        }}
+        selection={{ enabled: true, mode: 'fixed', itemIds: [], groups: [], overrides: {} }}
+        onChange={() => undefined}
+      />,
+    );
+
+    expect(html).not.toContain('기타');
+  });
+
   it('선택된 항목이 있어도 아코디언을 닫아서 시작한다', () => {
     const container = document.createElement('div');
     const root = createRoot(container);
