@@ -10,7 +10,7 @@ sync-manifest.yml과 배포 대상 파일을 검사합니다. PR 검증 워크�
 
 경고 (exit 0):
   - Claude/Codex 한쪽에만 있는 스킬·에이전트·훅 모듈
-  - --base를 주면, 그 커밋 이후 한쪽만 수정된 스킬·에이전트·훅 모듈
+  - --base를 주면, 그 커밋과 갈라진 뒤 한쪽만 수정된 스킬·에이전트·훅 모듈 (커밋하지 않은 변경 포함)
 
 사용법:
   python3 scripts/validate-manifest.py
@@ -466,16 +466,19 @@ def check_parity(root: Path, units: list[Unit], report: Report) -> None:
                 )
 
 
-def changed_files(root: Path, base: str) -> list[str]:
-    result = subprocess.run(
-        ["git", "diff", "--name-only", f"{base}...HEAD"],
-        cwd=root,
-        capture_output=True,
-        text=True,
-    )
+def _git(root: Path, *args: str) -> str:
+    result = subprocess.run(["git", *args], cwd=root, capture_output=True, text=True)
     if result.returncode != 0:
-        raise RuntimeError(f"git diff 실패 ({base}...HEAD): {result.stderr.strip()}")
-    return [line for line in result.stdout.splitlines() if line]
+        raise RuntimeError(f"git {' '.join(args)} 실패: {result.stderr.strip()}")
+    return result.stdout
+
+
+def changed_files(root: Path, base: str) -> list[str]:
+    """base와 갈라진 지점 이후 바뀐 파일. 커밋 전에도 쓸 수 있도록 작업 트리와 추적되지 않은 파일을 포함한다."""
+    merge_base = _git(root, "merge-base", base, "HEAD").strip()
+    tracked = _git(root, "diff", "--name-only", merge_base).splitlines()
+    untracked = _git(root, "ls-files", "--others", "--exclude-standard").splitlines()
+    return sorted({line for line in tracked + untracked if line})
 
 
 def check_one_sided_changes(units: list[Unit], changed: list[str], report: Report) -> None:
@@ -523,7 +526,7 @@ def _print(findings: list[Finding], level: str, github: bool) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--base", help="이 커밋 이후 Claude/Codex 한쪽만 수정된 항목을 경고합니다 (예: origin/main)")
+    parser.add_argument("--base", help="이 커밋과 갈라진 뒤 Claude/Codex 한쪽만 수정된 항목을 경고합니다. 커밋하지 않은 변경도 포함합니다 (예: origin/main)")
     parser.add_argument("--root", type=Path, default=ROOT, help=argparse.SUPPRESS)
     args = parser.parse_args(argv)
 

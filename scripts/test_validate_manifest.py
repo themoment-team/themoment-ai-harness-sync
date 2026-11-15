@@ -2,6 +2,7 @@ import contextlib
 import importlib.util
 import io
 import pathlib
+import subprocess
 import sys
 import tempfile
 import textwrap
@@ -360,6 +361,59 @@ class ValidateManifestTest(unittest.TestCase):
     def test_both_sides_changed_has_no_warning(self):
         report = self.run_validate(changed=[".claude/skills/demo/SKILL.md", ".agents/skills/demo/references/x.md"])
         self.assertEqual(report.warnings, [])
+
+
+class ChangedFilesTest(unittest.TestCase):
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = pathlib.Path(self._tmp.name)
+        self.git("init", "-q", "-b", "main")
+        self.git("config", "user.email", "test@example.com")
+        self.git("config", "user.name", "test")
+        self.write("a.txt", "a\n")
+        self.git("add", ".")
+        self.git("commit", "-q", "-m", "base")
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def git(self, *args):
+        subprocess.run(["git", *args], cwd=self.root, check=True, capture_output=True)
+
+    def write(self, rel, content):
+        path = self.root / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content, encoding="utf-8")
+
+    def test_includes_committed_working_tree_and_untracked_changes(self):
+        self.git("switch", "-q", "-c", "feature")
+        self.write("committed.txt", "c\n")
+        self.git("add", ".")
+        self.git("commit", "-q", "-m", "change")
+        self.write("a.txt", "modified\n")
+        self.write("staged.txt", "s\n")
+        self.git("add", "staged.txt")
+        self.write("untracked.txt", "u\n")
+        self.assertEqual(
+            MODULE.changed_files(self.root, "main"),
+            ["a.txt", "committed.txt", "staged.txt", "untracked.txt"],
+        )
+
+    def test_ignores_commits_added_to_base_after_branching(self):
+        self.git("switch", "-q", "-c", "feature")
+        self.write("feature.txt", "f\n")
+        self.git("add", ".")
+        self.git("commit", "-q", "-m", "feature")
+        self.git("switch", "-q", "main")
+        self.write("main-only.txt", "m\n")
+        self.git("add", ".")
+        self.git("commit", "-q", "-m", "main")
+        self.git("switch", "-q", "feature")
+        self.assertEqual(MODULE.changed_files(self.root, "main"), ["feature.txt"])
+
+    def test_unknown_base_raises(self):
+        with self.assertRaises(RuntimeError):
+            MODULE.changed_files(self.root, "does-not-exist")
 
 
 class PrintTest(unittest.TestCase):
