@@ -80,11 +80,25 @@ Hook 모듈은 dispatcher가 자동으로 스캔하는 구조입니다.
 
 타깃 레포는 `overrides: { claude/skills/git-commit: "v1" }` 로 구 버전을 유지할 수 있다.
 
+## 변경 검증
+
+스킬·에이전트·훅·manifest를 바꿨으면 커밋 전에 실행합니다. PR에서는 `.github/workflows/validate.yml`이 같은 검사를 돌립니다.
+
+```
+python3 scripts/validate-manifest.py --base origin/main
+python3 -m unittest discover -s scripts -p 'test_*.py'
+```
+
+- 에러: manifest 형식, 없는 `src`, 미등록 스킬·에이전트·훅 모듈, frontmatter·TOML·JSON 문법, Codex 에이전트 필드 규칙
+- 경고: Claude/Codex 한쪽에만 있는 항목, `--base` 이후 한쪽만 수정된 항목. Claude 전용 항목처럼 의도한 경우는 그대로 둡니다
+
 ## Key Files
 
 - `sync-manifest.yml` — available sync groups and item registry
 - `scripts/list-installed-repos.py` — discovers App installations and generates per-repo sync configs
+- `scripts/validate-manifest.py` — manifest와 배포 파일 검사 (PR 검증과 로컬 공용)
 - `.github/workflows/sync.yml` — auto-sync workflow (matrix per repo)
+- `.github/workflows/validate.yml` — PR 검증 워크플로 (manifest·스크립트 테스트, dashboard 변경 시 test/lint/check-types)
 - `.harness/sync.yml.example` — template for target repos to opt-in/opt-out of specific items
 - `.claude/templates/settings-base.json` — hooks 미포함 시 전파되는 settings.json 기반 파일
 - `docs/guide/` — 웹 대시보드 `/guide`에서 제공하는 문서 원본
