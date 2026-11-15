@@ -16,6 +16,17 @@ describe('buildSyncConfig', () => {
     );
   });
 
+  it('고정 선택에서도 선택된 항목의 버전 고정 값을 유지한다', () => {
+    expect(
+      buildSyncConfig({
+        enabled: true,
+        mode: 'fixed',
+        itemIds: ['claude/skills/the-sdk'],
+        overrides: { 'claude/skills/the-sdk': 'v1', 'codex/skills/the-sdk': 'v1' },
+      }),
+    ).toBe('enabled: true\ngroups: []\noverrides:\n  claude/skills/the-sdk: v1\n');
+  });
+
   it('자동 수신 설정의 기존 옵션을 보존한다', () => {
     expect(
       buildSyncConfig({

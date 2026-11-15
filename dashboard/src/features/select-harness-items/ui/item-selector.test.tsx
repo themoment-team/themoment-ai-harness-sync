@@ -4,7 +4,7 @@ import { act } from 'react';
 
 import { createRoot } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { ItemSelector } from './item-selector';
 
@@ -68,5 +68,49 @@ describe('ItemSelector', () => {
 
     expect(container.querySelector('details')?.open).toBe(false);
     act(() => root.unmount());
+  });
+
+  it('카테고리 체크박스는 일부 선택 시 중간 상태이고 클릭하면 아코디언을 유지한 채 전체 선택한다', () => {
+    const container = document.createElement('div');
+    document.body.append(container);
+    const root = createRoot(container);
+    const onChange = vi.fn();
+
+    act(() => {
+      root.render(
+        <ItemSelector
+          manifest={{
+            defaults: [],
+            items: [
+              { id: 'claude/skills/a', src: '', dest: '', groups: [] },
+              { id: 'claude/skills/b', src: '', dest: '', groups: [] },
+            ],
+          }}
+          selection={{
+            enabled: true,
+            mode: 'fixed',
+            itemIds: ['claude/skills/a'],
+            groups: [],
+            overrides: {},
+          }}
+          onChange={onChange}
+        />,
+      );
+    });
+
+    const checkbox = container.querySelector<HTMLInputElement>(
+      'input[aria-label="Skills 전체 선택"]',
+    );
+    expect(checkbox?.indeterminate).toBe(true);
+    expect(checkbox?.closest('summary')).toBeNull();
+
+    act(() => checkbox?.click());
+
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ itemIds: ['claude/skills/a', 'claude/skills/b'] }),
+    );
+    expect(container.querySelector('details')?.open).toBe(false);
+    act(() => root.unmount());
+    container.remove();
   });
 });

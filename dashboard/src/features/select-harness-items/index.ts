@@ -2,6 +2,7 @@ export type { SelectionState } from './model/selection';
 export {
   createSelectionState,
   isItemSelected,
+  setItemsSelected,
   switchToFixedSelection,
   toggleGroup,
   toggleItem,
