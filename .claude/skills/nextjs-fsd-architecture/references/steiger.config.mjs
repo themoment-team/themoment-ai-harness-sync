@@ -20,9 +20,13 @@ export default defineConfig([
     },
   },
   {
-    // Apps consume core entities through package exports, which are outside core's source root,
-    // so Steiger would report every promoted entity as unused.
-    files: ['./packages/core/src/entities/**'],
+    // Apps consume core slices through package exports, which are outside core's source root,
+    // so Steiger would report every promoted slice as unused.
+    files: [
+      './packages/core/src/entities/**',
+      './packages/core/src/features/**',
+      './packages/core/src/widgets/**',
+    ],
     rules: {
       'fsd/insignificant-slice': 'off',
     },

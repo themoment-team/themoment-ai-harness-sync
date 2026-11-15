@@ -157,9 +157,13 @@ export default defineConfig([
     },
   },
   {
-    // Apps consume core entities through package exports, which are outside core's source root,
-    // so Steiger would report every promoted entity as unused.
-    files: ['./packages/core/src/entities/**'],
+    // Apps consume core slices through package exports, which are outside core's source root,
+    // so Steiger would report every promoted slice as unused.
+    files: [
+      './packages/core/src/entities/**',
+      './packages/core/src/features/**',
+      './packages/core/src/widgets/**',
+    ],
     rules: {
       'fsd/insignificant-slice': 'off',
     },
@@ -180,11 +184,12 @@ Add another exception only for a real violation where restructuring would be wor
 
 ```text
 apps/<name>/src:     _app → _pages → widgets → features → entities → shared
-packages/core/src:   entities → shared
+packages/core/src:   widgets → features → entities → shared
 ```
 
 - Apps never import each other. Sharing goes through `packages/*`, and a package is imported only through the entry points in its `package.json` `exports`.
-- Keep an entity in the first app that uses it. When a second app needs it, move the slice folder to `packages/core/src/entities` and change imports from `@/entities/<slice>` to `@scope/core/entities/<slice>`.
+- Keep a slice in the first app that uses it. Move it to the same layer in `packages/core/src` only when a second app needs the same data and behavior, and change imports from `@/<layer>/<slice>` to `@scope/core/<layer>/<slice>`. Core cannot import apps, so a core slice uses only core's lower layers: promote bottom-up (entity, then feature, then widget).
+- Something that only looks the same across apps (a layout frame, a shell with slots) belongs in the shared UI package, with each app passing its content through props and children. Core is for slices whose data and behavior are identical.
 - `packages/core` has no root barrel. It is exposed in the same units as slice public APIs, so the import path keeps the layer visible:
 
   ```json
@@ -193,29 +198,49 @@ packages/core/src:   entities → shared
       "./shared/*": "./src/shared/*/index.ts",
       "./shared/*/server": "./src/shared/*/index.server.ts",
       "./entities/*": "./src/entities/*/index.ts",
-      "./entities/*/server": "./src/entities/*/index.server.ts"
+      "./entities/*/server": "./src/entities/*/index.server.ts",
+      "./features/*": "./src/features/*/index.ts",
+      "./features/*/server": "./src/features/*/index.server.ts",
+      "./widgets/*": "./src/widgets/*/index.ts",
+      "./widgets/*/server": "./src/widgets/*/index.server.ts"
     }
   }
   ```
 
 - New segments and slices need no `exports` change. Do not import paths inside a public file (`@scope/core/entities/user/model`); the wildcard also matches nested folders, so an `index.ts` in a subfolder becomes importable.
-- Steiger checks each source root separately and cannot see package imports. Block the cross-package violation it misses with ESLint in the apps' config:
+- An app and core share one layer system in two places. An app layer imports only core's **lower** layers. The same layer is a different slice and is forbidden too: an app feature cannot import a core feature (compose them in a widget or above), and an app widget cannot import a core widget (compose them in `_pages` or above).
+- The one exception is an entity reference: a core entity publishes `entities/<slice>/@x/<consumer>/index.ts`, and the app entity imports `@scope/core/entities/<slice>/@x/<consumer>`. Use the folder form, not `@x/<consumer>.ts`: a package `exports` pattern takes one wildcard, so `./entities/*` resolves only to an `index.ts`.
+- Steiger checks each source root separately and cannot see package imports. Block the cross-package violations it misses with ESLint in the apps' config, one block per app layer:
 
   ```js
-  {
-    files: ['src/shared/**'],
-    rules: {
-      'no-restricted-imports': ['error', {
-        patterns: [{
-          group: ['@scope/core/entities', '@scope/core/entities/*'],
-          message: 'The shared layer cannot import entities.',
-        }],
-      }],
-    },
-  }
+  const core = (layer) => `^@scope/core/${layer}(?:/|$)`;
+  const restrict = (files, patterns) => ({
+    files,
+    rules: { 'no-restricted-imports': ['error', { patterns }] },
+  });
+
+  export default [
+    // ...
+    restrict(['src/shared/**'], [
+      { regex: core('(?:entities|features|widgets)'), message: 'shared cannot import upper layers.' },
+    ]),
+    restrict(['src/entities/**'], [
+      {
+        regex: '^@scope/core/entities(?!/[^/]+/@x/[^/]+$)(?:/|$)',
+        message: 'Import a core entity only through its @x/<consumer> public API.',
+      },
+      { regex: core('(?:features|widgets)'), message: 'entities cannot import upper layers.' },
+    ]),
+    restrict(['src/features/**'], [
+      { regex: core('(?:features|widgets)'), message: 'Compose core features in a widget or above.' },
+    ]),
+    restrict(['src/widgets/**'], [
+      { regex: core('widgets'), message: 'Compose core widgets in _pages or above.' },
+    ]),
+  ];
   ```
 
-- Run Steiger from the repository root so the single deployed `steiger.config.mjs` applies, once per source root: `steiger apps/client/src --fail-on-warnings`, one per app, and `steiger packages/core/src --fail-on-warnings`. Running `steiger ./src` inside a package does not pick up the root config. The config turns off `fsd/insignificant-slice` for `packages/core/src/entities/**`: the apps that consume those entities are outside core's source root, so every promoted entity looks unused.
+- Run Steiger from the repository root so the single deployed `steiger.config.mjs` applies, once per source root: `steiger apps/client/src --fail-on-warnings`, one per app, and `steiger packages/core/src --fail-on-warnings`. Running `steiger ./src` inside a package does not pick up the root config. The config turns off `fsd/insignificant-slice` for core's `entities`, `features`, and `widgets`: the apps that consume those slices are outside core's source root, so every promoted slice looks unused.
 - Packages do not read environment variables. Each app validates its own env and passes values (such as a base URL) into package factories.
 - Each app's `@/shared/api` builds its HTTP methods from the core factory and re-exports them under the same names (`get`, `post`, `getQueryClient`, …), so slice code imports `@/shared/api` the same way as in a single app.
 - Lint React code in packages with the same React, hooks, and accessibility rules as the apps, minus Next.js-only rules and app-only FSD rules. Include `.tsx` in the package `tsconfig.json` and set `"jsx": "react-jsx"` before adding components; otherwise ESLint cannot parse them.

@@ -58,7 +58,7 @@ Turborepo는 설정 파일이 레포 루트 한 곳에만 배포되므로, 패�
 "lint:fsd": "steiger apps/client/src --fail-on-warnings && steiger apps/admin/src --fail-on-warnings && steiger packages/core/src --fail-on-warnings"
 ```
 
-배포되는 설정은 recommended 규칙에 `_app`·`_pages`의 `fsd/typo-in-layer-name`, `_app/providers`의 `fsd/segments-by-purpose`, Turborepo의 `packages/core/src/entities`에 대한 `fsd/insignificant-slice` 예외만 둡니다. 공식 구조에서는 Steiger가 모든 레이어를 직접 검사하므로 v1의 `check-fsd-dependencies.mjs`가 필요하지 않습니다.
+배포되는 설정은 recommended 규칙에 `_app`·`_pages`의 `fsd/typo-in-layer-name`, `_app/providers`의 `fsd/segments-by-purpose`, Turborepo의 `packages/core/src/{entities,features,widgets}`에 대한 `fsd/insignificant-slice` 예외만 둡니다. 공식 구조에서는 Steiger가 모든 레이어를 직접 검사하므로 v1의 `check-fsd-dependencies.mjs`가 필요하지 않습니다.
 
 ### Turborepo
 
@@ -66,13 +66,14 @@ Turborepo는 설정 파일이 레포 루트 한 곳에만 배포되므로, 패�
 
 ```text
 apps/*/src:          _app → _pages → widgets → features → entities → shared
-packages/core/src:   entities → shared
+packages/core/src:   widgets → features → entities → shared
 ```
 
 - 앱 간 직접 import는 금지하고, 패키지는 `package.json`의 `exports` 진입점으로만 사용합니다.
-- entity는 처음 쓰는 앱에 두고, 두 앱 이상이 쓰면 `packages/core/src/entities`로 옮깁니다.
-- core는 루트 배럴 없이 slice 단위 서브패스로 공개합니다(`@scope/core/shared/<segment>`, `@scope/core/entities/<slice>`, 각각의 `/server`). import 경로에 레이어가 드러나므로, 앱의 `src/shared`가 core의 entities를 가져오는 위반을 ESLint `no-restricted-imports`로 막습니다.
-- 각 앱과 `packages/core/src`에서 Steiger를 실행합니다. core에서는 앱의 참조가 보이지 않으므로 `entities`의 `fsd/insignificant-slice`를 끕니다(배포 설정에 포함).
+- slice는 처음 쓰는 앱에 두고, 두 앱 이상이 데이터와 동작까지 똑같이 쓸 때만 `packages/core/src`의 같은 레이어로 옮깁니다. core는 앱을 import할 수 없으므로 아래 레이어부터(entity → feature → widget) 옮깁니다. 생김새만 같은 것(레이아웃 틀, 슬롯을 받는 셸)은 공유 UI 패키지에 둡니다.
+- core는 루트 배럴 없이 slice 단위 서브패스로 공개합니다(`@scope/core/shared/<segment>`, `@scope/core/{entities,features,widgets}/<slice>`, 각각의 `/server`).
+- 앱 레이어는 core의 더 아래 레이어만 import합니다. 같은 레이어도 다른 slice라 금지입니다(앱 feature는 core feature를, 앱 widget은 core widget을 쓸 수 없고 한 레이어 위에서 조합). 앱 entity만 core entity의 `@x/<소비 slice>/index.ts`를 쓸 수 있습니다. import 경로에 레이어가 드러나므로 Steiger가 보지 못하는 이 위반을 앱 레이어별 ESLint `no-restricted-imports`로 막습니다.
+- 각 앱과 `packages/core/src`에서 Steiger를 실행합니다. core에서는 앱의 참조가 보이지 않으므로 `entities`·`features`·`widgets`의 `fsd/insignificant-slice`를 끕니다(배포 설정에 포함).
 - React 코드를 담는 패키지는 앱과 같은 React·hooks·접근성 lint 규칙을 쓰고, `tsconfig.json`에 `.tsx`와 `"jsx": "react-jsx"`를 둡니다.
 - source-consumed workspace package만 각 앱의 `transpilePackages`에 넣습니다. 빌드된 UI package는 다시 컴파일하지 않습니다.
 
