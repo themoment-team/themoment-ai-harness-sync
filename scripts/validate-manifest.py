@@ -47,6 +47,7 @@ SETTINGS_BASE: str = _SYNC.SETTINGS_BASE
 VERSIONED_ID = re.compile(r"^(?P<base>[^@]+)@(?P<version>v\d+)$")
 FRONTMATTER = re.compile(r"^---\r?\n(.*?)\r?\n---\r?\n", re.S)
 TOML_LITERAL_INSTRUCTIONS = re.compile(r"^developer_instructions\s*=\s*'''", re.M)
+TOML_ERROR_LINE = re.compile(r"\(at line (\d+), column \d+\)")
 
 CODEX_AGENT_REQUIRED = ("name", "description", "developer_instructions")
 CODEX_REASONING_EFFORTS = {"low", "medium", "high"}
@@ -343,6 +344,15 @@ def _read_frontmatter(path: Path, rel: str, report: Report) -> dict | None:
     return data
 
 
+def _toml_error_line(exc: ValueError) -> int | None:
+    """TOMLDecodeError의 줄 번호. `lineno` 속성은 Python 3.14부터 있으므로 그 전에는 메시지에서 읽는다."""
+    line = getattr(exc, "lineno", None)
+    if isinstance(line, int):
+        return line
+    match = TOML_ERROR_LINE.search(str(exc))
+    return int(match.group(1)) if match else None
+
+
 def _check_name_and_description(data: dict, unit: Unit, rel: str, report: Report) -> None:
     for key in ("name", "description"):
         value = data.get(key)
@@ -375,7 +385,7 @@ def check_syntax(root: Path, units: list[Unit], report: Report) -> None:
             try:
                 data = tomllib.loads(raw)
             except tomllib.TOMLDecodeError as exc:
-                report.error(unit.path, f"TOML 파싱 실패: {exc}", getattr(exc, "lineno", None))
+                report.error(unit.path, f"TOML 파싱 실패: {exc}", _toml_error_line(exc))
                 continue
             for key in CODEX_AGENT_REQUIRED:
                 value = data.get(key)

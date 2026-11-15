@@ -296,6 +296,16 @@ class ValidateManifestTest(unittest.TestCase):
         self.write(".codex/agents/helper.toml", 'name = "helper"\ndescription = "x"\n')
         self.assert_error(self.run_validate(), "`developer_instructions`가 비어 있거나")
 
+    def test_toml_error_reports_line(self):
+        self.write(".codex/agents/helper.toml", 'name = "helper"\ndescription = "x"\nsandbox_mode = \n')
+        lines = [e.line for e in self.run_validate().errors if "TOML 파싱 실패" in e.message]
+        self.assertEqual(lines, [3])
+
+    def test_toml_error_line_without_lineno_attribute(self):
+        # Python 3.12의 TOMLDecodeError에는 lineno가 없고 메시지에만 위치가 들어 있다
+        self.assertEqual(MODULE._toml_error_line(ValueError("Invalid value (at line 7, column 2)")), 7)
+        self.assertIsNone(MODULE._toml_error_line(ValueError("Invalid value (at end of document)")))
+
     def test_invalid_json(self):
         self.write(".gemini/settings.json", '{"a": 1,}\n')
         self.assert_error(self.run_validate(), ".gemini/settings.json: JSON 파싱 실패")
