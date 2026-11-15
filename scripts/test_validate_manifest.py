@@ -306,6 +306,18 @@ class ValidateManifestTest(unittest.TestCase):
         self.assertEqual(MODULE._toml_error_line(ValueError("Invalid value (at line 7, column 2)")), 7)
         self.assertIsNone(MODULE._toml_error_line(ValueError("Invalid value (at end of document)")))
 
+    def test_invalid_config_toml(self):
+        self.write(".codex/config.toml", 'model = "x"\n[profiles\n')
+        report = self.run_validate()
+        self.assert_error(report, ".codex/config.toml: TOML 파싱 실패")
+        # 설정 파일에는 에이전트 규칙(`model` 금지 등)을 적용하지 않는다
+        self.assertFalse(any("`model`은 생략해" in e.message for e in report.errors), report.errors)
+
+    def test_agent_toml_is_parsed_once(self):
+        self.write(".codex/agents/helper.toml", 'name = "helper"\ndescription = [\n')
+        errors = [e for e in self.run_validate().errors if "TOML 파싱 실패" in e.message]
+        self.assertEqual(len(errors), 1, errors)
+
     def test_invalid_json(self):
         self.write(".gemini/settings.json", '{"a": 1,}\n')
         self.assert_error(self.run_validate(), ".gemini/settings.json: JSON 파싱 실패")

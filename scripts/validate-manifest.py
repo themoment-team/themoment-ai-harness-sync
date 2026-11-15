@@ -60,8 +60,8 @@ HOOK_EVENT_FILES = {
     "sessionStart.sh": "session-start.sh",
 }
 
-# JSON 문법을 검사할 배포 디렉터리
-JSON_ROOTS = (".claude", ".codex", ".gemini", ".agents")
+# JSON·TOML 설정 문법을 검사할 배포 디렉터리
+CONFIG_ROOTS = (".claude", ".codex", ".gemini", ".agents")
 
 
 @dataclass
@@ -405,13 +405,23 @@ def check_syntax(root: Path, units: list[Unit], report: Report) -> None:
             if sandbox is not None and sandbox not in CODEX_SANDBOX_MODES:
                 report.error(unit.path, f"`sandbox_mode`는 {sorted(CODEX_SANDBOX_MODES)} 중 하나여야 합니다 ({sandbox})")
 
-    for base in JSON_ROOTS:
+    # 에이전트 TOML은 위에서 필드까지 검사했으므로 `.codex/config.toml` 같은 나머지 설정 파일만 파싱한다
+    agent_files = {u.path for u in units if u.kind == "agent" and u.side == "codex"}
+    for base in CONFIG_ROOTS:
         for path in sorted((root / base).rglob("*.json")):
             rel = _rel(root, path)
             try:
                 json.loads(path.read_text(encoding="utf-8"))
             except json.JSONDecodeError as exc:
                 report.error(rel, f"JSON 파싱 실패: {exc.msg}", exc.lineno)
+        for path in sorted((root / base).rglob("*.toml")):
+            rel = _rel(root, path)
+            if rel in agent_files:
+                continue
+            try:
+                tomllib.loads(path.read_text(encoding="utf-8"))
+            except tomllib.TOMLDecodeError as exc:
+                report.error(rel, f"TOML 파싱 실패: {exc}", _toml_error_line(exc))
 
 
 # ── Claude/Codex 대응 (경고) ─────────────────────────────────
