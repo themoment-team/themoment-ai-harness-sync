@@ -1,4 +1,6 @@
+import contextlib
 import importlib.util
+import io
 import pathlib
 import sys
 import tempfile
@@ -354,6 +356,18 @@ class ValidateManifestTest(unittest.TestCase):
     def test_both_sides_changed_has_no_warning(self):
         report = self.run_validate(changed=[".claude/skills/demo/SKILL.md", ".agents/skills/demo/references/x.md"])
         self.assertEqual(report.warnings, [])
+
+
+class PrintTest(unittest.TestCase):
+    def test_github_annotation_is_single_line(self):
+        finding = MODULE.Finding("sync-manifest.yml", "YAML 파싱 실패: while parsing\r\n  in line 1\n100% 확인", 1)
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            MODULE._print([finding], "error", github=True)
+        self.assertEqual(
+            out.getvalue(),
+            "::error file=sync-manifest.yml,line=1::YAML 파싱 실패: while parsing%0A  in line 1%0A100%25 확인\n",
+        )
 
 
 class RepositoryTest(unittest.TestCase):

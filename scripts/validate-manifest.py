@@ -499,7 +499,9 @@ def _print(findings: list[Finding], level: str, github: bool) -> None:
     for f in findings:
         if github:
             location = f"file={f.path}" + (f",line={f.line}" if f.line else "")
-            print(f"::{level} {location}::{f.message}")
+            # workflow command는 줄 단위라 개행이 있으면 annotation이 잘린다
+            message = f.message.replace("%", "%25").replace("\r", "").replace("\n", "%0A")
+            print(f"::{level} {location}::{message}")
         else:
             location = f.path + (f":{f.line}" if f.line else "")
             print(f"  [{level}] {location}: {f.message}")
