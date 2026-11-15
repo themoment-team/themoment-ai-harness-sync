@@ -272,13 +272,17 @@ def check_manifest(root: Path, report: Report) -> list[dict]:
     used_groups = {g for item in items for g in item["groups"]}
     defaults = manifest.get("defaults")
     defaults_line = _key_line(text, "defaults")
-    if defaults is not None:
-        if not isinstance(defaults, list) or not all(isinstance(g, str) for g in defaults):
-            report.error(MANIFEST_NAME, "`defaults`는 문자열 목록이어야 합니다", defaults_line)
-        else:
-            for group in defaults:
-                if group not in used_groups:
-                    report.error(MANIFEST_NAME, f"defaults의 그룹 `{group}`을 쓰는 항목이 없습니다", defaults_line)
+    if defaults is None:
+        # 동기화 스크립트는 defaults가 없으면 빈 목록으로 읽어, .harness/sync.yml이 없는 레포에 아무것도 배포하지 않는다
+        report.error(MANIFEST_NAME, "`defaults`가 없습니다. .harness/sync.yml이 없는 레포에 적용할 그룹을 지정하세요", defaults_line)
+    elif not isinstance(defaults, list) or not all(isinstance(g, str) for g in defaults):
+        report.error(MANIFEST_NAME, "`defaults`는 문자열 목록이어야 합니다", defaults_line)
+    elif not defaults:
+        report.error(MANIFEST_NAME, "`defaults`가 비어 있습니다. .harness/sync.yml이 없는 레포에 아무것도 배포되지 않습니다", defaults_line)
+    else:
+        for group in defaults:
+            if group not in used_groups:
+                report.error(MANIFEST_NAME, f"defaults의 그룹 `{group}`을 쓰는 항목이 없습니다", defaults_line)
 
     deletions = manifest.get("deletions")
     deletions_line = _key_line(text, "deletions")

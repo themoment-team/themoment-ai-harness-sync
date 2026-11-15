@@ -175,6 +175,17 @@ class ValidateManifestTest(unittest.TestCase):
         self.replace("sync-manifest.yml", "  - codex\n", "  - codex\n  - gemini\n")
         self.assert_error(self.run_validate(), "defaults의 그룹 `gemini`을 쓰는 항목이 없습니다")
 
+    def test_missing_or_empty_defaults(self):
+        self.replace("sync-manifest.yml", "defaults:\n  - claude\n  - codex\n", "")
+        self.assert_error(self.run_validate(), "`defaults`가 없습니다")
+
+        self.write("sync-manifest.yml", MANIFEST.replace("defaults:\n  - claude\n  - codex\n", "defaults: []\n"))
+        self.assert_error(self.run_validate(), "`defaults`가 비어 있습니다")
+
+        # 값이 빠진 `defaults:`는 None으로 읽히므로 키가 없는 것과 같이 취급한다
+        self.write("sync-manifest.yml", MANIFEST.replace("defaults:\n  - claude\n  - codex\n", "defaults:\n"))
+        self.assert_error(self.run_validate(), "`defaults`가 없습니다")
+
     def test_deletion_removes_current_item(self):
         self.replace("sync-manifest.yml", "- dest: .claude/skills/old/", "- dest: .claude/skills/demo/")
         self.assert_error(self.run_validate(), "현재 배포 항목 `claude/skills/demo`의 dest")
