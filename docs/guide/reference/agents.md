@@ -49,9 +49,9 @@ order: 110
 ---
 
 ### frontend-convention-validator
-**TypeScript/TSX 전용 읽기 검사기**입니다. FSD import 방향·같은 layer slice 경계(`entities/@x/<consumer>` 예외), Tailwind/shadcn 소유권, TanStack Query/Zod 규칙, server-only 진입점을 검사합니다.
+**TypeScript/TSX 전용 읽기 검사기**입니다. FSD 공식 Next.js 구조(`_app`, `_pages`) 기준으로 lint·Steiger·타입 검사·포맷 결과를 먼저 인용하고, 도구가 잡지 못하는 라우트 파일 두께, 레이어 배치, 서버/클라이언트 경계, API 에러 처리, TanStack Query/Zod 폼, Tailwind/shadcn 소유권과 접근성을 검사합니다.
 
-FSD 프로젝트에 `lint:fsd` 스크립트가 있으면 실행 결과를 보고하며, 근거 없는 FSD 위반을 추정하지 않습니다. 파일을 수정하거나 커밋하지 않습니다.
+근거(파일·줄·규칙)를 댈 수 없는 항목은 위반이 아니라 "확인 필요"로 보고합니다. 파일을 수정하거나 커밋하지 않습니다. `views` 레이아웃 레포는 `v1`으로 고정해 이전 검사 항목을 유지할 수 있습니다.
 
 **트리거**: `프론트엔드 컨벤션 검사해줘` / `frontend-convention-validator 실행해`
 
