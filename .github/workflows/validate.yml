@@ -1,0 +1,103 @@
+name: Validate
+
+# main에 머지되면 sync.yml이 바로 타깃 레포로 배포하므로, PR 단계에서 manifest와 배포 파일을 검사한다
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  harness:
+    name: manifest · scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # Claude/Codex 한쪽만 수정된 항목을 찾으려면 base 커밋까지 history가 필요하다
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install pyyaml -q
+
+      - name: Validate manifest and harness files
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [[ -n "$BASE_SHA" ]]; then
+            python3 scripts/validate-manifest.py --base "$BASE_SHA"
+          else
+            python3 scripts/validate-manifest.py
+          fi
+
+      - name: Test scripts
+        run: python3 -m unittest discover -s scripts -p 'test_*.py' -v
+
+  changes:
+    name: detect dashboard changes
+    runs-on: ubuntu-latest
+    outputs:
+      dashboard: ${{ steps.diff.outputs.dashboard }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - id: diff
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          # 수동 실행(base 없음)이면 항상 검사한다
+          if [[ -z "$BASE_SHA" ]] || git diff --name-only "$BASE_SHA...HEAD" \
+              | grep -qE '^(dashboard/|\.github/workflows/validate\.yml$)'; then
+            echo "dashboard=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "dashboard=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  dashboard:
+    name: dashboard
+    needs: changes
+    # 건너뛴 job은 성공으로 처리되므로 required check로 지정해도 막히지 않는다
+    if: needs.changes.outputs.dashboard == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dashboard
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: dashboard/package.json
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: dashboard/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Test
+        run: pnpm test
+
+      - name: Lint
+        run: pnpm lint
+
+      # PageProps·LayoutProps 같은 라우트 타입은 .next/types에 생성되므로 타입 검사 전에 만든다
+      - name: Generate route types
+        run: pnpm exec next typegen
+
+      - name: Type check
+        run: pnpm check-types
