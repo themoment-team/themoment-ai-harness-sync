@@ -143,6 +143,10 @@ class ValidateManifestTest(unittest.TestCase):
         self.replace("sync-manifest.yml", "id: codex/skills/demo", "id: claude/skills/demo")
         self.assert_error(self.run_validate(), "id가 중복됩니다")
 
+    def test_duplicate_dest(self):
+        self.replace("sync-manifest.yml", "dest: .agents/skills/demo/", "dest: .claude/skills/demo/")
+        self.assert_error(self.run_validate(), "`codex/skills/demo`: dest(.claude/skills/demo/)가 `claude/skills/demo`와 겹칩니다")
+
     def test_path_outside_repo(self):
         self.replace("sync-manifest.yml", "dest: .agents/skills/demo/", "dest: ../outside/")
         self.assert_error(self.run_validate(), "상대 경로여야 합니다")

@@ -255,6 +255,20 @@ def check_manifest(root: Path, report: Report) -> list[dict]:
 
         items.append(item)
 
+    # 같은 dest에 두 항목을 쓰면 나중 항목이 조용히 덮어쓴다. @vN 항목은 기준 항목과 dest가 같아야 하므로 아래에서 따로 본다
+    dest_owners: dict[str, str] = {}
+    for item in items:
+        if VERSIONED_ID.match(item["id"]):
+            continue
+        dest = _norm(item["dest"])
+        owner = dest_owners.setdefault(dest, item["id"])
+        if owner != item["id"]:
+            report.error(
+                MANIFEST_NAME,
+                f"`{item['id']}`: dest({item['dest']})가 `{owner}`와 겹칩니다",
+                id_lines.get(item["id"]),
+            )
+
     by_id = {item["id"]: item for item in items}
     for item in items:
         match = VERSIONED_ID.match(item["id"])
