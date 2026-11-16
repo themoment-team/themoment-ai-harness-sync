@@ -34,7 +34,19 @@ _app → _pages → widgets → features → entities → shared
 - business slice는 목적 이름 세그먼트(`ui`, `model`, `api`, `lib`, `config`)를 쓰고, 필요할 때만 만듭니다.
 - slice 밖에서는 `index.ts` 공개 API로만 import합니다. 서버 전용 코드는 `index.server.ts`로 따로 공개합니다.
 - 같은 레이어의 slice import는 금지합니다. 불가피한 entity 관계만 `entities/<slice>/@x/<consumer>` 공개 API로 허용합니다.
-- 루트 `app/`의 라우트 파일은 `_pages`의 페이지를 재수출하거나 얇게 조합만 합니다. 데이터 prefetch와 `HydrationBoundary`는 `_pages`의 페이지 컴포넌트가 맡습니다.
+- 루트 `app/`의 라우트 파일은 아래 역할만 맡고 얇게 유지합니다. 데이터 prefetch와 `HydrationBoundary`는 `_pages`의 페이지 컴포넌트가 맡습니다.
+
+| 라우트 파일                  | 역할                                                        |
+| ---------------------------- | ----------------------------------------------------------- |
+| `layout.tsx`                 | 문서의 `<html>`·`<body>`, metadata, provider, 전역 CSS 연결 |
+| `page.tsx`                   | `_pages`의 페이지 재수출                                    |
+| `loading.tsx`                | `_pages` 또는 `widgets`의 로딩 UI 렌더링                    |
+| `error.tsx`, `not-found.tsx` | `_pages`의 오류·404 화면을 얇게 재수출                      |
+| `global-error.tsx`           | `_app`의 독립적인 루트 layout 오류 경계 재수출              |
+| `route.ts`                   | Route Handler                                               |
+
+- 오류 경계 구현과 `error.tsx`·`global-error.tsx` 재수출 파일에는 `'use client'`를 둡니다. 안전한 사용자 안내와 가능한 경우 digest만 보여 주며 `error.message`나 stack은 노출하지 않습니다. 재시도 prop 이름·시그니처는 설치된 Next.js 버전의 번들 문서에서 확인합니다.
+- `global-error.tsx`는 루트 layout을 대체하므로 구현은 `src/_app`에 두고 자체 `<html>`·`<body>`와 독립 스타일을 준비합니다. 루트 layout의 provider나 CSS에 의존하지 않습니다. 변경한 오류 화면의 안전한 출력, 재시도, 홈 이동, 404 HTTP 상태는 테스트로 확인하고 코드 검토와 실제 실행 결과를 구분합니다.
 - 처음에는 `_pages` 안에서 시작하고, 두 번째 소비처가 생길 때 아래 레이어로 내립니다.
 
 ## 검증 도구
@@ -85,6 +97,12 @@ packages/core/src:   widgets → features → entities → shared
 - TanStack Query key는 `all()` 루트의 계층 factory로 만들고, mutation은 영향받는 가장 좁은 key만 무효화합니다.
 - Zod schema는 `PascalCaseSchema`, 추론 request type은 `Request` 접미사를 씁니다. 그 밖의 타입에는 `Type` 같은 종류 접미사를 붙이지 않고(`User`, `UserResponse`), `src` 안의 모듈은 named export만 씁니다(default export는 `app/` 라우트와 설정 파일에만). `enum`보다 union과 `Record<Union, Metadata>`를 우선합니다.
 
+## 환경 변수와 조건부 모킹
+
+- 서버 환경 변수는 검증 schema 모듈을 통해서만 읽고 클라이언트가 서버 env 모듈을 import하지 않게 합니다. 새 서버 변수는 schema·환경 변수 예시·CI에 함께 반영합니다.
+- 모킹이 이미 있는 프로젝트의 진입점에 한해 공개 빌드 시점 flag인 실제 `process.env.NEXT_PUBLIC_*`를 literal 값과 직접 비교할 수 있습니다. 계산된 키·동적 조회·비밀 값은 예외가 아닙니다. instrumentation은 `process.env.NEXT_RUNTIME === 'nodejs'`, mock provider는 `typeof window !== 'undefined'` guard를 함께 확인합니다.
+- 실제 flag 이름·활성 값·진입점과 `next.config`의 빌드 시점 기본값·비활성 분기 제거를 확인합니다. `env` 옵션으로 비밀을 노출하거나 모킹 없는 프로젝트에 모킹을 추가하지 않습니다. 빌드에 포함된 public 값·rewrite는 실행 환경 변수만 바꿔 변경할 수 없으므로 의도한 값으로 재빌드합니다.
+
 ## v1에서 옮기기
 
 v1은 Next.js `src/app`을 FSD app 레이어와 함께 쓰고 `pages` 대신 `views`를 썼습니다. 옮기기 전까지는 [동기화 설정](../sync-configuration.md)의 버전 고정으로 v1 스킬·에이전트·Steiger 설정을 유지할 수 있습니다.
@@ -103,6 +121,6 @@ v1은 Next.js `src/app`을 FSD app 레이어와 함께 쓰고 `pages` 대신 `vi
 
 ## 자동 검사 에이전트
 
-`프론트엔드 컨벤션 검사해줘` 또는 `frontend-convention-validator 실행해`라고 요청하면 TypeScript/TSX 변경 파일을 읽기 전용으로 검사합니다. lint·Steiger·타입 검사 결과를 먼저 인용하고, 도구가 잡지 못하는 라우트 파일·레이어 배치·서버/클라이언트 경계·데이터와 폼·스타일 규칙을 확인합니다.
+`프론트엔드 컨벤션 검사해줘` 또는 `frontend-convention-validator 실행해`라고 요청하면 TypeScript/TSX 변경 파일을 읽기 전용으로 검사합니다. lint·Steiger·타입 검사 결과를 먼저 인용하고, 도구가 잡지 못하는 라우트 파일·오류 복구·레이어 배치·서버/클라이언트 경계와 폼·스타일 규칙을 확인합니다. **(lint)** 표시는 대상 파일에 실제 규칙이 활성화되고 명령이 실행된 경우만 자동 검사로 인정합니다. 설정되지 않은 규칙은 수동 검토로 보고하며, lint 성공만으로 검사됐다고 하지 않습니다.
 
 스킬 목록은 [스킬 레퍼런스](../reference/skills.md), 에이전트 상세는 [에이전트 레퍼런스](../reference/agents.md)를 참고하세요.
