@@ -9,7 +9,7 @@ Claude가 특정 트리거 문구 또는 상황을 감지하면 자동으로 위
 
 | 에이전트 | 트리거 예시 | 설명 |
 | --- | --- | --- |
-| [frontend-convention-validator](./frontend-convention-validator.md) | `프론트엔드 컨벤션 검사해줘` | TypeScript/TSX 변경 파일의 FSD, Tailwind/shadcn, Query/Zod 규칙을 읽기 전용으로 검사 |
+| [frontend-convention-validator](./frontend-convention-validator.md) | `프론트엔드 컨벤션 검사해줘` | TypeScript/TSX 변경 파일을 도구 결과와 FSD 공식 구조·Query/Zod·Tailwind/shadcn 규칙 기준으로 읽기 전용 검사 |
 
 ## Backend
 

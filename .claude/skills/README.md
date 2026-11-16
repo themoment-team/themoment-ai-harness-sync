@@ -8,11 +8,10 @@ Claude에서 `/skill-name` 으로 호출하는 재사용 가능한 작업 단위
 
 | 스킬 | 설명 |
 | --- | --- |
-| [nextjs-fsd-architecture](./nextjs-fsd-architecture/SKILL.md) | Next.js App Router + FSD — `views` 레이어, 슬라이스 세그먼트, import 경계, Server API 공개 규칙 |
-| [nextjs-turborepo-fsd](./nextjs-turborepo-fsd/SKILL.md) | Turborepo Next.js FSD — 앱·공유 패키지 경계, 엔티티 승격, 다중 앱 의존성 검사 |
-| [nextjs-package-boundaries](./nextjs-package-boundaries/SKILL.md) | Next.js 워크스페이스 패키지의 server-only export, 소스 소비·prebuilt 경계 |
-| [tailwind-shadcn](./tailwind-shadcn/SKILL.md) | Tailwind 클래스, `cn()`, 디자인 토큰, shadcn·도메인 UI 소유권 |
-| [tanstack-query-zod](./tanstack-query-zod/SKILL.md) | TanStack Query 훅·Query Key, API 래퍼, Zod 스키마·추론 타입 |
+| [nextjs-fsd-architecture](./nextjs-fsd-architecture/SKILL.md) | Next.js App Router + FSD 공식 구조 — `_app`·`_pages` 레이어, 슬라이스 세그먼트, 공개 API, 라우트 파일, Steiger, Turborepo 패키지 경계 |
+| [tailwind-shadcn](./tailwind-shadcn/SKILL.md) | Tailwind v4 클래스, `cn()`, `@theme` 토큰, shadcn·도메인 UI 소유권 |
+| [react-conventions](./react-conventions/SKILL.md) | React·TypeScript 이름 규칙, 타입 작성, 컴포넌트 모양·export, 컴포넌트 안 순서, import 순서 |
+| [data-and-forms](./data-and-forms/SKILL.md) | TanStack Query key·훅, RSC prefetch, 무효화 범위, Zod·React Hook Form 폼과 API 에러 표시 |
 | [react-best-practices](./react-best-practices/SKILL.md) | Vercel의 React/Next.js 성능 규칙 70개 — 워터폴, 번들 크기, 리렌더링 등 영향도 순 (opt-in) |
 
 ## Backend

@@ -13,7 +13,7 @@ OpenAI Codex가 명시적 위임 요청(예: "이 작업 두 에이전트로 나
 
 | 에이전트 | 트리거 예시 | sandbox | 설명 |
 | --- | --- | --- | --- |
-| [frontend-convention-validator](./frontend-convention-validator.toml) | `프론트엔드 컨벤션 검사해줘` | read-only | TypeScript/TSX 변경 파일의 FSD, Tailwind/shadcn, Query/Zod 규칙을 읽기 전용으로 검사 |
+| [frontend-convention-validator](./frontend-convention-validator.toml) | `프론트엔드 컨벤션 검사해줘` | read-only | TypeScript/TSX 변경 파일을 도구 결과와 FSD 공식 구조·Query/Zod·Tailwind/shadcn 규칙 기준으로 읽기 전용 검사 |
 
 ## Backend
 
