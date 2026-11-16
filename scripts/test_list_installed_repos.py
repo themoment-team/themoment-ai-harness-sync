@@ -11,8 +11,12 @@ MODULE_PATH = pathlib.Path(__file__).with_name("list-installed-repos.py")
 SPEC = importlib.util.spec_from_file_location("list_installed_repos", MODULE_PATH)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
-# PyYAML이 없는 환경에서도 모듈을 import할 수 있게 하는 용도로만 쓴다
-sys.modules.setdefault("yaml", types.ModuleType("yaml"))
+# PyYAML이 없는 환경에서도 모듈을 import할 수 있게 하는 용도로만 쓴다.
+# 설치된 PyYAML을 빈 모듈로 가리면 같은 프로세스의 다른 테스트가 깨지므로 import가 실패할 때만 넣는다.
+try:
+    import yaml  # noqa: F401
+except ModuleNotFoundError:
+    sys.modules.setdefault("yaml", types.ModuleType("yaml"))
 SPEC.loader.exec_module(MODULE)
 
 
