@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import type { HarnessItem, HarnessManifest } from '@/entities/harness-config';
+import { harnessDomains, type HarnessItem, type HarnessManifest } from '@/entities/harness-config';
 
 import {
   isItemSelected,
@@ -34,8 +34,25 @@ const categoryLabels: Record<string, string> = {
   fsd: 'FSD',
 };
 
+const domainLabels: Record<string, string> = {
+  frontend: 'Frontend',
+  backend: 'Backend',
+  common: '공통',
+};
+
 const providerOrder = ['claude', 'codex', 'gemini', 'nextjs'];
 const categoryOrder = ['skills', 'agents', 'hooks', 'settings', 'config', 'fsd'];
+const otherDomain = 'other';
+
+function groupByDomain(items: HarnessItem[]) {
+  return [...harnessDomains, otherDomain]
+    .map((domain) => ({
+      id: domain,
+      label: domainLabels[domain] ?? '기타',
+      items: items.filter((item) => (item.domain ?? otherDomain) === domain),
+    }))
+    .filter((section) => section.items.length > 0);
+}
 
 function categoryFor(item: HarnessItem): string {
   const category = item.id.split('/')[1] ?? 'other';
@@ -180,17 +197,50 @@ function ItemCategory({
             {selectedCount}/{category.items.length}개 선택
           </span>
         </summary>
-        <div className="border-border space-y-2 border-t p-2">
-          {category.items.map((item) => (
-            <ItemRow
-              key={item.id}
-              item={item}
-              selected={isItemSelected(selection, item)}
-              onToggle={() => onChange(toggleItem(selection, item.id, item))}
-            />
-          ))}
+        <div className="border-border border-t p-2">
+          {category.items.some((item) => item.domain) ? (
+            <div className="space-y-4">
+              {groupByDomain(category.items).map((section) => (
+                <section key={section.id} aria-label={`${category.label} ${section.label}`}>
+                  <h4 className="text-fg-muted tracking-label mb-2 flex items-center justify-between px-1 text-xs font-medium uppercase">
+                    <span>{section.label}</span>
+                    <span>
+                      {section.items.filter((item) => isItemSelected(selection, item)).length}/
+                      {section.items.length}
+                    </span>
+                  </h4>
+                  <ItemList items={section.items} selection={selection} onChange={onChange} />
+                </section>
+              ))}
+            </div>
+          ) : (
+            <ItemList items={category.items} selection={selection} onChange={onChange} />
+          )}
         </div>
       </details>
+    </div>
+  );
+}
+
+function ItemList({
+  items,
+  selection,
+  onChange,
+}: {
+  items: HarnessItem[];
+  selection: SelectionState;
+  onChange: (selection: SelectionState) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      {items.map((item) => (
+        <ItemRow
+          key={item.id}
+          item={item}
+          selected={isItemSelected(selection, item)}
+          onToggle={() => onChange(toggleItem(selection, item.id, item))}
+        />
+      ))}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { parse } from 'yaml';
 import { z } from 'zod';
 
-import type { HarnessManifest } from '../model/types';
+import { harnessDomains, type HarnessManifest } from '../model/types';
 
 const manifestSchema = z.object({
   defaults: z.array(z.string()).default([]),
@@ -11,6 +11,7 @@ const manifestSchema = z.object({
       src: z.string().min(1),
       dest: z.string().min(1),
       groups: z.array(z.string()),
+      domain: z.enum(harnessDomains).optional(),
     }),
   ),
 });
