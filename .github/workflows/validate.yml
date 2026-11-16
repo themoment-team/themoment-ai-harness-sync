@@ -97,6 +97,10 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      # 레이어 의존 방향과 FSD 구조는 ESLint가 아니라 check-fsd-dependencies·steiger가 검사한다
+      - name: FSD lint
+        run: pnpm lint:fsd
+
       # PageProps·LayoutProps 같은 라우트 타입은 .next/types에 생성되므로 타입 검사 전에 만든다
       - name: Generate route types
         run: pnpm exec next typegen

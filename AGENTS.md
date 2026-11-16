@@ -98,7 +98,7 @@ python3 -m unittest discover -s scripts -p 'test_*.py'
 - `scripts/list-installed-repos.py` — discovers App installations and generates per-repo sync configs
 - `scripts/validate-manifest.py` — manifest와 배포 파일 검사 (PR 검증과 로컬 공용)
 - `.github/workflows/sync.yml` — auto-sync workflow (matrix per repo)
-- `.github/workflows/validate.yml` — PR 검증 워크플로 (manifest·스크립트 테스트, `dashboard/`·`docs/guide/`·`sync-manifest.yml` 변경 시 dashboard 검사)
+- `.github/workflows/validate.yml` — PR 검증 워크플로 (manifest·스크립트 테스트, `dashboard/`·`docs/guide/`·`sync-manifest.yml` 변경 시 dashboard test/lint/lint:fsd/check-types)
 - `.harness/sync.yml.example` — template for target repos to opt-in/opt-out of specific items
 - `.claude/templates/settings-base.json` — hooks 미포함 시 전파되는 settings.json 기반 파일
 - `docs/guide/` — 웹 대시보드 `/guide`에서 제공하는 문서 원본
