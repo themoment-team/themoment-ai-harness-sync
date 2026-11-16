@@ -82,9 +82,10 @@ Hook 모듈은 dispatcher가 자동으로 스캔하는 구조입니다.
 
 ## 변경 검증
 
-스킬·에이전트·훅·manifest를 바꿨으면 커밋 전에 실행합니다. PR에서는 `.github/workflows/validate.yml`이 같은 검사를 돌립니다.
+스킬·에이전트·훅·manifest를 바꿨으면 커밋 전에 실행합니다. PR에서는 `.github/workflows/validate.yml`이 같은 검사를 돌립니다. Python 3.11 이상(`tomllib`)과 PyYAML이 필요합니다.
 
 ```
+pip install pyyaml
 python3 scripts/validate-manifest.py --base origin/main
 python3 -m unittest discover -s scripts -p 'test_*.py'
 ```
