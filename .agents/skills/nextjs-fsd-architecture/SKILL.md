@@ -1,6 +1,6 @@
 ---
 name: nextjs-fsd-architecture
-description: Use when placing, structuring, or reviewing code in a Next.js App Router project that follows the official Feature-Sliced Design layout (`src/_app`, `src/_pages`), including Turborepo workspaces that share FSD lower layers through `packages/core`.
+description: Use when placing, structuring, or reviewing code in a Next.js App Router project that follows the official Feature-Sliced Design layout (`src/_app`, `src/_pages`), including error, not-found, and global-error boundaries, environment access and API-mocking entry points, and Turborepo workspaces that share FSD lower layers through `packages/core`.
 ---
 
 # Next.js + Feature-Sliced Design Guide

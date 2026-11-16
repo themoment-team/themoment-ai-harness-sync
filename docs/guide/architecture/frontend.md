@@ -46,7 +46,8 @@ _app → _pages → widgets → features → entities → shared
 | `route.ts`                   | Route Handler                                               |
 
 - 오류 경계 구현과 `error.tsx`·`global-error.tsx` 재수출 파일에는 `'use client'`를 둡니다. 안전한 사용자 안내와 가능한 경우 digest만 보여 주며 `error.message`나 stack은 노출하지 않습니다. 재시도 prop 이름·시그니처는 설치된 Next.js 버전의 번들 문서(`node_modules/next/dist/docs/`)에서, 문서가 없으면 설치 버전의 타입 정의에서 확인합니다.
-- `global-error.tsx`는 루트 layout을 대체하므로 구현은 `src/_app`(예: `src/_app/global-error/`)에 두고 자체 `<html>`·`<body>`와 독립 스타일을 준비합니다. 루트 layout의 provider나 CSS에 의존하지 않습니다. 변경한 오류 화면은 안전한 출력과 재시도, 화면이 이미 제공하는 복구 경로(홈 이동 등)를 테스트합니다. 404 HTTP 상태는 없는 경로를 실제로 요청하는 E2E로만 확인할 수 있습니다.
+- `global-error.tsx`는 루트 layout을 대체하므로 구현은 `src/_app`(예: `src/_app/global-error/`)에 두고 자체 `<html>`·`<body>`와 독립 스타일을 준비합니다. 루트 layout의 provider나 CSS에 의존하지 않습니다.
+- 변경한 오류 화면은 안전한 출력과 재시도, 화면이 이미 제공하는 복구 경로(홈 이동 등)를 테스트합니다. 404 HTTP 상태는 없는 경로를 실제로 요청하는 E2E·통합 테스트로만 확인할 수 있습니다.
 - 처음에는 `_pages` 안에서 시작하고, 두 번째 소비처가 생길 때 아래 레이어로 내립니다.
 
 ## 검증 도구
