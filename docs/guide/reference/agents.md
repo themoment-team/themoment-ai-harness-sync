@@ -25,7 +25,7 @@ order: 110
 ## Frontend
 
 ### frontend-convention-validator
-**TypeScript/TSX 전용 읽기 검사기**입니다. FSD 공식 Next.js 구조(`_app`, `_pages`) 기준으로 lint·Steiger·타입 검사·포맷 결과를 먼저 인용하고, 도구가 잡지 못하는 라우트 파일 두께, 레이어 배치, 서버/클라이언트 경계, API 에러 처리, TanStack Query/Zod 폼, Tailwind/shadcn 소유권과 접근성을 검사합니다.
+**TypeScript/TSX 전용 읽기 검사기**입니다. FSD 공식 Next.js 구조(`_app`, `_pages`) 기준으로 lint·Steiger·타입 검사·포맷 결과를 먼저 인용하고, 도구가 잡지 못하는 라우트 파일 두께와 오류·404·global-error 구조, 레이어 배치, 서버/클라이언트 경계(모킹 flag 예외 포함), API 에러 계약·401 refresh 처리, TanStack Query/Zod 폼, Tailwind/shadcn 소유권과 접근성, Turborepo 앱별 공통 정책 적용을 검사합니다. **(lint)** 규칙은 대상 레포 설정에 켜져 있고 명령이 실행됐을 때만 자동 검사로 인정하며, 읽기 전용이라 운영 빌드처럼 직접 실행하지 못한 검사는 따로 표시합니다.
 
 근거(파일·줄·규칙)를 댈 수 없는 항목은 위반이 아니라 "확인 필요"로 보고합니다. 파일을 수정하거나 커밋하지 않습니다. `views` 레이아웃 레포는 `v1`으로 고정해 이전 검사 항목을 유지할 수 있습니다.
 

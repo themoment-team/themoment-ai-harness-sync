@@ -23,7 +23,7 @@ If there is no entity yet and only one feature uses the data, keep it in that fe
 
 ## HTTP calls
 
-- Before writing calls, inspect the project's HTTP implementation for its real error contract (status, code, message, and request ID header) and 401 policy. Find the actual field, header, class, and module names; do not assume the examples match. Confirm that at most one refresh is in flight and that refresh requests use an instance without the 401 interceptor; preserve the project's retry and failure behavior.
+- Before writing calls, inspect the project's HTTP implementation for its real error contract (status, code, message, and request ID header) and 401 policy. Find the actual field, header, class, and module names; do not assume the examples match. Where the project refreshes on 401, confirm its existing single-flight coordination (at most one refresh in flight, waiting requests share it) and keep using it; if the project has no coordination mechanism, report it as unverified instead of inventing one. Preserve the project's retry and failure behavior.
 - Call the project's typed method wrappers (`get`, `post`, `patch`, `put`, `del`) that return the response body. Do not call the raw Axios instance for ordinary requests; it returns `AxiosResponse`.
 - Pass the response type first and the body type second: `post<User, UpdateProfileRequest>(url, body)`.
 - Browser code uses the client module (for example `@/shared/api`); server code uses the server-only module (for example `@/shared/api/index.server`).

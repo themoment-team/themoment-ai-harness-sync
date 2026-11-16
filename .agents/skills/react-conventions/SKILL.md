@@ -5,7 +5,7 @@ description: Use when writing or reviewing React and TypeScript code in a Next.j
 
 # React + TypeScript Conventions
 
-These rules apply to `.ts` and `.tsx` files in a Next.js project. If the project's instructions or lint configuration say otherwise, follow the project and report the difference. Treat rules marked **(lint)** as machine-checked only after confirming that the target project's ESLint configuration enables them for the files being reviewed and running the relevant lint command. Otherwise review them by hand and explicitly report that they were not machine-checked; a green lint run does not prove coverage for unconfigured rules.
+These rules apply to `.ts` and `.tsx` files in a Next.js project. If the project's instructions or lint configuration say otherwise, follow the project and report the difference. Treat rules marked **(lint)** as machine-checked only when the target repository's configuration (ESLint, Prettier, or another configured tool) enables that rule for the reviewed files and the relevant command ran. Otherwise review them by hand and explicitly report that they were not machine-checked; a green lint run does not prove coverage for unconfigured rules.
 
 ## Naming
 

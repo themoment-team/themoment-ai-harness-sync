@@ -45,8 +45,8 @@ _app → _pages → widgets → features → entities → shared
 | `global-error.tsx`           | `_app`의 독립적인 루트 layout 오류 경계 재수출              |
 | `route.ts`                   | Route Handler                                               |
 
-- 오류 경계 구현과 `error.tsx`·`global-error.tsx` 재수출 파일에는 `'use client'`를 둡니다. 안전한 사용자 안내와 가능한 경우 digest만 보여 주며 `error.message`나 stack은 노출하지 않습니다. 재시도 prop 이름·시그니처는 설치된 Next.js 버전의 번들 문서에서 확인합니다.
-- `global-error.tsx`는 루트 layout을 대체하므로 구현은 `src/_app`에 두고 자체 `<html>`·`<body>`와 독립 스타일을 준비합니다. 루트 layout의 provider나 CSS에 의존하지 않습니다. 변경한 오류 화면의 안전한 출력, 재시도, 홈 이동, 404 HTTP 상태는 테스트로 확인하고 코드 검토와 실제 실행 결과를 구분합니다.
+- 오류 경계 구현과 `error.tsx`·`global-error.tsx` 재수출 파일에는 `'use client'`를 둡니다. 안전한 사용자 안내와 가능한 경우 digest만 보여 주며 `error.message`나 stack은 노출하지 않습니다. 재시도 prop 이름·시그니처는 설치된 Next.js 버전의 번들 문서(`node_modules/next/dist/docs/`)에서, 문서가 없으면 설치 버전의 타입 정의에서 확인합니다.
+- `global-error.tsx`는 루트 layout을 대체하므로 구현은 `src/_app`(예: `src/_app/global-error/`)에 두고 자체 `<html>`·`<body>`와 독립 스타일을 준비합니다. 루트 layout의 provider나 CSS에 의존하지 않습니다. 변경한 오류 화면은 안전한 출력과 재시도, 화면이 이미 제공하는 복구 경로(홈 이동 등)를 테스트합니다. 404 HTTP 상태는 없는 경로를 실제로 요청하는 E2E로만 확인할 수 있습니다.
 - 처음에는 `_pages` 안에서 시작하고, 두 번째 소비처가 생길 때 아래 레이어로 내립니다.
 
 ## 검증 도구
@@ -82,6 +82,7 @@ packages/core/src:   widgets → features → entities → shared
 ```
 
 - 앱 간 직접 import는 금지하고, 패키지는 `package.json`의 `exports` 진입점으로만 사용합니다.
+- `next.config` 같은 프레임워크 설정은 앱마다 따로 두되, 보안 헤더·모킹 스위치 같은 공통 정책은 필요한 모든 앱에 적용합니다. 검토할 때는 앱 목록을 확인해 빠진 앱이 없는지 봅니다.
 - slice는 처음 쓰는 앱에 두고, 두 앱 이상이 데이터와 동작까지 똑같이 쓸 때만 `packages/core/src`의 같은 레이어로 옮깁니다. core는 앱을 import할 수 없으므로 아래 레이어부터(entity → feature → widget) 옮깁니다. 생김새만 같은 것(레이아웃 틀, 슬롯을 받는 셸)은 공유 UI 패키지에 둡니다.
 - core는 루트 배럴 없이 slice 단위 서브패스로 공개합니다(`@scope/core/shared/<segment>`, `@scope/core/{entities,features,widgets}/<slice>`, 각각의 `/server`).
 - 앱 레이어는 core의 더 아래 레이어만 import합니다. 같은 레이어도 다른 slice라 금지입니다(앱 feature는 core feature를, 앱 widget은 core widget을 쓸 수 없고 한 레이어 위에서 조합). 앱 entity만 core entity의 `@x/<소비 slice>/index.ts`를 쓸 수 있습니다. import 경로에 레이어가 드러나므로 Steiger가 보지 못하는 이 위반을 앱 레이어별 ESLint `no-restricted-imports`로 막습니다.
@@ -100,8 +101,9 @@ packages/core/src:   widgets → features → entities → shared
 ## 환경 변수와 조건부 모킹
 
 - 서버 환경 변수는 검증 schema 모듈을 통해서만 읽고 클라이언트가 서버 env 모듈을 import하지 않게 합니다. 새 서버 변수는 schema·환경 변수 예시·CI에 함께 반영합니다.
-- 모킹이 이미 있는 프로젝트의 진입점에 한해 공개 빌드 시점 flag인 실제 `process.env.NEXT_PUBLIC_*`를 literal 값과 직접 비교할 수 있습니다. 계산된 키·동적 조회·비밀 값은 예외가 아닙니다. instrumentation은 `process.env.NEXT_RUNTIME === 'nodejs'`, mock provider는 `typeof window !== 'undefined'` guard를 함께 확인합니다.
+- 모킹이 이미 있는 프로젝트에서, 모킹을 켜고 끄는 공개 빌드 시점 flag에 한해 그 모킹의 진입 모듈에서만 실제 `process.env.NEXT_PUBLIC_*`를 literal 값과 직접 비교할 수 있습니다. 계산된 키·동적 조회·비밀 값은 예외가 아닙니다. instrumentation은 `process.env.NEXT_RUNTIME === 'nodejs'`, mock provider는 `typeof window !== 'undefined'` guard를 함께 확인합니다.
 - 실제 flag 이름·활성 값·진입점과 `next.config`의 빌드 시점 기본값·비활성 분기 제거를 확인합니다. `env` 옵션으로 비밀을 노출하거나 모킹 없는 프로젝트에 모킹을 추가하지 않습니다. 빌드에 포함된 public 값·rewrite는 실행 환경 변수만 바꿔 변경할 수 없으므로 의도한 값으로 재빌드합니다.
+- 서비스 워커로 모킹하는 프로젝트는 워커가 준비된 뒤에 요청을 보내고, 브라우저 응답이 실제로 워커에서 왔는지와 서버 모킹을 따로 테스트합니다. 모킹을 끈 운영 빌드에서는 워커가 등록되지 않고 클라이언트 JS 번들에 모킹 코드가 없는지 확인합니다. `public/`의 워커 스크립트는 정적 자산이라 빌드에 항상 복사되며, 등록되지 않으면 문제가 아닙니다.
 
 ## v1에서 옮기기
 
