@@ -23,6 +23,7 @@ If there is no entity yet and only one feature uses the data, keep it in that fe
 
 ## HTTP calls
 
+- Before writing calls, inspect the project's HTTP implementation for its real error contract (status, code, message, and request ID header) and 401 policy. Find the actual field, header, class, and module names; do not assume the examples match. Confirm that at most one refresh is in flight and that refresh requests use an instance without the 401 interceptor; preserve the project's retry and failure behavior.
 - Call the project's typed method wrappers (`get`, `post`, `patch`, `put`, `del`) that return the response body. Do not call the raw Axios instance for ordinary requests; it returns `AxiosResponse`.
 - Pass the response type first and the body type second: `post<User, UpdateProfileRequest>(url, body)`.
 - Browser code uses the client module (for example `@/shared/api`); server code uses the server-only module (for example `@/shared/api/index.server`).
@@ -141,7 +142,7 @@ Fetch first-screen data on the server and put it in the client cache.
 - `await` the prefetch unless the project's QueryClient is configured to dehydrate pending queries.
 - `getQueryClient()` returns a new instance per call on the server. Call it once per page component and use that instance for both prefetch and dehydrate. On the browser it returns a singleton.
 - `prefetchQuery` does not throw. On failure the client hook requests again and exposes the error through `error`.
-- Why `queryFn` is replaced: browser requests go through a relative proxy path and the 401 interceptor, the server has neither, and a Server Component cannot write refreshed cookies. A server prefetch that fails with 401 is not dehydrated, so the client retries through the browser instance and its 401 handling.
+- Why `queryFn` is replaced: browser and server use different transports and authentication contexts (for example, a relative proxy path in the browser versus an absolute base URL and per-request cookies on the server). Use the project's actual transport configuration. A Server Component cannot write refreshed cookies, so the server prefetch must not refresh tokens; its HTTP instance may still share error normalization with the browser instance. A server prefetch that fails with 401 is not dehydrated, so the client retries through the browser instance and its 401 handling.
 - `getQueryClient` is shared by server and client code, so the client API module must not import `server-only` code or server environment variables.
 
 ## Mutations and invalidation scope
