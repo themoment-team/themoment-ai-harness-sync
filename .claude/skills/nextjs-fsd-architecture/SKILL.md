@@ -63,6 +63,7 @@ Create a segment only when it has code.
 - Server-only code (anything importing `server-only` or the server HTTP client) is exported from a separate `index.server.ts`. Mixing it into `index.ts` breaks the build of any client component that imports the slice.
 - Add `import 'server-only';` to server-only implementations and to the server HTTP module, so a client import fails at build time instead of leaking server code.
 - Inside a slice, use relative imports.
+- Do not put one `index.ts` in `shared/ui` or `shared/lib` that re-exports everything. Give each component or library its own folder and `index.ts` (`shared/ui/button/index.ts`, imported as `@/shared/ui/button`). One large barrel makes the dev server compile every component for each import and mixes `'use client'` components with server components behind one entry point.
 
 ```ts
 // src/entities/user/index.ts
@@ -197,7 +198,7 @@ packages/core/src:   widgets → features → entities → shared
 - Each app owns its framework configuration (for example, `next.config`). Apply shared security-header and, where mocking already exists, mocking-switch policies to every app that needs them, through each app's configuration. During review, enumerate the applicable apps and check each configuration so no app is missed; a policy applied to one app does not cover the others.
 - Apps never import each other. Sharing goes through `packages/*`, and a package is imported only through the entry points in its `package.json` `exports`.
 - Keep a slice in the first app that uses it. Move it to the same layer in `packages/core/src` only when a second app needs the same data and behavior, and change imports from `@/<layer>/<slice>` to `@scope/core/<layer>/<slice>`. Core cannot import apps, so a core slice uses only core's lower layers: promote bottom-up (entity, then feature, then widget).
-- Something that only looks the same across several web apps (a layout frame, a shell with slots) belongs in their shared UI package, with each app passing its content through props and children. Core is for slices whose data and behavior are identical.
+- Something that only looks the same across several web apps (a primitive such as a button, a layout frame, a shell with slots) has no domain, so it belongs to the Shared layer: core's `shared/ui`, one folder per component (`@scope/core/shared/ui/<component>`), with each app passing its content through props and children. Core's `entities`, `features`, and `widgets` are for slices whose data and behavior are identical. If the repository already has a separate UI package (for example a shadcn monorepo setup), keep using it instead of moving its components; do not create a new UI package only to share components between apps.
 - `packages/core` has no root barrel. It is exposed in the same units as slice public APIs, so the import path keeps the layer visible:
 
   ```json
@@ -251,7 +252,7 @@ packages/core/src:   widgets → features → entities → shared
 - Run Steiger from the repository root so the single deployed `steiger.config.mjs` applies, once per source root: `steiger apps/client/src --fail-on-warnings`, one per app, and `steiger packages/core/src --fail-on-warnings`. Running `steiger ./src` inside a package does not pick up the root config. The config turns off `fsd/insignificant-slice` for core's `entities`, `features`, and `widgets`: the apps that consume those slices are outside core's source root, so every promoted slice looks unused.
 - Packages do not read environment variables. Each app validates its own env and passes values (such as a base URL) into package factories.
 - Each app's `@/shared/api` builds its HTTP methods from the core factory and re-exports them under the same names (`get`, `post`, `getQueryClient`, …), so slice code imports `@/shared/api` the same way as in a single app.
-- Lint React code in packages with the same React, hooks, and accessibility rules as the apps, minus Next.js-only rules and app-only FSD rules. Include `.tsx` in the package `tsconfig.json` and set `"jsx": "react-jsx"` before adding components; otherwise ESLint cannot parse them.
+- Lint React code in packages with the same React, hooks, and accessibility rules as the apps, minus Next.js-only rules and app-only FSD rules. Include `.tsx` in the package `tsconfig.json` and set `"jsx": "react-jsx"` before adding components; otherwise ESLint cannot parse them. A package that holds components also needs the same DOM test environment as the apps (for example Vitest with jsdom and Testing Library); a Node-only test setup fails component tests with `document is not defined`.
 - Put a source-consumed workspace package (one whose TypeScript the apps compile) in each app's `transpilePackages`. A prebuilt UI package that publishes JavaScript, CSS, and declarations is not transpiled again.
 - Keep package, lint, and Tailwind configuration out of the application runtime bundle. Each app keeps its own `public/`, environment files, and deployment configuration.
 

@@ -84,7 +84,7 @@ packages/core/src:   widgets → features → entities → shared
 
 - 앱 간 직접 import는 금지하고, 패키지는 `package.json`의 `exports` 진입점으로만 사용합니다.
 - `next.config` 같은 프레임워크 설정은 앱마다 따로 두되, 보안 헤더·모킹 스위치 같은 공통 정책은 필요한 모든 앱에 적용합니다. 검토할 때는 앱 목록을 확인해 빠진 앱이 없는지 봅니다.
-- slice는 처음 쓰는 앱에 두고, 두 앱 이상이 데이터와 동작까지 똑같이 쓸 때만 `packages/core/src`의 같은 레이어로 옮깁니다. core는 앱을 import할 수 없으므로 아래 레이어부터(entity → feature → widget) 옮깁니다. 생김새만 같은 것(레이아웃 틀, 슬롯을 받는 셸)은 공유 UI 패키지에 둡니다.
+- slice는 처음 쓰는 앱에 두고, 두 앱 이상이 데이터와 동작까지 똑같이 쓸 때만 `packages/core/src`의 같은 레이어로 옮깁니다. core는 앱을 import할 수 없으므로 아래 레이어부터(entity → feature → widget) 옮깁니다. 생김새만 같은 것(버튼 같은 기본 컴포넌트, 레이아웃 틀, 슬롯을 받는 셸)은 도메인이 없으므로 core의 `shared/ui`에 컴포넌트별 폴더로 둡니다. 레포에 이미 UI 패키지(shadcn 모노레포 등)가 있으면 그대로 쓰고, 앱끼리 컴포넌트를 나누려고 UI 패키지를 새로 만들지는 않습니다.
 - core는 루트 배럴 없이 slice 단위 서브패스로 공개합니다(`@scope/core/shared/<segment>`, `@scope/core/{entities,features,widgets}/<slice>`, 각각의 `/server`).
 - 앱 레이어는 core의 더 아래 레이어만 import합니다. 같은 레이어도 다른 slice라 금지입니다(앱 feature는 core feature를, 앱 widget은 core widget을 쓸 수 없고 한 레이어 위에서 조합). 앱 entity만 core entity의 `@x/<소비 slice>/index.ts`를 쓸 수 있습니다. import 경로에 레이어가 드러나므로 Steiger가 보지 못하는 이 위반을 앱 레이어별 ESLint `no-restricted-imports`로 막습니다.
 - 각 앱과 `packages/core/src`에서 Steiger를 실행합니다. core에서는 앱의 참조가 보이지 않으므로 `entities`·`features`·`widgets`의 `fsd/insignificant-slice`를 끕니다(배포 설정에 포함).
@@ -94,7 +94,8 @@ packages/core/src:   widgets → features → entities → shared
 ## UI와 데이터 규칙
 
 - Tailwind 정적 클래스는 문자열로 쓰고, 조건부 클래스나 외부 `className` 병합에만 `cn()`을 씁니다. 색·간격은 `@theme` 토큰을 씁니다.
-- shadcn primitive는 단일 앱의 `src/shared/ui` 또는 공유 UI 패키지에, 도메인 UI는 소유 slice에 둡니다.
+- 공통 primitive(shadcn 포함)는 `shared/ui`(Turborepo는 core의 `shared/ui`, 기존 UI 패키지가 있으면 그 패키지)에 컴포넌트마다 폴더와 `index.ts`를 두고, 세그먼트 전체를 묶는 배럴은 만들지 않습니다. `cn()`은 같은 위치의 `shared/lib`에 둡니다. 도메인 UI는 소유 slice에 둡니다.
+- Turborepo의 Tailwind `@source`는 클래스가 들어 있는 모든 패키지(core, 기존 UI 패키지)를 가리켜야 합니다. 빠지면 빌드 오류 없이 클래스가 CSS에서 사라집니다. 컴포넌트를 담는 패키지는 앱과 같은 DOM 테스트 환경(jsdom 등)을 씁니다.
 - API 호출은 프로젝트의 typed HTTP wrapper를 사용합니다. URL 상수와 `queryOptions` 기반 query 팩토리(`<리소스>Queries`)는 소유 entity의 `api/`에, mutation 훅은 동작을 맡는 feature의 `api/`에 둡니다. 컴포넌트는 팩토리 옵션을 `useQuery`에 바로 넘기고, mutation 훅은 HTTP 메서드가 아니라 동작으로 이름 짓습니다(`useUpdateProfile`).
 - TanStack Query key는 `all()` 루트의 계층 factory로 만들고, mutation은 영향받는 가장 좁은 key만 무효화합니다.
 - Zod schema는 `PascalCaseSchema`, 추론 request type은 `Request` 접미사를 씁니다. 그 밖의 타입에는 `Type` 같은 종류 접미사를 붙이지 않고(`User`, `UserResponse`), `src` 안의 모듈은 named export만 씁니다(default export는 `app/` 라우트와 설정 파일에만). `enum`보다 union과 `Record<Union, Metadata>`를 우선합니다.
