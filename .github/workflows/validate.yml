@@ -57,9 +57,10 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           # 수동 실행(base 없음)이면 항상 검사한다.
-          # /guide는 런타임에 docs/guide를 읽으므로 문서만 바뀐 PR도 dashboard 테스트로 frontmatter를 확인한다
+          # /guide는 런타임에 docs/guide를 읽으므로 문서만 바뀐 PR도 dashboard 테스트로 frontmatter를 확인한다.
+          # 대시보드는 manifest를 자체 스키마(parseManifest)로 다시 검사하므로 manifest만 바뀐 PR도 포함한다
           if [[ -z "$BASE_SHA" ]] || git diff --name-only "$BASE_SHA...HEAD" \
-              | grep -qE '^(dashboard/|docs/guide/|\.github/workflows/validate\.yml$)'; then
+              | grep -qE '^(dashboard/|docs/guide/|sync-manifest\.yml$|\.github/workflows/validate\.yml$)'; then
             echo "dashboard=true" >> "$GITHUB_OUTPUT"
           else
             echo "dashboard=false" >> "$GITHUB_OUTPUT"
