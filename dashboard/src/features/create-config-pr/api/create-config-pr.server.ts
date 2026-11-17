@@ -5,6 +5,7 @@ import {
   buildSyncConfig,
   parseSyncConfig,
   resolveSelectedItemIds,
+  splitStaleOverrides,
 } from '@/entities/harness-config';
 import {
   DashboardDataError,
@@ -185,12 +186,16 @@ function buildPullRequestBody(input: {
   content: string;
   currentItemIds: string[];
   selectedItemIds: string[];
+  staleOverrideIds: string[];
 }): string {
   const added = input.selectedItemIds.filter((itemId) => !input.currentItemIds.includes(itemId));
   const removed = input.currentItemIds.filter((itemId) => !input.selectedItemIds.includes(itemId));
   const changes = [
     ...added.map((itemId) => `- 추가: \`${itemId}\``),
     ...removed.map((itemId) => `- 제거: \`${itemId}\``),
+    ...input.staleOverrideIds.map(
+      (itemId) => `- 정리: \`${itemId}\` (매니페스트에 없는 항목 또는 버전)`,
+    ),
   ];
 
   return [
@@ -211,11 +216,13 @@ export async function createConfigPullRequest(
   const dashboard = await services.getDashboardData(input);
   const knownItemIds = new Set(dashboard.manifest.items.map((item) => item.id));
   const groups = input.config.groups ?? [];
-  const overrides = input.config.overrides ?? {};
-  if (
-    input.config.itemIds.some((itemId) => !knownItemIds.has(itemId)) ||
-    Object.keys(overrides).some((itemId) => !knownItemIds.has(itemId))
-  ) {
+  // 오래된 override는 막지 않고 정리해 본문에 남긴다. 구 화면이나 다른 호출자도 같은 기준을 따른다
+  const { overrides } = splitStaleOverrides(dashboard.manifest, input.config.overrides ?? {});
+  const staleOverrideIds = splitStaleOverrides(
+    dashboard.manifest,
+    dashboard.config.overrides,
+  ).staleItemIds;
+  if (input.config.itemIds.some((itemId) => !knownItemIds.has(itemId))) {
     throw new ConfigPullRequestError('INVALID_ITEM');
   }
 
@@ -270,6 +277,7 @@ export async function createConfigPullRequest(
       content,
       currentItemIds: dashboard.selectedItemIds,
       selectedItemIds,
+      staleOverrideIds,
     }),
   });
 }

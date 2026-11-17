@@ -1,4 +1,9 @@
-import type { HarnessItem, SyncConfig } from '@/entities/harness-config';
+import {
+  type HarnessItem,
+  type HarnessManifest,
+  splitStaleOverrides,
+  type SyncConfig,
+} from '@/entities/harness-config';
 
 export type SelectionState = {
   enabled: boolean;
@@ -10,15 +15,22 @@ export type SelectionState = {
   pinnedVersions?: Record<string, string>;
 };
 
-export function createSelectionState(config: SyncConfig, itemIds: string[]): SelectionState {
+export function createSelectionState(
+  config: SyncConfig,
+  itemIds: string[],
+  manifest: HarnessManifest,
+): SelectionState {
+  // manifest에서 사라진 항목의 override는 화면과 설정 PR에 남기지 않는다
+  const { overrides } = splitStaleOverrides(manifest, config.overrides);
+
   return {
     enabled: config.enabled,
     mode: config.mode,
     itemIds,
     groups: config.groups,
-    overrides: config.overrides,
+    overrides,
     pinnedVersions: Object.fromEntries(
-      Object.entries(config.overrides).filter(
+      Object.entries(overrides).filter(
         (entry): entry is [string, string] => typeof entry[1] === 'string',
       ),
     ),
