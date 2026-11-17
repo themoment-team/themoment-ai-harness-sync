@@ -1,6 +1,6 @@
 ---
 name: tailwind-shadcn
-description: Use when building or reviewing Tailwind CSS v4 styles and shadcn/Base UI components in a Next.js FSD application or a shared UI package.
+description: Use when building or reviewing Tailwind CSS v4 styles and shared UI components (including shadcn/Base UI primitives) in a Next.js FSD application or Turborepo.
 ---
 
 # Tailwind + shadcn Guide
@@ -53,12 +53,12 @@ export const Button = ({ variant, size, className, ...props }: ButtonProps) => (
 
 - Tailwind v4 tokens live in `@theme` (`--color-background` becomes `bg-background`). Use tokens instead of hard-coded colors, spacing, or radii; add a missing token to `@theme` first.
 - A single app owns one global style entry, `src/_app/styles/globals.css`. Do not add another global stylesheet.
-- In a Turborepo, shared tokens and `@source` paths live in the shared Tailwind package's stylesheet. Each app's `globals.css` imports it first, then overrides only app-specific `@theme` values.
+- In a Turborepo, shared tokens and `@source` paths live in the shared Tailwind package's stylesheet. Point `@source` at every package whose source contains Tailwind classes (core, and the UI package if the repository has one); Tailwind does not scan packages outside the app, so missing classes disappear from the built CSS without a build error. Each app's `globals.css` imports it first, then overrides only app-specific `@theme` values.
 
 ## Ownership
 
-- `cn()` lives in `shared/lib` of a single app, or in the shared UI package of a Turborepo.
-- shadcn primitives keep their upstream kebab-case filenames and named exports: in `src/shared/ui` of a single app, or in the shared UI package of a Turborepo.
+- `cn()` lives in `shared/lib`: the app's `src/shared/lib` in a single app, core's `shared/lib` in a Turborepo (or the existing UI package, if the repository has one).
+- Shared primitives live in `shared/ui`, one folder and `index.ts` per component: `src/shared/ui` in a single app, core's `shared/ui` in a Turborepo (or the existing UI package). shadcn primitives keep their upstream kebab-case filenames and named exports.
 - Domain components such as cards and forms belong to their FSD slice (`entities/*/ui`, `features/*/ui`), not to `shared/ui` or the UI package.
 - Set app fonts once in the root layout; do not set the font again in feature components.
 

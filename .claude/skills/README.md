@@ -9,7 +9,7 @@ Claude에서 `/skill-name` 으로 호출하는 재사용 가능한 작업 단위
 | 스킬 | 설명 |
 | --- | --- |
 | [nextjs-fsd-architecture](./nextjs-fsd-architecture/SKILL.md) | Next.js App Router + FSD 공식 구조 — `_app`·`_pages` 레이어, 슬라이스 세그먼트, 공개 API, 라우트 파일, Steiger, Turborepo 패키지 경계 |
-| [tailwind-shadcn](./tailwind-shadcn/SKILL.md) | Tailwind v4 클래스, `cn()`, `@theme` 토큰, shadcn·도메인 UI 소유권 |
+| [tailwind-shadcn](./tailwind-shadcn/SKILL.md) | Tailwind v4 클래스, `cn()`, `@theme` 토큰, 공통 UI(`shared/ui`)·도메인 UI 소유권 |
 | [react-conventions](./react-conventions/SKILL.md) | React·TypeScript 이름 규칙, 타입 작성, 컴포넌트 모양·export, 컴포넌트 안 순서, import 순서 |
 | [data-and-forms](./data-and-forms/SKILL.md) | TanStack Query key·훅, RSC prefetch, 무효화 범위, Zod·React Hook Form 폼과 API 에러 표시 |
 | [react-best-practices](./react-best-practices/SKILL.md) | Vercel의 React/Next.js 성능 규칙 70개 — 워터폴, 번들 크기, 리렌더링 등 영향도 순 (opt-in) |

@@ -17,10 +17,10 @@ Claude Code에서 `/skill-name` 으로 직접 호출하는 스킬 목록입니�
 
 | 스킬 | 호출 | 설명 |
 |------|------|------|
-| `nextjs-fsd-architecture` | `/nextjs-fsd-architecture` | FSD 공식 Next.js 구조(`_app`, `_pages`), 레이어 고르기, slice·세그먼트, `index.server.ts`·`@x` 공개 API, 라우트 파일, Steiger, Turborepo 패키지 경계와 entity 승격 |
-| `tailwind-shadcn` | `/tailwind-shadcn` | Tailwind v4 클래스와 `cn()`, `@theme` 토큰, shadcn primitive·도메인 UI 소유권 |
-| `react-conventions` | `/react-conventions` | 파일·타입 이름(`Props`, `Request`, `Schema`, 종류 접미사 없는 타입), `interface`/`type`, `enum` 대신 union, 화살표 함수 컴포넌트와 named export(default export는 라우트 파일만), 컴포넌트 안 순서, `'use client'` 범위, import 순서 |
-| `data-and-forms` | `/data-and-forms` | typed API wrapper, TanStack Query `queryOptions` 팩토리·mutation 훅 이름, RSC prefetch와 `HydrationBoundary`, 무효화 범위, Zod·React Hook Form 폼과 API 에러 표시 |
+| `nextjs-fsd-architecture` | `/nextjs-fsd-architecture` | FSD 공식 Next.js 구조(`_app`, `_pages`), 레이어 고르기, slice·세그먼트, `index.server.ts`·`@x` 공개 API, 라우트 파일(얇은 오류·404 라우트와 독립 global-error), 조건부 공개 모킹 flag 예외, Steiger, Turborepo 패키지 경계와 entity 승격 |
+| `tailwind-shadcn` | `/tailwind-shadcn` | Tailwind v4 클래스와 `cn()`, `@theme` 토큰, 공통 UI(`shared/ui`)·도메인 UI 소유권 |
+| `react-conventions` | `/react-conventions` | 파일·타입 이름(`Props`, `Request`, `Schema`, 종류 접미사 없는 타입), `interface`/`type`, `enum` 대신 union, 화살표 함수 컴포넌트와 named export(default export는 라우트 파일만), 컴포넌트 안 순서, `'use client'` 범위, import 순서. **(lint)**는 대상 레포 설정에 규칙이 켜져 있을 때만 자동 검사로 인정 |
+| `data-and-forms` | `/data-and-forms` | 실제 HTTP 오류·401 계약 확인, typed API wrapper, TanStack Query `queryOptions` 팩토리·mutation 훅 이름, RSC prefetch와 `HydrationBoundary`, 무효화 범위, Zod·React Hook Form 폼과 API 에러 표시 |
 | `react-best-practices` | `/react-best-practices` | React/Next.js 성능 규칙 70개. 요청 워터폴, 번들 크기, 서버 성능, 리렌더링, 렌더링, JavaScript 성능을 영향도 순으로 정리 (opt-in) |
 
 `react-best-practices`는 [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices) v1.0.0(MIT)을 옮겨 온 스킬입니다. 합본 문서(`AGENTS.md`)와 빌드용 파일은 빼고 규칙 파일만 가져왔습니다. FSD slice의 `index.ts` 공개 API, TanStack Query 등 프로젝트 컨벤션과 충돌하면 프로젝트 컨벤션을 따르도록 했습니다. 기본 그룹에 포함되지 않으므로 [동기화 설정](../sync-configuration.md#react-스킬-opt-in-전용)에서 직접 켜야 합니다.
