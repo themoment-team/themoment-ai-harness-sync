@@ -1,4 +1,4 @@
-import type { HarnessItem, SyncConfig } from '@/entities/harness-config';
+import type { HarnessItem, HarnessManifest, SyncConfig } from '@/entities/harness-config';
 
 export type SelectionState = {
   enabled: boolean;
@@ -10,15 +10,25 @@ export type SelectionState = {
   pinnedVersions?: Record<string, string>;
 };
 
-export function createSelectionState(config: SyncConfig, itemIds: string[]): SelectionState {
+export function createSelectionState(
+  config: SyncConfig,
+  itemIds: string[],
+  manifest: HarnessManifest,
+): SelectionState {
+  // manifest에서 사라진 항목의 override는 설정 PR 검증에 걸리므로 처음 읽을 때 버린다
+  const knownItemIds = new Set(manifest.items.map((item) => item.id));
+  const overrides = Object.fromEntries(
+    Object.entries(config.overrides).filter(([itemId]) => knownItemIds.has(itemId)),
+  );
+
   return {
     enabled: config.enabled,
     mode: config.mode,
     itemIds,
     groups: config.groups,
-    overrides: config.overrides,
+    overrides,
     pinnedVersions: Object.fromEntries(
-      Object.entries(config.overrides).filter(
+      Object.entries(overrides).filter(
         (entry): entry is [string, string] => typeof entry[1] === 'string',
       ),
     ),

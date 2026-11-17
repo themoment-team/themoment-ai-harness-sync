@@ -80,6 +80,7 @@ describe('setItemsSelected', () => {
         overrides: { 'claude/skills/a': 'v1' },
       },
       ['claude/skills/a'],
+      { defaults: ['claude'], items },
     );
 
     const cleared = setItemsSelected(state, items, false);
@@ -102,6 +103,7 @@ describe('switchToFixedSelection', () => {
         overrides: { 'claude/skills/the-sdk': 'v1' },
       },
       ['claude/skills/the-sdk'],
+      { defaults: ['claude'], items },
     );
 
     const fixed = switchToFixedSelection(state, ['claude/skills/the-sdk']);
@@ -110,5 +112,24 @@ describe('switchToFixedSelection', () => {
     const roundTrip = setItemsSelected(setItemsSelected(fixed, items, false), items, true);
     expect(roundTrip.itemIds).toEqual(['claude/skills/the-sdk']);
     expect(roundTrip.overrides).toEqual({ 'claude/skills/the-sdk': 'v1' });
+  });
+});
+
+describe('createSelectionState', () => {
+  it('매니페스트에서 삭제된 항목의 override는 버린다', () => {
+    const items = [{ id: 'claude/skills/a', src: '', dest: '', groups: ['claude'] }];
+    const state = createSelectionState(
+      {
+        enabled: true,
+        mode: 'automatic',
+        groups: ['claude'],
+        overrides: { 'claude/skills/a': 'v1', 'claude/skills/removed': false },
+      },
+      ['claude/skills/a'],
+      { defaults: ['claude'], items },
+    );
+
+    expect(state.overrides).toEqual({ 'claude/skills/a': 'v1' });
+    expect(state.pinnedVersions).toEqual({ 'claude/skills/a': 'v1' });
   });
 });

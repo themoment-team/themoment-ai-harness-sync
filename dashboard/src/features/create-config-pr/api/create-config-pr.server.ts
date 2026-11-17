@@ -185,12 +185,14 @@ function buildPullRequestBody(input: {
   content: string;
   currentItemIds: string[];
   selectedItemIds: string[];
+  staleOverrideIds: string[];
 }): string {
   const added = input.selectedItemIds.filter((itemId) => !input.currentItemIds.includes(itemId));
   const removed = input.currentItemIds.filter((itemId) => !input.selectedItemIds.includes(itemId));
   const changes = [
     ...added.map((itemId) => `- 추가: \`${itemId}\``),
     ...removed.map((itemId) => `- 제거: \`${itemId}\``),
+    ...input.staleOverrideIds.map((itemId) => `- 정리: \`${itemId}\` (매니페스트에서 삭제된 항목)`),
   ];
 
   return [
@@ -270,6 +272,9 @@ export async function createConfigPullRequest(
       content,
       currentItemIds: dashboard.selectedItemIds,
       selectedItemIds,
+      staleOverrideIds: Object.keys(dashboard.config.overrides).filter(
+        (itemId) => !knownItemIds.has(itemId),
+      ),
     }),
   });
 }

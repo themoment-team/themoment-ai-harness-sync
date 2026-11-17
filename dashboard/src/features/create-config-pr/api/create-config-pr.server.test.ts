@@ -87,4 +87,58 @@ describe('createConfigPullRequest', () => {
 
     expect(createReference).not.toHaveBeenCalled();
   });
+
+  it('매니페스트에서 삭제된 override를 정리하면 PR 본문에 표시한다', async () => {
+    const createPullRequest = vi.fn(async () => ({
+      url: 'https://github.com/acme/api/pull/13',
+      number: 13,
+    }));
+
+    await createConfigPullRequest(
+      {
+        owner: 'acme',
+        repo: 'api',
+        userToken: 'user-token',
+        config: {
+          enabled: true,
+          mode: 'automatic',
+          itemIds: ['claude/skills/api-design'],
+          groups: ['claude'],
+          overrides: {},
+        },
+      },
+      {
+        getDashboardData: async () => ({
+          repository: { fullName: 'acme/api', installationId: 3, defaultBranch: 'main' },
+          manifest: {
+            defaults: ['claude'],
+            items: [
+              { id: 'claude/skills/api-design', src: 'source', dest: 'dest', groups: ['claude'] },
+            ],
+          },
+          config: {
+            enabled: true,
+            mode: 'automatic',
+            groups: ['claude'],
+            overrides: { 'claude/skills/removed': false },
+          },
+          syncConfigSource:
+            'enabled: true\ngroups:\n  - claude\noverrides:\n  claude/skills/removed: false\n',
+          selectedItemIds: ['claude/skills/api-design'],
+        }),
+        findOpenConfigPullRequest: async () => null,
+        createReference: vi.fn(),
+        writeSyncConfig: vi.fn(),
+        createPullRequest,
+      },
+    );
+
+    expect(createPullRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: expect.stringContaining(
+          '- 정리: `claude/skills/removed` (매니페스트에서 삭제된 항목)',
+        ),
+      }),
+    );
+  });
 });

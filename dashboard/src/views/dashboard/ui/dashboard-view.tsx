@@ -84,7 +84,7 @@ export function DashboardView() {
         );
 
       setDashboardData(body);
-      setSelection(createSelectionState(body.config, body.selectedItemIds));
+      setSelection(createSelectionState(body.config, body.selectedItemIds, body.manifest));
       setDataState('ready');
     } catch (caughtError) {
       setDataState('error');
