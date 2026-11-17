@@ -88,7 +88,8 @@ describe('createConfigPullRequest', () => {
     expect(createReference).not.toHaveBeenCalled();
   });
 
-  it('매니페스트에서 삭제된 override를 정리하면 PR 본문에 표시한다', async () => {
+  it('매니페스트에서 삭제된 override는 막지 않고 파일에서 정리한 뒤 PR 본문에 표시한다', async () => {
+    const writeSyncConfig = vi.fn();
     const createPullRequest = vi.fn(async () => ({
       url: 'https://github.com/acme/api/pull/13',
       number: 13,
@@ -104,7 +105,8 @@ describe('createConfigPullRequest', () => {
           mode: 'automatic',
           itemIds: ['claude/skills/api-design'],
           groups: ['claude'],
-          overrides: {},
+          // 수정 전 화면은 오래된 override를 그대로 보낸다
+          overrides: { 'claude/skills/removed': false },
         },
       },
       {
@@ -128,11 +130,14 @@ describe('createConfigPullRequest', () => {
         }),
         findOpenConfigPullRequest: async () => null,
         createReference: vi.fn(),
-        writeSyncConfig: vi.fn(),
+        writeSyncConfig,
         createPullRequest,
       },
     );
 
+    expect(writeSyncConfig).toHaveBeenCalledWith(
+      expect.objectContaining({ content: expect.not.stringContaining('claude/skills/removed') }),
+    );
     expect(createPullRequest).toHaveBeenCalledWith(
       expect.objectContaining({
         body: expect.stringContaining(

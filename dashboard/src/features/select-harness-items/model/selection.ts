@@ -1,4 +1,9 @@
-import type { HarnessItem, HarnessManifest, SyncConfig } from '@/entities/harness-config';
+import {
+  type HarnessItem,
+  type HarnessManifest,
+  splitStaleOverrides,
+  type SyncConfig,
+} from '@/entities/harness-config';
 
 export type SelectionState = {
   enabled: boolean;
@@ -15,11 +20,8 @@ export function createSelectionState(
   itemIds: string[],
   manifest: HarnessManifest,
 ): SelectionState {
-  // manifest에서 사라진 항목의 override는 설정 PR 검증에 걸리므로 처음 읽을 때 버린다
-  const knownItemIds = new Set(manifest.items.map((item) => item.id));
-  const overrides = Object.fromEntries(
-    Object.entries(config.overrides).filter(([itemId]) => knownItemIds.has(itemId)),
-  );
+  // manifest에서 사라진 항목의 override는 화면과 설정 PR에 남기지 않는다
+  const { overrides } = splitStaleOverrides(manifest, config.overrides);
 
   return {
     enabled: config.enabled,
