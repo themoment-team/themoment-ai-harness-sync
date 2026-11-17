@@ -193,7 +193,9 @@ function buildPullRequestBody(input: {
   const changes = [
     ...added.map((itemId) => `- 추가: \`${itemId}\``),
     ...removed.map((itemId) => `- 제거: \`${itemId}\``),
-    ...input.staleOverrideIds.map((itemId) => `- 정리: \`${itemId}\` (매니페스트에서 삭제된 항목)`),
+    ...input.staleOverrideIds.map(
+      (itemId) => `- 정리: \`${itemId}\` (매니페스트에 없는 항목 또는 버전)`,
+    ),
   ];
 
   return [

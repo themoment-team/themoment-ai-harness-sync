@@ -80,7 +80,10 @@ describe('setItemsSelected', () => {
         overrides: { 'claude/skills/a': 'v1' },
       },
       ['claude/skills/a'],
-      { defaults: ['claude'], items },
+      {
+        defaults: ['claude'],
+        items: [...items, { id: 'claude/skills/a@v1', src: '', dest: '', groups: [] }],
+      },
     );
 
     const cleared = setItemsSelected(state, items, false);
@@ -103,7 +106,10 @@ describe('switchToFixedSelection', () => {
         overrides: { 'claude/skills/the-sdk': 'v1' },
       },
       ['claude/skills/the-sdk'],
-      { defaults: ['claude'], items },
+      {
+        defaults: ['claude'],
+        items: [...items, { id: 'claude/skills/the-sdk@v1', src: '', dest: '', groups: [] }],
+      },
     );
 
     const fixed = switchToFixedSelection(state, ['claude/skills/the-sdk']);
@@ -126,7 +132,10 @@ describe('createSelectionState', () => {
         overrides: { 'claude/skills/a': 'v1', 'claude/skills/removed': false },
       },
       ['claude/skills/a'],
-      { defaults: ['claude'], items },
+      {
+        defaults: ['claude'],
+        items: [...items, { id: 'claude/skills/a@v1', src: '', dest: '', groups: [] }],
+      },
     );
 
     expect(state.overrides).toEqual({ 'claude/skills/a': 'v1' });
