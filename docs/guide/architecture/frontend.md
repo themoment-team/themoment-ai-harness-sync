@@ -98,6 +98,7 @@ packages/core/src:   widgets → features → entities → shared
 - Turborepo의 Tailwind `@source`는 클래스가 들어 있는 모든 패키지(core, 기존 UI 패키지)를 가리켜야 합니다. 빠지면 빌드 오류 없이 클래스가 CSS에서 사라집니다. 컴포넌트를 담는 패키지는 앱과 같은 DOM 테스트 환경(jsdom 등)을 씁니다.
 - API 호출은 프로젝트의 typed HTTP wrapper를 사용합니다. URL 상수와 `queryOptions` 기반 query 팩토리(`<리소스>Queries`)는 소유 entity의 `api/`에, mutation 훅은 동작을 맡는 feature의 `api/`에 둡니다. 컴포넌트는 팩토리 옵션을 `useQuery`에 바로 넘기고, mutation 훅은 HTTP 메서드가 아니라 동작으로 이름 짓습니다(`useUpdateProfile`).
 - TanStack Query key는 `all()` 루트의 계층 factory로 만들고, mutation은 영향받는 가장 좁은 key만 무효화합니다.
+- 서버에서 앞 결과로 다음 요청을 만들 때는 `fetchQuery`로 값을 받고(`prefetchQuery` 뒤 `getQueryData`로 꺼내지 않습니다), 캐시에 없는 여러 query를 Suspense로 읽을 때는 `useSuspenseQueries`로 묶거나 컴포넌트를 나눕니다.
 - Zod schema는 `PascalCaseSchema`, 추론 request type은 `Request` 접미사를 씁니다. 그 밖의 타입에는 `Type` 같은 종류 접미사를 붙이지 않고(`User`, `UserResponse`), `src` 안의 모듈은 named export만 씁니다(default export는 `app/` 라우트와 설정 파일에만). `enum`보다 union과 `Record<Union, Metadata>`를 우선합니다.
 
 ## 환경 변수와 조건부 모킹
