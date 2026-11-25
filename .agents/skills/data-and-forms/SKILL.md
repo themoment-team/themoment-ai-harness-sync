@@ -87,6 +87,7 @@ export const UserDetails = ({ userId }: { userId: string }) => {
 - Add per-screen options by spreading: `useQuery({ ...userQueries.detail(id), select: (user) => user.nickname, enabled: Boolean(id) })`.
 - Write a custom read hook only when it carries logic: combining queries, a derived value that always comes with the data, or wiring to other hooks such as the router or auth state. Use the factory options inside it.
 - To fetch ahead without rendering the data (for example on link hover), call `queryClient.prefetchQuery(userQueries.detail(id))` from the event handler instead of mounting `useQuery`.
+- With Suspense, read several queries in one component through `useSuspenseQueries`, or give each `useSuspenseQuery` its own child component under the Suspense boundary. Sibling `useSuspenseQuery` calls in one component suspend one at a time, so each request starts only after the previous one resolves.
 
 ## RSC prefetch and HydrationBoundary
 
@@ -142,6 +143,18 @@ Fetch first-screen data on the server and put it in the client cache.
 - `await` the prefetch unless the project's QueryClient is configured to dehydrate pending queries.
 - `getQueryClient()` returns a new instance per call on the server. Call it once per page component and use that instance for both prefetch and dehydrate. On the browser it returns a singleton.
 - `prefetchQuery` does not throw. On failure the client hook requests again and exposes the error through `error`.
+- When the server needs one result to build the next request, get it with `fetchQuery` (or `ensureQueryData` to reuse fresh cached data), using the same spread options. It returns the data and fills the same cache that is dehydrated. Do not call `prefetchQuery` and then read the value back with `getQueryData`; a failed prefetch leaves nothing to read. Unlike `prefetchQuery`, `fetchQuery` throws on failure, so handle it explicitly: call `notFound()` for a missing resource or let the error boundary take the rest. A 401 also throws here instead of falling back to the client retry described below, so when the chain can hit 401, leave the dependent part to a client component. Await only that dependent chain; start independent prefetches before it and await them together with `Promise.all`.
+
+  ```tsx
+  const post = await queryClient.fetchQuery({
+    ...postQueries.detail(id),
+    queryFn: () => getPostOnServer(id),
+  });
+  await queryClient.prefetchQuery({
+    ...userQueries.detail(post.authorId),
+    queryFn: () => getUserOnServer(post.authorId),
+  });
+  ```
 - Why `queryFn` is replaced: browser and server use different transports and authentication contexts (for example, a relative proxy path in the browser versus an absolute base URL and per-request cookies on the server). Use the project's actual transport configuration. A Server Component cannot write refreshed cookies, so the server prefetch must not refresh tokens; its HTTP instance may still share error normalization with the browser instance. A server prefetch that fails with 401 is not dehydrated, so the client retries through the browser instance and its 401 handling.
 - `getQueryClient` is shared by server and client code, so the client API module must not import `server-only` code or server environment variables.
 
